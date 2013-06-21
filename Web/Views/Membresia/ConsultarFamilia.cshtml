@@ -1,0 +1,84 @@
+﻿@model Web.Models.Familia
+@using Web.Models
+@{
+    ViewBag.Title = "Consultar información de familia";
+}
+
+<h1>@ViewBag.Title</h1>
+
+<div id="kendo-table">
+    @(Html.Kendo().Grid<Web.Models.Familia>()
+        .Name("Grid")
+        .Columns(columns =>
+        {
+            columns.Bound(p => p.id);
+            //columns.Bound(p => p.usuario.nomUsuario);
+            columns.Bound(p => p.tipo);
+            columns.Bound(p => p.socioTitular.persona.nombre);
+            columns.Bound(p => p.socioTitular.persona.id);
+            columns.Bound(p => p.saldo);
+        }
+        )
+        .Pageable()
+        .Sortable()
+        .Filterable(filterable => filterable
+        .Operators(operators => operators
+            .ForString(str => str.Clear()
+                .Contains("Contiene")
+                .StartsWith("Empezar con")
+                .IsEqualTo("Es igual a")
+                .IsNotEqualTo("Diferente a"))
+            .ForNumber(number => number.Clear()
+                .IsGreaterThan("Es mayor a")
+                .IsLessThan("Es menor a")
+                .IsEqualTo("Es igual a")
+                .IsNotEqualTo("Es diferente a"))
+        ))
+        .ClientDetailTemplateId("template")
+        .DataSource(d => d.Ajax()
+            .Read(r => r.Action("leerFamilias", "Membresia"))
+            .Events(events => events.Error("ErrorMessage"))
+            .Model(m => m.Id(p => p.id))
+        )
+
+    ) 
+</div>
+
+<script id="template" type="text/kendo-tmpl">
+    @(Html.Kendo().Grid<Web.Models.Socio>()
+            .Name("grid_#=id#")
+            .Columns(columns =>
+            {
+                columns.Bound(o => o.persona.id).EditorTemplateName("Id");
+                columns.Template(@<text>@item.persona.nombre @item.persona.apPaterno @item.persona.apMaterno</text>).ClientTemplate(" \\#=persona.nombre\\# \\#=persona.apPaterno\\# \\#=persona.apMaterno\\#").Title("Nombres");
+                columns.Template(@<text>
+                            @Html.ActionLink("edit", "EditarSocio", "Membresia", new { id = @item.persona.id }, new {@class = "k-button" })
+                            </text>).ClientTemplate(@Html.ActionLink("Modificar", "EditarSocio", "Membresia", new { ID = "\\#=persona.id\\#" }, new { @class = "k-button" }).ToHtmlString()).Width(50);
+            })
+            .DataSource(dataSource => dataSource
+                .Ajax()
+                .PageSize(5)
+                .Read(read => read.Action("LeerSocios", "Membresia", new { Id = "#=id#" }))
+            )
+            .Selectable()
+            .Pageable()
+            .Sortable()
+            .ToClientTemplate()
+    )
+</script>
+
+
+<script type="text/javascript">
+    function ErrorMessage(e) {
+        alert("A ocurrido un error en el servidor!\nVuelva a intentar la operación en unos minutos...");
+    }
+    function EditarSocio(e) {
+        e.preventDefault();
+        var grid = $('#grid_inside').data('kendoGrid');
+        var row = grid.select();
+        var dataItem = grid.dataItem(row);
+        var id = dataItem.id;
+        alert("Id = " + id);
+        //location = "@Url.Action("Editar")" + "?persona.id=" + id;
+    }
+</script>

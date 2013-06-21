@@ -1,0 +1,278 @@
+﻿@model Web.Models.SolicitudMembresia
+@using Web.Models
+@{
+    ViewBag.Title = "Solicitudes de Membresía";
+}
+
+<h2>Ver Solicitudes De Membresia</h2>
+
+<fieldset>
+<legend>Formulario Solicitud de Membresia</legend>
+
+@using (Html.BeginForm("InsertarSolicitud", "SolicitudMembresia", FormMethod.Post,new {@id = "Form" }))
+{
+    <form id="myform">
+    <ul>
+        <li>
+               <div class="editor-label">@Html.LabelFor(p => p.id)</div>
+                @Html.TextBoxFor(p => p.id, new { @readonly = "readonly" })
+            </li><li>
+
+    <div class="editor-label">
+            @Html.LabelFor(p => p.dni)
+    </div> 
+        
+         @if (Model == null || Model.estado == null || Model.estado.Equals("Pendiente"))
+        {             
+           @Html.TextBoxFor(p => p.dni)
+        }
+        else
+        {
+        @Html.TextBoxFor(p => p.dni, new { @readonly = "readonly" })
+         
+        }
+
+
+    </li><li>
+    <div class="editor-label">
+        @Html.LabelFor(p => p.nombre) 
+    </div> 
+       @if (Model == null || Model.estado == null || Model.estado.Equals("Pendiente"))
+        {
+            @Html.TextBoxFor(p => p.nombre) 
+            
+        }
+       else
+       {
+
+       @Html.TextBoxFor(p => p.nombre, new { @readonly = "readonly" })
+       }
+
+
+    </li><li>
+    <div class="editor-label">
+        @Html.LabelFor(p => p.apPaterno) 
+    </div> 
+                @if (Model == null || Model.estado == null || Model.estado.Equals("Pendiente"))
+                {
+            @Html.TextBoxFor(p => p.apPaterno) 
+                }
+                else
+                {
+                @Html.TextBoxFor(p => p.apPaterno, new { @readonly = "readonly" })
+       
+                }
+
+    </li><li>
+    <div class="editor-label">
+        @Html.LabelFor(p => p.apMaterno) 
+    </div> 
+              @if (Model == null || Model.estado == null || Model.estado.Equals("Pendiente"))
+               {
+           @Html.TextBoxFor(p => p.apMaterno) 
+               }
+               else
+               {
+                @Html.TextBoxFor(p => p.apMaterno, new { @readonly = "readonly" })
+        
+               }
+
+    </li><li>
+    <div class="editor-label">
+        @Html.LabelFor(p => p.correo) 
+    </div> 
+            @if (Model == null || Model.estado == null || Model.estado.Equals("Pendiente"))
+            {
+              @Html.TextBoxFor(p => p.correo)
+            }
+            else
+            {
+            @Html.TextBoxFor(p => p.correo, new { @readonly = "readonly" })
+     
+            }
+
+    </li><li>
+
+     @Html.TextBoxFor(p => p.fechaRegistro, "", new { style = "display:none" })
+
+    </li><li>
+       @if (Model == null || Model.estado == null || Model.estado.Equals("Pendiente"))
+      {
+             @Html.TextBoxFor(p => p.estado, "", new { style = "display:none;" })
+      }
+      else
+      {
+            @Html.TextBoxFor(p => p.estado, new { @readonly = "readonly" })
+   
+      }
+    </li></ul>
+
+    <div id="botones">                                          
+            <input type="button" value="Nuevo" id="Nuevo" onclick="location.href = '@(Url.Action("VerSolicitudesDeMembresia", "SolicitudMembresia"))'" />
+            <input  name="submit" type="submit" id = "modificar" value=@(Model == null || Model.id == 0 ? "Insertar" : "Modificar") />
+            @if (Model != null && Model.estado != null && Model.estado.Equals("Pendiente"))
+            {
+            <input name="submit" type="submit" id = "acpetar" value= "Aceptar"/>
+            <input name="submit" type="submit" id = "rechazar" value= "rechazar"/>
+                
+            }
+     </div>
+
+         @if (ViewData["message"] == null)
+         { }                                                                                                         
+         else if (ViewData["message"].Equals("F"))
+         {<script type="text/javascript">              alert("Lo sentimos!\nNo se pudo realizar la operación.\nVuelva intentarlo en otro momento. ")</script> }
+         else if (ViewData["message"].Equals("E"))
+         { <script type="text/javascript">               alert("La operación se realizó con éxito!")</script>} 
+   </form>  
+}
+
+</fieldset>
+
+<div id="kendotable">
+@(Html.Kendo().Grid<Web.Models.SolicitudMembresia>()
+    .Name("Grid")
+    .Columns(columns =>
+    {
+        //       columns.Bound(p => p.dni).Sortable(true);
+        //.Filterable(filterable => filterable.UI("dniFiltro"));
+        columns.Bound(p => p.nombre);
+        columns.Bound(p => p.apPaterno);
+        //      columns.Bound(p => p.apMaterno);
+        //       columns.Bound(p => p.correo);
+        columns.Bound(p => p.fechaRegistro).Title("fechaRegistro").Width(70).Format("{0:dd/MM/yyyy}");
+        columns.Bound(p => p.estado);
+        columns.Command(c => { c.Custom("Editar").Click("EditarSolicitud"); c.Destroy().Text("Eliminar"); });
+
+
+    })
+    .Editable(editable => { editable.Mode(GridEditMode.InLine); editable.DisplayDeleteConfirmation("El regitro será eliminado ¿Desea continuar?"); })
+    .Filterable(filterable => filterable
+            .Extra(false)
+            .Operators(operators => operators
+                .ForString(str => str.Clear()
+                    .Contains("Contiene")
+                    .StartsWith("Empezar con")
+                    .IsEqualTo("Es igual a")
+                    .IsNotEqualTo("Diferente a"))
+                .ForNumber(number => number.Clear()
+                    .IsGreaterThan("Es mayor a")
+                    .IsLessThan("Es menor a")
+                    .IsEqualTo("Es igual a")
+                    .IsNotEqualTo("Es diferente a")))
+                )
+                .Pageable()
+                .DataSource(datasource => datasource
+                                          .Ajax()
+                                          .Events(events => events.Error("ErrorMessage"))
+                                          .Read(read => read.Action("getSolicitudesDeMembresia", "SolicitudMembresia"))
+                                          .Model(m => m.Id(p => p.id))
+                                          .Destroy(p => p.Action("EliminarSolicitud", "SolicitudMembresia"))
+                                          )
+                                          .Selectable()
+                  )
+    </div>
+
+
+<script type="text/javascript">
+    function dniFiltro(element) {
+        element.kendoDropDownList({
+            dataSource: {
+                transport: {
+                    read: "@Url.Action("/FilterMenuCustomization_dni")"
+                    }
+            },
+            optionLabel: "--Select Value--"
+        });
+    }
+
+  </script>
+
+  <script type="text/javascript">
+    function EditarSolicitud(e) {
+        e.preventDefault();
+        var grid = $('#Grid').data('kendoGrid');
+        var row = grid.select();
+        var dataItem = grid.dataItem(row);
+        var id = dataItem.id;
+        location = "@Url.Action("EditarSolicitud")" + "?id=" + id;
+    }
+</script>
+
+  <script type="text/javascript">
+    function AceptarSolicitud(e) {
+        e.preventDefault();
+        location = "@Url.Action("AceptarSolicitud")" + "?id=" + id;
+    }
+</script>
+
+ <script type="text/javascript">
+    // validate signup form on keyup and submit  
+$("#Form").validate({
+		rules: {
+			dni: {
+                required: true,
+                digits: true,
+                maxlength:8,
+                minlength:8
+            },
+			nombre: {
+                required: true,
+                maxlength: 50
+            },
+            apPaterno: {
+                required: true,
+                maxlength: 50
+            },
+			apMaterno:{
+                required: true,
+                maxlength: 50
+            },
+            correo   : {
+				required: true,
+                email: true
+			}
+
+		},
+		messages: {
+            dni : {
+                required: "*Campo obligatorio",
+                digits: "Ingrese solo dígitos",
+                maxlength: "Ingrese 8 dígitos",
+                minlength: "Ingrese 8 dígitos"
+            },
+			nombre: {
+                required: "*Campo obligatorio",
+                maxlength: "Tamaño máx. 50 caracteres"
+            },
+			apPaterno:{
+                required: "*Campo obligatorio",
+                maxlength: "Tamaño máx. 50 caracteres"
+            },
+			apMaterno: {
+                required: "*Campo obligatorio",
+                maxlength: "Tamaño máx. 50 caracteres"
+            },
+            correo: {
+				required: "*Campo obligatorio",
+                digits: "Formato inválido"
+			}
+		},
+        submitHandler: function ConfirmationBox(form) {
+        var result = confirm("¿Está seguro de realizar los cambios?");
+        if (result == true) {
+            form.submit();
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+		
+});
+
+function ErrorMessage(e) {
+    alert("A ocurrido un error en el servidor!\nVuelva a intentar la operación en unos minutos...");
+}
+</script>
+

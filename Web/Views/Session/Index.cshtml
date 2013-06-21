@@ -1,0 +1,71 @@
+﻿@model Web.Models.Login
+
+@{
+    ViewBag.Title = "Login";
+}
+<h1>Login</h1>
+<fieldset>
+        <legend>Formulario de inicio de sesión</legend>
+        <form ="form" action = "../Session/login" method = post id="form">
+        <ul>
+            <li class="center">
+                @Html.LabelFor(m => m.usuario) 
+                @Html.TextBoxFor(m => m.usuario)
+                
+            </li><li class="center">
+                @Html.LabelFor(m => m.contrasena)
+                @Html.PasswordFor(m => m.contrasena)
+                
+            @*</li><li>
+                @Html.CheckBoxFor(m => m.RememberMe)
+                @Html.LabelFor(m => m.RememberMe, new { @class = "checkbox" })*@
+            </li>
+        </ul>
+        <div id="botones-center"><input type="submit" value="Iniciar sesión"/></div>
+    @if (ViewData["message"] == null)
+    { }
+    else if (ViewData["message"].Equals("F"))
+    { <script type= "text/javascript">alert("El usuario o la contraseña son incorrectos ")</script>}
+    else if (ViewData["message"].Equals("FF"))
+    { <script type= "text/javascript"> alert("Lo sentimos!\n No se pudo realizar la operacion\nVuelva a intentarlo en otro momento. ")</script>}                                                                                     
+      </form>
+    </fieldset>
+
+    <script type="text/javascript">
+
+        $("#form").validate({
+            rules: {
+                usuario: {
+                    required: true,
+                    digits:true
+                },
+                contrasena: {
+                    required: true
+                }
+            },
+
+            messages: {
+                usuario: {
+                    required: "*Campo obligatorio", 
+                    digits: "Ingrese solo dígitos"
+                },
+                contrasena: {
+                    required: "*Campo obligatorio"
+                }
+            },
+
+            submitHandler: function(form) {
+                    form.submit();		
+            }
+//            submitHandler: function ConfirmationBox(form) {
+//                var result = confirm("¿Está seguro de realizar los cambios?");
+//                if (result == true) {
+//                    form.submit();
+//                    return true;
+//                }
+//                else {
+//                    return false;
+//                }
+//            }
+        });
+</script>

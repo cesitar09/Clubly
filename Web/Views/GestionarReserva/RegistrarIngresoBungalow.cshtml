@@ -1,0 +1,75 @@
+﻿@{
+    ViewBag.Title = "Registrar Ingreso A Bungalow";
+}
+
+<h1>@ViewBag.Title</h1>
+<div id="kendotable">
+    @(Html.Kendo().Grid<Web.Models.ReservaBungalow>()
+        .Name("TablaReservaBungalow")
+        .Columns(columns =>
+        {
+            columns.Bound(r => r.id);
+            columns.Bound(p => p.familia.id).Title("Codigo de Familia");
+            columns.Bound(p => p.fechaInicio).Format("{0:dd/MM/yyyy}");
+            columns.Bound(p => p.fechaFin).Format("{0:dd/MM/yyyy}");
+            columns.Bound(p => p.estado);
+
+            columns.Template(P => P.estado).ClientTemplate("# if (estado == 'No Ingresado') { #" +
+                "<input type='button' value='Check In' onclick=\"Ingresar()\"/>" +
+                "# } else if (estado == 'Ingresado') { #" +
+                    "<input type='button' value='Check Out' onclick=\"Salir()\"/>" +
+                "# } #");
+
+        }
+        )
+        .Pageable()
+        .Sortable()
+        .Filterable(filterable => filterable
+        .Operators(operators => operators
+            .ForString(str => str.Clear()
+                .Contains("Contiene")
+                .StartsWith("Empezar con")
+                .IsEqualTo("Es igual a")
+                .IsNotEqualTo("Diferente a"))
+            .ForNumber(number => number.Clear()
+                .IsGreaterThan("Es mayor a")
+                .IsLessThan("Es menor a")
+                .IsEqualTo("Es igual a")
+                .IsNotEqualTo("Es diferente a"))
+        )
+       )
+       .DataSource(d => d.Ajax()
+                    .Read(r => r.Action("LeerReservasBungalows", "GestionarReserva"))
+            .Events(events => events.Error("MensajeError"))
+            .Model(m => m.Id(p => p.id))
+            )   
+            .Selectable()
+
+    )
+</div>
+<script type="text/javascript">
+
+    function MensajeError(e){
+        alert("A ocurrido un error en el servidor!\nVuelva a intentar la operación en unos minutos...");
+    }
+
+    function Ingresar() {
+        //e.preventDefault();
+        var grid = $('#TablaReservaBungalow').data('kendoGrid');
+        var row = grid.select();
+        var dataItem = grid.dataItem(row);
+        var id = dataItem.id;
+        location = "@Url.Action("RegistrarIngresoBungalow")" + "?id=" + id;
+    }
+
+    function Salir() {
+        //e.preventDefault();
+        var grid = $('#TablaReservaBungalow').data('kendoGrid');
+        var row = grid.select();
+        var dataItem = grid.dataItem(row);
+        var id = dataItem.id;
+        location = "@Url.Action("RegistrarSalidaBungalow")" + "?id=" + id;
+    }
+
+    
+</script>

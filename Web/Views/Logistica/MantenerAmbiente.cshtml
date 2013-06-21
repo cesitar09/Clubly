@@ -1,0 +1,217 @@
+﻿@model Web.Models.Ambiente
+@using Web.Models
+
+@{
+    ViewBag.Title = "Mantener ambiente";
+}
+
+<h1>@ViewBag.Title</h1>
+
+<fieldset>
+ <legend>Datos del Formulario</legend>  
+ @using (Html.BeginForm("agregarAmbiente", "Logistica", FormMethod.Post, new { @id = "Form" }))
+ {
+    <form>
+    <ul>
+        <li>
+            <div class="editor-label">@Html.LabelFor(p => p.id)</div>
+            @Html.TextBoxFor(p => p.id, new { @readonly = "readonly" })
+      
+        </li><li>
+            <div class="editor-label">@Html.LabelFor(p => p.nombre)</div>
+            @Html.TextBoxFor(p => p.nombre)
+        </li><li>
+            <div class="editor-label">@Html.LabelFor(p => p.area)</div>
+            @Html.TextBoxFor(p => p.area)
+        </li><li> 
+            @*-----------------SEDES----------------*@
+            <div class = "editor-label">   @Html.LabelFor(p => p.sede.nombre) </div>        
+          @(Html.Kendo().DropDownList()
+           .OptionLabel("--Seleccionar--")
+           .Name("sedeBox")
+           .DataTextField("nombre")
+           .DataValueField("id")
+           .AutoBind(true)
+           .BindTo(Sede.SeleccionarTodo())
+           .Value(Model != null && Model.sede != null ? Model.sede.id.ToString() : null)
+    )  
+    </li>
+    </ul>
+        @Html.TextBoxFor(p => p.estado, new { style = "display: none;" })
+        @Html.TextBoxFor(p => p.sede.id, new { style = "display: none;" })
+  <div id="botones">
+  <input type="button" value= "Limpiar"  id="cancel" onclick="location.href = '@(Url.Action("MantenerAmbiente", "Logistica"))'" class="button fright"/>
+  <input type="submit" value=@(Model == null || Model.id == 0 ? "Insertar" : "Modificar" ) />
+  </div>
+
+  
+         @if (ViewData["message"] == null)
+         { }                                                                                                         
+         else if (ViewData["message"].Equals("F"))
+         {<script type="text/javascript">alert("Lo sentimos!\nNo se pudo realizar la operación.\nVuelva intentarlo en otro momento. ")</script> }
+         else if (ViewData["message"].Equals("E"))
+         { <script type="text/javascript">alert("La operación se realizó con éxito!")</script>} 
+
+  </form> 
+ }
+  </fieldset>
+
+  <div id="kendotable">
+@(Html.Kendo().Grid<Web.Models.Ambiente>()
+    .Name("Grid")
+    .Columns(columns =>
+    {
+        columns.Bound(p => p.nombre).Width(180);
+            //.Filterable(filterable => filterable.UI("nombreFiltro"));
+        columns.Bound(p => p.area).Width(150);
+            //.Filterable(filterable => filterable.UI("areaFiltro"));
+        columns.Bound(p => p.sede.nombre).Width(180);
+        columns.Command(command => { command.Custom("Editar").Click("onChange"); command.Destroy().Text("Eliminar"); }).Width(181);
+
+    })
+     .Editable(editable => { editable.Mode(GridEditMode.InLine); editable.DisplayDeleteConfirmation("El regitro será eliminado ¿Desea continuar?"); })
+     .Pageable()
+     .Sortable()
+     .Filterable(filterable => filterable
+        .Operators(operators => operators
+            .ForString(str => str.Clear()
+                .Contains("Contiene")
+                .StartsWith("Empezar con")
+                .IsEqualTo("Es igual a")
+                .IsNotEqualTo("Diferente a"))
+            .ForNumber(number => number.Clear()
+                .IsGreaterThan("Es mayor a")
+                .IsLessThan("Es menor a")
+                .IsEqualTo("Es igual a")
+                .IsNotEqualTo("Es diferente a"))
+        )
+    )
+    .DataSource(datasource => datasource
+        .Ajax()
+        .Events(events => events.Error("ErrorMessage"))
+        .Model(model => model.Id(p => p.id))
+        .Read(read => read.Action("getAmbiente", "Logistica"))
+        .Destroy(update => update.Action("eliminarAmbiente", "Logistica"))
+                                    
+    )
+    .Selectable()
+)
+</div>
+
+<script type="text/javascript">
+
+$(document).ready(function() {
+var dropdownlist = $("#sedeBox").data("kendoDropDownList");
+        
+            $("#sede_id").val(dropdownlist.value());
+        dropdownlist.bind("change",function(e){ 
+            $("#sede_id").val(dropdownlist.value());            
+           //alert("idSede: "+dropdownlist.value()); 
+        });
+     
+    });
+
+$("#Form").validate({
+ignore: "",
+		rules: {
+            "sede.id":  {
+                required : true
+                },
+			nombre: {
+                required:true,
+                maxlength:50
+            },
+			area: {
+				required: true,
+                digits: true,
+                range:[0,200]
+			}
+		},
+		messages: {
+        "sede.id":  {
+                required : "Debe seleccionar una Sede"
+                },
+			nombre: {
+                required: "*Campo obligatorio",
+                maxlength: "Tamaño máx. 50 caracteres"
+                },			
+			area: {
+				required: "*Campo obligatorio",
+                digits: "Ingrese solo dígitos",
+                range:"Ingrese un numero entre 0 y 200"        
+			}
+		},
+        submitHandler: function ConfirmationBox(form) {
+        var result = confirm("¿Está seguro de realizar los cambios?");
+        if (result == true) {
+            form.submit();
+            return true;
+        }
+        else {
+            return false;
+            }
+        }
+		
+});
+
+    function ErrorMessage(e) {
+            alert("A ocurrido un error en el servidor!\nVuelva a intentar la operación en unos minutos...");
+    }
+
+$("#area").keydown(function (event) {
+    if (event.shiftKey) {
+        event.preventDefault();
+    }
+
+    if (event.keyCode == 46 || event.keyCode == 8) {
+    }
+    else {
+    if (event.keyCode < 95) {
+        if (event.keyCode < 48 || event.keyCode > 57) {
+            event.preventDefault();
+        }
+    }
+    else {
+    if (event.keyCode < 96 || event.keyCode > 105) {
+        event.preventDefault();
+}
+}
+}
+});
+
+function onChange(e){
+    e.preventDefault();
+    var grid = $('#Grid').data('kendoGrid');
+    var row = grid.select();
+    var dataItem = grid.dataItem(row);
+    var id = dataItem.id;
+    location = "@Url.Action("modificarAmbiente")" + "?id=" + id;
+}
+
+function nombreFiltro(element) {
+    element.kendoAutoComplete({
+        dataSource: {
+            transport: {
+                read: "@Url.Action("/FilterMenuCustomization_Nombre2")"
+            }
+        }
+    });
+}
+
+function areaFiltro(element) {
+    element.kendoAutoComplete({
+        dataSource: {
+            transport: {
+                read: "@Url.Action("/FilterMenuCustomization_Area")"
+            }
+        }
+    });
+}
+
+//function onAdditionalData() {
+//    return {
+//        text: $("#sedeComboBox").val()
+//    };
+//}
+
+</script>

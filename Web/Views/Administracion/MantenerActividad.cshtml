@@ -1,0 +1,112 @@
+﻿@model Web.Models.Actividad
+@using Web.Models
+@{
+    ViewBag.Title = "Mantener Actividad";
+}
+<h2>Mantener Actividades</h2>
+
+<form id="contact_form" method="post">	
+<fieldset>
+<legend>Datos de la actividad</legend>
+				<ul>
+					<li>
+						<label for="id">Id :</label>
+                         
+                            <input type="text" name="id" id="id" readonly>
+                        
+					</li><li>
+						<label for="nombre">Nombre :</label>
+                       
+                            <input type="text" name="nombre" id="nombre" required class="required">
+                        
+					</li><li>
+						<label for="tipoActividadId">Tipo :</label>
+                       
+                            @Html.DropDownList("idTipoActividad", new List<SelectListItem>
+                             {
+                                new SelectListItem{ Text="Clases", Value = "1" },
+                                new SelectListItem{ Text="Deportes", Value = "2" }
+                             })
+                        
+                         
+					</li><li>
+						<label for="precio">Precio :</label>
+                       
+                            <input type="text" name="precio" id="precio" required class="required">
+                        
+					</li><li>
+                        <label for="descripcion">Descripción :</label>
+                       
+                            <input type="text" name="descripcion" id="descripcion" required class="required">
+                        
+                    </li><li>
+						<label for="fechaInicio">Fecha inicio :</label>
+                        
+                            <input type="text" name="fechaInicio" id="fechaInicio" required class="required">
+                        
+					</li><li>
+						<label for="fechaFin">Fecha fin :</label>
+                        
+                            <input type="text" name="fechaFin" id="fechaFin" required class="required">
+                        
+					</li>
+				</ul>	
+				<input type="button" value="Guardar" id="save" name="submit" class="button fright" />
+                </fieldset>		
+			</form>
+            
+            
+           <div id="kendotable">
+@(Html.Kendo().Grid<Web.Models.Actividad>()
+    .Name("Grid")
+    .Columns(columns =>
+    {
+        columns.Bound(p => p.nombre).Sortable(true)
+            .Filterable(filterable => filterable.UI("nombreFiltro")).Title("Nombre");
+        columns.Bound(p => p.descripcion).Sortable(true) 
+            .Filterable(filterable => filterable.UI("montoFiltro")).Title("Descripcion");
+        columns.Bound(p => p.precio).Title("Precio");
+        columns.Bound(p => p.fechaInicio).Title("Fecha Inicio");
+        columns.Bound(p => p.fechaFin).Title("Fecha Fin");
+        columns.Bound(p => p.estado).Title("Estado");
+        columns.Bound(p => p.tipoActividad.nombre).Title("Tipo Actividad");
+    })
+    .Editable(editable => { editable.Mode(GridEditMode.InLine); editable.DisplayDeleteConfirmation("El regitro será eliminado ¿Desea continuar?"); })
+    .Filterable(filterable => filterable
+        .Extra(false)
+        .Operators(operators => operators
+            .ForString(str => str.Clear()
+                .StartsWith("Starts with")
+                .IsEqualTo("Is equal to")
+                .IsNotEqualTo("Is not equal to")
+            ))
+        )
+    .DataSource(datasource => datasource
+                                .Ajax()
+                                .Read(read => read.Action("getActividad", "Administracion"))
+                )
+)
+</div>
+
+
+<script type="text/javascript">
+    function nombreFiltro(element) {
+        element.kendoAutoComplete({
+            dataSource: {
+                transport: {
+                    read: "@Url.Action("/FilterActividadNombre")"
+                }
+            }
+        });
+    }
+
+    function montoFiltro(element) {
+        element.kendoAutoComplete({
+            dataSource: {
+                transport: {
+                    read: "@Url.Action("/FilterActividad_Precio")"
+                }
+            }
+        });
+    }
+</script>

@@ -1,0 +1,163 @@
+﻿@model Web.Models.ConceptoDePago
+@using Web.Models
+@{
+    ViewBag.Title = "Conceptos de Pago";
+}
+
+<h1>Mantener conceptos de pago</h1>
+
+<fieldset>
+ <legend>Datos del Formulario</legend>
+@using (Html.BeginForm("AñadirTipoDePago", "Administracion", FormMethod.Post, new {@id="Form" }))
+{
+    <form><ul>
+        <li>
+            <div class="editor-label">@Html.LabelFor(p => p.id)</div>
+         @Html.TextBoxFor(p => p.id, new { @readonly = "readonly" })
+        </li><li>
+        <div class="editor-label">@Html.LabelFor(p => p.nombre)</div>
+        @Html.TextBoxFor(p => p.nombre)
+       
+        </li><li>
+            <div class="editor-label">@Html.LabelFor(p => p.descripcion)</div>
+        @Html.TextBoxFor(p => p.descripcion)
+        
+        </li><li>
+        
+            <div class="editor-label">@Html.LabelFor(p => p.monto)</div>
+            @Html.TextBoxFor(p => p.monto)
+         
+         </li>
+         @Html.TextBoxFor(p => p.estado, new { @readonly = "readonly", style = "display: none;" })
+    </ul>
+    <div id="botones">
+    <input type="button" value= "Limpiar"  id="cancel" onclick="location.href = '@(Url.Action("CancelarTipoDePago", "Administracion"))'" class="button fright"/>
+    <input type="submit" value="Modificar") />
+    </div>
+</form>
+}
+  </fieldset>
+  
+<div id="kendotable">
+@(Html.Kendo().Grid<Web.Models.ConceptoDePago>()
+    .Name("Grid")
+    .Columns(columns =>
+    {
+        //columns.Bound(p => p.id);
+        columns.Bound(p => p.nombre).Sortable(true)
+            .Filterable(filterable => filterable.UI("nombreFiltro"));
+        columns.Bound(p => p.descripcion).Sortable(true)
+            .Filterable(filterable => filterable.UI("montoFiltro"));
+        columns.Bound(p => p.monto);
+        columns.Command(command => { command.Custom("Editar").Click("onChange"); }).Width(90);
+    })
+    .Filterable(filterable => filterable
+        .Extra(false)
+        .Operators(operators => operators
+            .ForString(str => str.Clear()
+                .StartsWith("Starts with")
+                .IsEqualTo("Is equal to")
+                .IsNotEqualTo("Is not equal to")
+            ))
+        )
+    .Pageable()
+        //.Selectable(selectable => selectable
+        //                    .Mode(GridSelectionMode.Single)).Events(events => events.Change("onChange"))
+    .Selectable()
+    .DataSource(datasource => datasource
+                                .Ajax()
+                                .Model(model => model.Id(p => p.id))
+                                .Read(read => read.Action("getConceptoPago", "Administracion"))
+                )
+)
+</div>
+
+
+<script type="text/javascript">
+jQuery.validator.addMethod("accept2", function(value, element, param) {
+  return value.match(new RegExp("^" + param + "$"));
+});
+
+$("#Form").validate({
+		rules: {
+			nombre: {
+                required : true,
+                maxlength : 50,
+                accept2: "[a-zA-Z]+"
+                },
+			descripcion:  {
+                required : true,
+                maxlength : 150
+                },
+			monto: {
+				required: true,
+                number: true,
+                range: [0,100000]
+			}
+		},
+		messages: {
+			nombre: {
+                required: "Ingrese un Nombre",
+                maxlength : "Sobrepaso el tamano maximo",
+                accept2 : "solo letras"
+                },
+			descripcion: {
+                required: "Ingrese un Nombre",
+                maxlength : "Sobrepaso el tamano maximo"
+                },
+			monto: {
+				required: "Ingrese un precio",
+                number: "Ingrese un numero valido",
+                range: "El precio esta fuera del rango de precios"
+			}
+		},
+		submitHandler: function(form) {
+            form.submit();
+		}
+		
+});
+
+
+//$("#monto").keydown(function (event) {
+//    if (event.shiftKey) {
+//        event.preventDefault();
+//    }
+//    if(event.keyCode == 139 || event.keyCode == 155 || event.keyCode == 39 || event.keyCode == 34)
+//    {
+//        event.preventDefault();
+//    }
+//});
+
+function onChange(e){
+        e.preventDefault();
+        var grid = $('#Grid').data('kendoGrid');
+        var row = grid.select();
+        var dataItem = grid.dataItem(row);
+        var id = dataItem.id;
+        location = "@Url.Action("EditarInscripcion")" + "?id=" + id;
+    }
+
+
+    function nombreFiltro(element) {
+        element.kendoAutoComplete({
+            dataSource: {
+                transport: {
+                    read: "@Url.Action("/FilterMenuCustomization_Nombre")"
+                }
+            }
+        });
+    }
+
+    function montoFiltro(element) {
+        element.kendoAutoComplete({
+            dataSource: {
+                transport: {
+                    read: "@Url.Action("/FilterMenuCustomization_Monto")"
+                }
+            }
+        });
+    }
+    
+
+
+</script>

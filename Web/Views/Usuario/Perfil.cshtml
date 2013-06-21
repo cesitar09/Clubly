@@ -1,0 +1,229 @@
+﻿@model Web.Models.Perfil
+@using Web.Models
+@{
+    ViewBag.Title = "Perfil";
+}
+
+<fieldset>
+    <legend>Datos de Perfil</legend>
+    @using (Html.BeginForm("InsertarPerfil", "Usuario", FormMethod.Post)){
+        <ul>
+            <li>
+                <div class="editor-label">@Html.LabelFor(p => p.id)</div>
+                @Html.TextBoxFor(p => p.id, new {@readonly = "readonly" })
+            </li><li>
+                <div class="editor-label">@Html.LabelFor(p => p.nombre)</div>
+                @Html.TextBoxFor(p => p.nombre)
+                @if (Model != null && Model.nombre == null)
+                {
+                    <div id="validacion">@Html.ValidationMessageFor(p => p.nombre)</div>
+                }
+            </li><li>
+                @*<div class="editor-label">@Html.LabelFor(p => p.descripcion)</div>
+                @Html.TextBoxFor(p => p.descripcion)
+                @if (Model != null && Model.descripcion == null)
+                {
+                    <div id="validacion">@Html.ValidationMessageFor(p => p.descripcion)</div>
+                }*@
+        </ul>
+        <div id="botones">
+            <input type="button" value="Agregar Permiso" id="AgregarPermiso" onclick="Javascript: AbrirPopup() "   />
+            <input type="button" value="Limpiar" id="Limpiar" onclick="location.href = '@(Url.Action("Perfil", "Usuario"))'" />
+            <input type="button" value="Guardar" onclick="Javascript: guardar() " />
+        </div>
+    }
+</fieldset>
+<div id="kendotable">
+@(Html.Kendo().Grid<Web.Models.Perfil>()
+    .Name("Grid")
+    .Columns(columns =>
+    {
+        columns.Bound(p => p.id).Sortable(true);
+        columns.Bound(p => p.nombre).Sortable(true).EditorTemplateName("Nombre");
+        //columns.Bound(p => p.descripcion).EditorTemplateName("Descripción");
+        columns.Command(p => { p.Custom("Modificar").Click("EditarPerfil"); p.Destroy().Text("Eliminar"); });
+
+    })
+    .Filterable(filterable => filterable
+        .Extra(false)
+        .Operators(operators => operators
+            .ForString(str => str.Clear()
+                .StartsWith("Starts with")
+                .IsEqualTo("Is equal to")
+                .IsNotEqualTo("Is not equal to")
+            ))
+        )
+    .ClientDetailTemplateId("template")
+    .HtmlAttributes(new { style = "height:430px;" })
+    .DataSource(datasource => datasource
+                                .Ajax()
+                                    .Read(read => read.Action("ObtenerPerfil", "Usuario"))
+                                    .Model(m => m.Id(p => p.id))
+                                    .PageSize(8)
+                                    .Destroy(a => a.Action("EliminarPerfil", "Usuario"))
+                )
+                .Selectable()
+                .Pageable()
+)
+</div>
+
+<script type="text/javascript">
+    function EditarPerfil(e) {
+        e.preventDefault();
+        var grid = $('#Grid').data('kendoGrid');
+        var row = grid.select();
+        var dataItem = grid.dataItem(row);
+        var id = dataItem.id;
+        location = "@Url.Action("EditarPerfil")" + "?id=" + id;
+    }
+</script>
+
+<script id="template" type="text/kendo-tmpl">
+    @(Html.Kendo().Grid<Web.Models.Permiso>()
+            .Name("grid_#=id#")
+            .Columns(columns =>
+            {
+                columns.Bound(o => o.id).EditorTemplateName("Id");
+                columns.Bound(o => o.descripcion).EditorTemplateName("Permisos");
+                
+            })
+            .DataSource(dataSource => dataSource
+                .Ajax()
+                .PageSize(5)
+                .Read(read => read.Action("ObtenerPermisosPorPerfil", "Usuario", new { Id = "#=id#" }))
+            )
+            .Pageable()
+            .Sortable()
+            .ToClientTemplate()
+    )
+</script>
+
+@(Html.Kendo().Window().Name("Permisos")
+    .Title("Permisos del Perfil")
+    .Visible(false)
+    .Modal(true)
+    .Draggable(true)
+    .Events(ev => ev.Close("onClose"))     
+)
+
+
+<script>
+        var models = new Array();
+        function onClose() {
+            var grid = $("#gridPermisos").data("kendoGrid");            
+            //find the selected models
+            grid.tbody
+                    .find(":checked")
+                    .closest("tr")
+                    .each(function () {
+                        models.push(grid.dataItem(this).id);
+                    });
+                }
+                function guardar() {
+                    var id = document.getElementById("id").value;
+                    var nombre = document.getElementById("nombre").value;
+                    var descripcion = document.getElementById("descripcion").value;
+                    $.ajax({
+                        url: '@Url.Action("GuardarPerfil")',
+                        type: 'POST',
+                        datatype: "json",
+                        traditional: true,
+                        data: {
+                            permisos: JSON.stringify(models),
+                            strid: JSON.stringify(id),
+                            strnombre: JSON.stringify(nombre),
+                            strdescripcion: JSON.stringify(descripcion)
+                        },
+                        success: function () { 
+                            models = [];
+                            window.alert("Su transacción completó satisfactoriamente"); 
+                            window.location.href = "/Usuario/Perfil";
+                        },
+                        error: function (event, request, settings) {
+                            models = [];
+                            window.alert("Ocurrió un error en su transacción");
+                        },
+                        timeout: 20000
+                    });
+                } 
+</script>
+
+
+<script type="text/x-kendo-template" id="template2">
+    @(Html.Kendo().Grid<Web.Models.Permiso>()
+            .Name("gridPermisos")
+            .Columns(columns =>
+            {
+                columns.Bound(o => o.descripcion).Title("Permisos");
+                columns.Bound(o => o.id).ClientTemplate("<input type=\"checkbox\" \\#= checkquery(id) ? 'checked' :'' \\# class='chkbx5' />").Width(30); 
+            })
+            .DataSource(dataSource => dataSource
+                .Ajax()
+                .PageSize(5)
+                .Model(model => model.Id(p => p.id))
+                .Read(read => read.Action("ObtenerPermisos", "Usuario"))
+            )
+            .Pageable()
+            .Sortable()
+            .ToClientTemplate()
+ )
+</script>
+
+
+
+<script type="text/javascript">
+    var detailsTemplate = kendo.template($("#template2").html());
+    function AbrirPopup() {
+        var i = 0;
+        var wnd = $("#Permisos").data('kendoWindow');
+        wnd.content(detailsTemplate);
+        
+        wnd.center().open();
+    }
+</script>
+
+@if (Model != null)
+{
+<script type="text/javascript">
+    function checkquery(id) {
+        var i;
+        var bool = false;
+        var permisos;
+        permisos = @Html.Raw(Json.Encode(@Model.listaPermiso));
+        for(i=0; i<permisos.length; i++){
+            if(id==permisos[i])
+                bool = true
+        }
+        return bool;
+    }
+</script>
+}
+else { 
+<script>
+    function checkquery(id) {
+        return false
+    }
+</script>
+}
+<style type="text/css">
+                #details-container
+                {
+                    padding: 10px;
+                }
+
+                #details-container h2
+                {
+                    margin: 0;
+                }
+
+                #details-container em
+                {
+                    color: #8c8c8c;
+                }
+
+                #details-container dt
+                {
+                    margin:0;
+                    display: inline;
+                }
+            </style>

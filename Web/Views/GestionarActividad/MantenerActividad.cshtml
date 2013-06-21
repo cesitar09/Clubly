@@ -1,0 +1,288 @@
+﻿@model Web.Models.Actividad
+@using Web.Models
+@{
+    ViewBag.Title = "Mantenimiento de Actividad";
+}
+
+<h1>@ViewBag.Title</h1>
+
+<fieldset>
+    <legend>Datos del Formulario</legend>
+    @using (Html.BeginForm("insertarActividad", "GestionarActividad", FormMethod.Post, new { @id = "Form" }))
+    {
+        <form id="myform">
+        <ul>
+            <li>
+                <div class="editor-label">@Html.LabelFor(p => p.id)</div>
+                @Html.TextBoxFor(p => p.id, new { @readonly = "readonly" })
+            @*-------DATEPICKER-------*@
+            </li><li>
+            <div class="editor-label">@Html.LabelFor(p => p.fechaInicio)</div>
+            @(Html.Kendo().DatePickerFor(p => p.fechaInicio)            
+            .HtmlAttributes(new { style = "width:160px" })
+                .Min(new DateTime(1990, 1, 1)) 
+                .Max(new DateTime(2020, 12, 31)) 
+                //.Value(DateTime.Today) 
+                .Events(e => e.Change("startChange"))
+                //.Name("start")
+            )
+            </li><li>                            
+                                              
+            <div class="editor-label">@Html.LabelFor(p => p.nombre)</div>
+                @Html.TextBoxFor(p => p.nombre)
+            </li><li>
+            <div class="editor-label">@Html.LabelFor(p => p.fechaFin)</div>
+            @(Html.Kendo().DatePickerFor(p => p.fechaFin)
+            .HtmlAttributes(new { style = "width:160px" })
+                .Min(new DateTime(1990, 1, 1))
+                .Max(new DateTime(2020, 12, 31))
+                //.Value(DateTime.Today) 
+                .Events(e => e.Change("endChange"))
+                //.Name("end")
+                
+            )
+            </li><li>                        
+                <div class="editor-label">@Html.LabelFor(p => p.precio)</div>
+                @Html.TextBoxFor(p => p.precio)
+            </li><li>               
+            @*-----------------TipoActividad----------------*@
+            <div class = "editor-label">   @Html.LabelFor(p => p.tipoActividad) </div>        
+
+            @(Html.Kendo().DropDownList()
+            .Name("tipoActividadComboBox")
+            .OptionLabel("--Seleccione--")
+            .HtmlAttributes(new { style = "width:160px" })
+            .DataTextField("nombre")
+            .DataValueField("id")
+            .AutoBind(true)
+            .BindTo(TipoActividad.seleccionarTodo())  
+            .Value(Model != null && Model.tipoActividad != null ? Model.tipoActividad.id.ToString() :null)
+            )
+            @Html.TextBoxFor(p => p.tipoActividad.id, new { style = "display:none;" })
+            </li><li> 
+            <div class="editor-label">@Html.LabelFor(p => p.vacantesTotales)</div>
+                @Html.TextBoxFor(p => p.vacantesTotales)
+            </li><li>
+            @*-----------------Ambiente----------------*@
+            <div class = "editor-label">   @Html.LabelFor(p => p.reserva.ambiente) </div>        
+
+            @(Html.Kendo().DropDownList()
+            .Name("ambienteComboBox")
+            .OptionLabel("--Seleccione--")
+            .HtmlAttributes(new { style = "width:160px" })
+            .DataTextField("nombre")
+            .DataValueField("id")
+            .AutoBind(true)
+            .BindTo(Ambiente.SeleccionarTodo())  
+            .Value(Model != null && Model.reserva != null ? Model.reserva.ambiente.id.ToString() :null)
+            )       
+            @Html.TextBoxFor(p => p.reserva.ambiente.id, new { style = "display: none;" })
+            </li><li>
+            <div class="editor-label">@Html.LabelFor(p => p.descripcion)</div>
+                @Html.TextBoxFor(p => p.descripcion)
+            </li><li>  
+            <div class="editor-label"></div>
+            </li><li> 
+                @Html.TextBoxFor(p => p.estado,new { style = "display:none;" })
+                @Html.TextBoxFor(p => p.fechaInicio, new { style = "display: none;" })
+                @Html.TextBoxFor(p => p.fechaFin, new { style = "display: none;" })
+            </li>
+        </ul>
+        <div id="botones">
+            <input type="button" value="Limpiar" id="Limpiar" onclick="location.href = '@(Url.Action("MantenerActividad", "GestionarActividad"))'" />
+            <input type="submit" value= "@(Model == null || Model.id == 0 ? "Insertar" : "Modificar")"/>
+        </div> 
+        
+         @if (ViewData["message"] == null)
+         { }                                                                                                         
+         else if (ViewData["message"].Equals("F"))
+         {<script type="text/javascript">alert("Lo sentimos!\nNo se pudo realizar la operación.\nVuelva intentarlo en otro momento. ")</script> }
+         else if (ViewData["message"].Equals("E"))
+         { <script type="text/javascript">alert("La operación se realizó con éxito!")</script>} 
+        </form>   
+    }
+       
+</fieldset>
+<div id="kendotable">
+    @(Html.Kendo().Grid<Web.Models.Actividad>()
+    .Name("Grid")
+    .Columns(columns =>
+    {
+        columns.Bound(p => p.nombre).Sortable(true).Width(100);
+        columns.Bound(p => p.precio).Sortable(true).Width(50);
+        columns.Bound(p => p.vacantesTotales).Sortable(true).Width(50);
+        columns.Bound(p => p.fechaInicio).Format("{0:dd/MM/yyyy}").Sortable(true).Width(100);
+        columns.Bound(p => p.fechaFin).Format("{0:dd/MM/yyyy}").Sortable(true).Width(100);
+        columns.Command(c => { c.Custom("Editar").Click("onChange"); c.Destroy().Text("Eliminar"); }).Width(175);
+    })
+        .Editable(editable => { editable.Mode(GridEditMode.InLine); editable.DisplayDeleteConfirmation("El regitro será eliminado ¿Desea continuar?"); })
+        .Pageable()
+        .Sortable()
+        .Selectable()
+        .Filterable(filterable => filterable
+        .Extra(false)
+        .Operators(operators => operators
+            .ForString(str => str.Clear()
+                .Contains("Contiene")
+                .StartsWith("Empezar con")
+                .IsEqualTo("Es igual a")
+                .IsNotEqualTo("Diferente a"))
+            .ForNumber(number => number.Clear()
+                .IsGreaterThan("Es mayor a")
+                .IsLessThan("Es menor a")
+                .IsEqualTo("Es igual a")
+                .IsNotEqualTo("Es diferente a"))
+        )
+    )
+    .DataSource(datasource => datasource
+        .Ajax()
+        .Events(events => events.Error("ErrorMessage"))
+        .Model(model => model.Id(p => p.id))
+        .Read(read => read.Action("leerActividad", "GestionarActividad"))
+                .Destroy(update => update.Action("eliminarActividad", "GestionarActividad"))
+        )
+    )
+</div>
+
+<script type="text/javascript">
+$(document).ready(function() {
+        var dropdownlist = $("#tipoActividadComboBox").data("kendoDropDownList");
+        var dropdownlist2 = $("#ambienteComboBox").data("kendoDropDownList");
+
+        $("#tipoActividad_id").val(dropdownlist.value());
+        dropdownlist.bind("change",function(e){$("#tipoActividad_id").val(dropdownlist.value());});
+
+        $("#reserva_ambiente_id").val(dropdownlist2.value());
+        dropdownlist2.bind("change",function(e){$("#reserva_ambiente_id").val(dropdownlist2.value());});
+});
+
+
+$("#Form").validate({
+ignore: "",
+		rules: {
+			nombre: {
+                required:true,
+                maxlength:50
+                },
+			descripcion:{
+                required: true,
+                maxlength:150
+                },
+			precio: {
+                required: true,
+                number: true,
+                range: [0,100000]
+			},
+            vacantesTotales: {
+                required: true,
+                number: true,
+                range: [0,1000]
+			},
+            fechaInicio:{
+                required:true
+            },
+            fechaFin:{
+                required:true
+            },
+            "tipoActividad.id": {
+                required: true
+            },
+            "reserva.ambiente.id":{
+                required:true
+            }         
+		},
+		messages: {
+			nombre: {
+                required: "*Campo obligatorio",
+                maxlength: "Tamaño máx. 50 caracteres"
+                },
+			descripcion: {
+                required: '*Campo obligatorio',
+                maxlength: 'Tamaño máx. 200 caracteres'
+                },
+			precio: {
+				required:"*Campo obligatorio",
+                number: "Ingrese solo números",
+                range: "Precio fuera del rango:[0,100000]"
+			},
+            vacantesTotales: {
+				required:"*Campo obligatorio",
+                number: "Ingrese solo números",
+                range: "Precio fuera del rango:[0,1000]"
+			},
+            fechaInicio:{
+                required: "*Campo obligatorio"
+            },
+            fechaFin: {
+                required: "*Campo obligatorio"
+            },
+            "tipoActividad.id":{
+                required: "Seleccionar un valor"
+            },
+            "reserva.ambiente.id":{
+                required: "Seleccionar un valor"
+            }
+		},
+        submitHandler: function ConfirmationBox(form) {
+        var result = confirm("¿Está seguro de realizar los cambios?");
+        if (result == true) {
+            form.submit();
+            return true;
+        }
+        else {
+            return false;
+            }
+        }
+});
+
+
+    function ErrorMessage(e) {
+        alert("A ocurrido un error en el servidor!\nVuelva a intentar la operación en unos minutos...");
+    };
+
+//Manejo del DatePicker
+    function startChange() {
+        var endPicker = $("#end").data("kendoDatePicker"),
+            startDate = this.value();
+
+        if (startDate) {
+            startDate = new Date(startDate);
+            startDate.setDate(startDate.getDate() + 1);
+            endPicker.min(startDate);
+        }
+    };
+
+    function endChange() {
+        var startPicker = $("#start").data("kendoDatePicker"),
+            endDate = this.value();
+
+        if (endDate) {
+            endDate = new Date(endDate);
+            endDate.setDate(endDate.getDate() - 1);
+            startPicker.max(endDate);
+        }
+    };
+
+    function onChange(e) {
+
+        e.preventDefault();
+        var grid = $('#Grid').data('kendoGrid');
+        var row = grid.select();
+        var dataItem = grid.dataItem(row);
+        var id = dataItem.id;
+        location = "@Url.Action("modificarActividad")"+ "?id=" + id;
+    };
+    
+    var star=$("#start").kendoDatePicker({
+        change:startChange
+    }).data("kendoDatePicker");
+
+    var end = $("#end").kendoDatePicker({
+        change: endChange
+    }).data("kendoDatePicker");
+
+    start.max(end.value());
+    end.min(start.value());
+    
+    </script>
+

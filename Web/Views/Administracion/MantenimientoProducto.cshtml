@@ -1,0 +1,209 @@
+﻿@model Web.Models.Producto
+@using Web.Models
+
+@{
+    ViewBag.Title = "MantenimientoProducto";
+}
+
+<h1>Mantenimiento de Productos</h1>
+
+
+ 
+<fieldset>
+ <legend>Datos del Formulario</legend>
+@using (Html.BeginForm("AñadirProducto", "Administracion", FormMethod.Post, new {@id = "Form"}))
+{
+    <form id="myform">
+    <ul>
+        <li>
+         <div class="editor-label">@Html.LabelFor(p => p.id)</div>
+         @Html.TextBoxFor(p => p.id, new { @readonly = "readonly" })
+        </li><li>        
+        <div class="editor-label">@Html.LabelFor(p => p.nombre)</div>
+        @Html.TextBoxFor(p => p.nombre)
+        @if (Model != null && Model.nombre == null)
+        {
+                <div id="validacion">@Html.ValidationMessageFor(p => p.nombre)</div>
+        }
+        </li><li>
+        
+            <div class="editor-label">@Html.LabelFor(p => p.descripcion)</div>
+            @Html.TextBoxFor(p => p.descripcion)
+        @if (Model != null && Model.descripcion == null)
+        {
+                <div id="validacion">@Html.ValidationMessageFor(p => p.descripcion)</div>
+        }
+        </li><li>
+            <div class="editor-label">@Html.LabelFor(p => p.precioUnitario)</div>
+            @Html.TextBoxFor(p => p.precioUnitario)
+         @if (Model != null && Model.precioUnitario == 0)
+         {
+                <div id="validacion">@Html.ValidationMessageFor(p => p.precioUnitario)</div>
+         }
+         </li><li>
+         @Html.TextBoxFor(p => p.estado, new { @readonly = "readonly", style = "display: none;" })
+        </li>
+    </ul>
+    <div id="botones">
+    <input type="button" value= "Limpiar"  id="cancel" onclick="location.href = '@(Url.Action("CancelarProducto", "Administracion"))'" class="button fright"/>
+    <input type="submit" value=@(Model == null || Model.id == 0 ? "Insertar" : "Modificar") />
+    </div>
+         @if (ViewData["message"] == null)
+         { }                                                                                                         
+         else if (ViewData["message"].Equals("F"))
+         {<script type="text/javascript">              alert("Lo sentimos!\nNo se pudo realizar la operación.\nVuelva intentarlo en otro momento. ")</script> }
+         else if (ViewData["message"].Equals("E"))
+         { <script type="text/javascript">               alert("La operación se realizó con éxito!")</script>} 
+  </form>
+}
+  </fieldset>
+  
+<div id="kendotable">
+@(Html.Kendo().Grid<Web.Models.Producto>()
+    .Name("Grid")
+    .Columns(columns =>
+    {
+        columns.Bound(p => p.id);
+        columns.Bound(p => p.nombre).Sortable(true)
+            .Filterable(filterable => filterable.UI("nombreFiltro"));
+        columns.Bound(p => p.descripcion).Sortable(true)
+            .Filterable(filterable => filterable.UI("montoFiltro"));
+        columns.Bound(p => p.precioUnitario);
+        columns.Command(command => { command.Custom("Editar").Click("onChange"); command.Destroy().Text("Eliminar"); }).Width(200);
+        
+    })
+    .Editable(editable => { editable.Mode(GridEditMode.InLine); editable.DisplayDeleteConfirmation("El regitro será eliminado ¿Desea continuar?"); })
+    .Filterable(filterable => filterable
+        .Extra(false)
+        .Operators(operators => operators
+            .ForString(str => str.Clear()
+                .Contains("Contiene")
+                .StartsWith("Empezar con")
+                .IsEqualTo("Es igual a")
+                .IsNotEqualTo("Diferente a"))
+            .ForNumber(number => number.Clear()
+                .IsGreaterThan("Es mayor a")
+                .IsLessThan("Es menor a")
+                .IsEqualTo("Es igual a")
+                .IsNotEqualTo("Es diferente a"))
+        )
+     )
+    .Pageable()
+    .Selectable()
+    .DataSource(datasource => datasource
+                                .Ajax()
+                                .Events(events => events.Error("ErrorMessage"))
+                                .Model(model => model.Id(p => p.id))
+                                .Destroy(update => update.Action("EliminarProducto", "Administracion"))
+                                .Read(read => read.Action("getProducto", "Administracion"))
+                                   
+                )
+)
+</div>
+     
+<script type="text/javascript">
+
+
+	// validate signup form on keyup and submit
+$("#Form").validate({
+		rules: {
+			nombre: {
+                required : true,
+                maxlength : 50
+                },
+			descripcion:  {
+                required : true,
+                maxlength : 150
+                },
+			precioUnitario: {
+				required: true,
+                number: true,
+                range: [0,100000]
+			}
+		},
+		messages: {
+			nombre: {
+                required: "*Campo obligatorio",
+                maxlength : "Tamaño máx. 50 caracteres"
+                },
+			descripcion: {
+                required: "*Campo obligatorio",
+                maxlength : "Tamaño máx. 150 caracteres"
+                },
+			precioUnitario: {
+				required: "*Campo obligatorio",
+                number: "Ingrese solo números",
+                range: "Precio fuera de rango:[0,100000]"
+			}
+		},
+        submitHandler: function ConfirmationBox(form) {
+        var result = confirm("¿Está seguro de realizar los cambios?");
+        if (result == true) {
+            form.submit();
+            return true;
+        }
+        else {
+            return false;
+            }
+        }
+});
+
+
+    function ErrorMessage(e) {
+        alert("A ocurrido un error en el servidor!\nVuelva a intentar la operación en unos minutos...");
+    }
+
+//$("#precioUnitario").keydown(function (event) {
+//    if (event.shiftKey) {
+//        event.preventDefault();
+//    }
+
+//    if (event.keyCode == 46 || event.keyCode == 8 || event.keyCode == 110) {
+//        
+//    }
+//    else {
+//    if (event.keyCode < 95) {
+//        if (event.keyCode < 48 || event.keyCode > 57) {
+//            event.preventDefault();
+//        }
+//    }
+//    else {
+//    if (event.keyCode < 96 || event.keyCode > 105) {
+//        event.preventDefault();
+//}
+//}
+//}
+//});
+
+
+
+function onChange(e){
+        e.preventDefault();
+        var grid = $('#Grid').data('kendoGrid');
+        var row = grid.select();
+        var dataItem = grid.dataItem(row);
+        var id = dataItem.id;
+        location = "@Url.Action("EditarProducto")" + "?id=" + id;
+    }
+
+
+    function nombreFiltro(element) {
+        element.kendoAutoComplete({
+            dataSource: {
+                transport: {
+                    read: "@Url.Action("/FilterMenuCustomization_NombreProd")"
+                }
+            }
+        });
+    }
+
+    function montoFiltro(element) {
+        element.kendoAutoComplete({
+            dataSource: {
+                transport: {
+                    read: "@Url.Action("/FilterMenuCustomization_PrecUnitarioProd")"
+                }
+            }
+        });
+    }
+</script>

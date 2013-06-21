@@ -1,0 +1,186 @@
+﻿@model Web.Models.Actividad
+@using Web.Models
+@{
+    ViewBag.Title = "Realizar Inscripcion";
+}
+
+<h2>Inscribirse a @Model.nombre</h2>
+@(Html.Kendo().Grid<Web.Models.Socio>()
+    .Name("tablaSocio") 
+    .Columns(columns =>
+    {
+      
+        columns.Bound(p => p.persona.nombre);
+        
+        
+    })
+        .ClientRowTemplate(
+            "<tr>" +
+                "<td>"+
+                            "<img src='../../Images/User.png' />" +
+                       
+		        "</td>" +
+                "<td>" +
+                            "<span >Codigo Familia :#: familia.id #</span>" + "<br>" +
+                            "<span >Name : #: persona.nombre# #: persona.apPaterno#</span>" + 
+                                       
+                "</td>" +
+                "<td>" +
+                
+                                 "<input type='button' value= 'Agregar'  id='Agregar' onclick='Agregar()' class='button fright'/>" +
+                "</td>"               +
+             "</tr>"
+        )
+    .Selectable()
+    .Sortable()
+    //.Pageable()
+    .Scrollable()
+    .DataSource(datasource => datasource
+        .Ajax()
+                            .Read(read => read.Action("LeerSociosNoInscritos", "Actividad", @Model))
+    )
+)
+
+
+
+
+<h2>Lista de Socios Inscritos</h2>
+
+
+
+@(Html.Kendo().Grid<Web.Models.SocioXActividad>()
+    .Name("tablaSocioXActividad") 
+    .Columns(columns =>
+    {
+        columns.Bound(p => p.Socio.persona.nombre).Width(70);
+        columns.Bound(p => p.Socio.persona.apPaterno).Width(90).Title("Ap Paterno");
+        columns.Bound(p => p.Socio.persona.apMaterno).Width(90).Title("Ap Paterno");
+        columns.Bound(p => (p.horaIngreso)).Title("Hora de Ingreso").Width(110);//.Format("{0: h:mm}");
+        //columns.Command(command => { command.Destroy().Text("Cancelar"); }).Width(90);      
+        columns.Command(c => c.Custom("Cancelar").Click("CancelarSocio")).Width(100);                                         
+                                    
+        
+    })
+    .Selectable()
+    .Sortable()
+    .Editable(editable => { editable.Mode(GridEditMode.InLine); editable.DisplayDeleteConfirmation("El regitro será eliminado ¿Desea continuar?"); })
+    .Scrollable()
+    .Pageable()
+    .Filterable(filterable => filterable
+        .Extra(false)
+        .Operators(operators => operators
+            .ForString(str => str.Clear()
+                .StartsWith("Empezar con")
+                .IsEqualTo("Es igual a")
+                .IsNotEqualTo("Diferente a"))
+            .ForNumber(number => number.Clear()
+                .IsGreaterThan("Es mayor a")
+                .IsLessThan("Es menor a")
+                .IsEqualTo("Es igual a")
+                .IsNotEqualTo("Es diferente a"))
+            )
+    )
+    .DataSource(datasource => datasource
+        .Ajax()
+           .Read(read => read.Action("LeerSocioxActividad", "Actividad",@Model))
+           .Model(model => model.Id(p => p.idSocio))
+           .Destroy(destroy => destroy.Action("EliminarInscripcion", "Actividad"))
+    )
+)
+ 
+
+<input type="button" value= "Finalizar"  id="finalizar" onclick="location.href = '@(Url.Action("VerActividadesXsocio", "Actividad",@Model.id))'" class="button fright"/>
+<input type="button" value= "Cancelar"  id="cancela" onclick="location.href = '@(Url.Action("CancelarInscripcionTotal", "Actividad"))'" class="button fright"/>
+
+
+ <script type="text/javascript">
+    //$(function () {
+      //  var grid = $("#tablaSocioXActividad").data("kendoGrid");
+ 
+        //grid.table.on("mousedown", ".k-grid-Cancelar", $.proxy(Recargar, grid));
+    //});
+
+     //function Recargar(e){
+       //window.location=window.location;
+    //}
+
+    function MensajeError(e){
+       alert("A ocurrido un error en el servidor!\nVuelva a intentar la operación en unos minutos...");
+    }
+
+    function Agregar() {
+        //e.preventDefault(e);
+        var grid = $('#tablaSocio').data('kendoGrid');
+        var row = grid.select();
+        var dataItem = grid.dataItem(row);
+        var id = dataItem.persona.id;
+        $.ajax({
+            url: '@Url.Action("AgregarSocioEnActividad")',
+            type: 'POST',
+            datatype: "json",
+            traditional: true,
+            data: { 
+                strIdSocio: JSON.stringify(id),
+                strIdActividad: JSON.stringify(@Model.id)
+            },
+           success: function () { 
+                window.location=window.location;
+            },
+            error: function () {  
+                window.location=window.location; 
+            },
+            timeout: 20000
+        });
+   
+    }
+
+    function CancelarSocio(e) {
+        e.preventDefault();
+        if(confirm("Este registro será eliminado ¿Desea continuar?"))
+        {
+        var grid = $('#tablaSocioXActividad').data('kendoGrid');
+        var row = grid.select();
+        var dataItem = grid.dataItem(row);
+        var id = dataItem.Socio.persona.id;
+        $.ajax({
+            url: '@Url.Action("EliminarInscripcion")',
+            type: 'POST',
+            datatype: "json",
+            traditional: true,
+            data: { 
+                strIdSocio: JSON.stringify(id),
+                strIdActividad: JSON.stringify(@Model.id)
+            },
+            success: function () { 
+                window.location=window.location;
+            },
+            error: function () {  
+                window.location=window.location; 
+            },
+            timeout: 20000
+        });
+        }
+    }
+
+    function Finalizar(){
+         alert("llegue");
+        $.ajax({
+            url: '@Url.Action("VerActividadesXsocio")',
+            type: 'POST',
+            datatype: "json",
+            traditional: true,
+            data: { 
+                strIdAct: JSON.stringify(@Model.id)
+            },
+           
+          // success: function () { 
+           //     window.location=window.location;
+           // },
+          //  error: function () {  
+           //     window.location=window.location; 
+           // },
+          //  timeout: 20000
+        });
+    
+    }
+  </script>

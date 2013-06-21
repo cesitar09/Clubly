@@ -1,0 +1,379 @@
+﻿@model Web.Models.EventoCorporativo
+@using Web.Models
+@{
+    ViewBag.Title = "Mantener Evento Corporativo";
+}
+
+<h1>Mantener Evento Corporativo</h1>
+
+
+<fieldset>
+ <legend>Datos del Formulario</legend>
+ <form id = "form" action="insertarEventoCorp" method= post>
+     <fieldset>
+        <legend>Datos de la Empresa</legend>
+        <ul>
+            <li>
+            @Html.LabelFor(p => p.razonSocial)
+            @Html.TextBoxFor(p => p.razonSocial)
+            </li><li>
+            @Html.LabelFor(p => p.ruc)
+            @Html.TextBoxFor(p => p.ruc)
+            </li><li>
+            @Html.LabelFor(p => p.direccion)
+            @Html.TextBoxFor(p => p.direccion)
+            </li><li>
+            @Html.LabelFor(p => p.paginaWeb)
+            @Html.TextBoxFor(p => p.paginaWeb)
+            </li><li> 
+            @Html.LabelFor(p => p.numParticipantes)
+            @Html.TextBoxFor(p => p.numParticipantes)
+            </li>          
+        </ul>
+    </fieldset>
+    <fieldset>
+        <legend>Datos del Evento</legend>
+    <ul>
+    <li>
+    @Html.LabelFor(p => p.id)
+    @Html.TextBoxFor(p => p.id, new { @readonly = "readonly" })
+    </li><li>
+    </li><li>  
+    @Html.LabelFor(p => p.nombre)
+    @Html.TextBoxFor(p => p.nombre)                              
+    </li><li>           
+    @Html.LabelFor(p => p.precioSocio)
+    @Html.TextBoxFor(p => p.precioSocio)          
+    </li><li>         
+    @Html.LabelFor(p => p.descripcion) 
+    @Html.TextBoxFor(p => p.descripcion)              
+    </li><li>                    
+    @Html.LabelFor(p => p.precioInvitado)
+    @Html.TextBoxFor(p => p.precioInvitado)                    
+    </li><li>
+    @Html.LabelFor(p => p.vacantesSocio)
+    @Html.TextBoxFor(p => p.vacantesSocio)
+    </li><li>
+    @Html.LabelFor(p => p.vacantesInvitado)
+    @Html.TextBoxFor(p => p.vacantesInvitado)
+    </li><li> 
+            @*-------DATEPICKER INICIO-------*@
+            <div class="editor-label">@Html.LabelFor(p => p.fechaInicio)</div>
+            @(Html.Kendo().DateTimePickerFor(p => p.fechaInicio)
+
+                .HtmlAttributes(new { style = "width:160px" })
+                .Min(new DateTime(1990, 1, 1)) 
+                .Max(new DateTime(2020, 12, 31)) 
+                .Value(DateTime.Today) 
+                .Events(e => e.Change("startChange"))
+            )
+    </li><li>  
+            @*-------DATEPICKER FIN-------*@                      
+            <div class="editor-label">@Html.LabelFor(p => p.fechaFin)</div>
+            @(Html.Kendo().DateTimePickerFor(p => p.fechaFin)
+
+                .HtmlAttributes(new { style = "width:160px" })
+                .Min(new DateTime(1990, 1, 1))
+                .Max(new DateTime(2020, 12, 31))
+                .Value(DateTime.Today) 
+                .Events(e => e.Change("endChange"))
+            )
+    </li><li>
+            @*-----------------EMPLEADO----------------*@
+            <div class = "editor-label">   @Html.LabelFor(p => p.empleado) </div>        
+
+            @(Html.Kendo().DropDownList()
+            .Name("empleadoComboBox")
+            .OptionLabel("--Seleccione--")
+            .HtmlAttributes(new { style = "width:160px" })
+            .DataTextField("persona.nombre")
+            .DataValueField("persona.id")
+            .AutoBind(true)
+            .BindTo(Empleado.seleccionarTodo())  
+            .Value(Model != null && Model.empleado != null ? Model.empleado.persona.id.ToString() :null)
+            )       
+            @Html.TextBoxFor(p => p.empleado.persona.id, new { style = "display: none;" })
+    </li><li>
+            @*-----------------AMBIENTE----------------*@
+            <div class = "editor-label">   @Html.LabelFor(p => p.reserva) </div>        
+
+            @(Html.Kendo().DropDownList()
+            .Name("ambienteComboBox")
+            .OptionLabel("--Seleccione--")
+            .HtmlAttributes(new { style = "width:160px" })
+            .DataTextField("nombre")
+            .DataValueField("id")
+            .AutoBind(true)
+            .BindTo(Ambiente.SeleccionarTodo())  
+            .Value(Model != null && Model.reserva != null ? Model.reserva.ambiente.id.ToString() :null)
+            )       
+            @Html.TextBoxFor(p => p.reserva.ambiente.id, new { style = "display: none;" })
+    </li>
+    </ul>
+    </fieldset>     
+    @Html.TextBoxFor(p => p.estado  , new { style = "display: none;" })
+    @Html.TextBoxFor(p => p.fechaInicio, new { style = "display: none;" })
+    @Html.TextBoxFor(p => p.fechaFin, new { style = "display: none;" })       
+
+    <div id="botones">
+        <input type="button" value= "Limpiar"  id="limpiar" onclick="location.href = '@(Url.Action("MantenerEventosCorp", "GestionarEventos"))'" class="button fright"/>
+        <input type="submit" value=  @(Model == null ? "Insertar" : "Modificar")  />
+    </div>
+    @if (ViewData["message"] == null)
+    { }
+    else if (ViewData["message"].Equals("F"))
+    { <script type= "text/javascript">          alert("Lo sentimos!\n No se pudo realizar la operacion\nVuelva a intentarlo en otro momento. ")</script>}
+    else if (ViewData["message"].Equals("E"))
+    { <script type= "text/javascript">          alert("La operación se realizó con éxito!")</script>}                                                                                                                                      
+  </form>
+  
+  </fieldset>
+   
+   <div id="kendotable">
+    @(Html.Kendo().Grid<Web.Models.EventoCorporativo>()
+    .Name("Grid")
+    .Columns(columns =>
+    {
+        columns.Bound(p => p.nombre).Sortable(true);
+        columns.Bound(p => p.fechaInicio).Sortable(true);
+        columns.Bound(p => p.fechaFin).Sortable(true);  
+        columns.Bound(p => p.razonSocial).Sortable(true);   
+        columns.Bound(p => p.numParticipantes).Sortable(true);
+        columns.Command(command => { command.Custom("Editar").Click("Edit"); command.Destroy().Text("Eliminar"); }).Width(181);
+
+    })
+    .Editable(editable => { editable.Mode(GridEditMode.InLine); editable.DisplayDeleteConfirmation("El registro será eliminado ¿Desea continuar?"); })
+    .Selectable()
+    .Pageable()
+    .Sortable()
+    .Filterable(filterable => filterable
+         .Extra(false)
+         .Operators(operators => operators
+         .ForString(str => str.Clear()
+         .Contains("Contiene")
+         .StartsWith("Empezar con")
+         .IsEqualTo("Es igual a")
+         .IsNotEqualTo("Diferente a"))
+         .ForNumber(number => number.Clear()
+        .IsGreaterThan("Es mayor a")
+        .IsLessThan("Es menor a")
+        .IsEqualTo("Es igual a")
+        .IsNotEqualTo("Es diferente a"))
+     )
+    )
+    .DataSource(datasource => datasource
+            .Ajax()
+            .PageSize(6)
+            .Read(read => read.Action("leerEventosCorp", "GestionarEventos"))
+            .Events(events => events.Error("ErrorMessage"))
+            .Model(model => model.Id(p => p.id))
+            .Destroy(update => update.Action("eliminarEventoCorp", "GestionarEventos"))
+        )
+    )
+</div>
+
+
+
+<script type="text/javascript">
+
+    $(document).ready(function() {
+            var dropdownlist = $("#empleadoComboBox").data("kendoDropDownList");
+            var dropdownlist2 = $("#ambienteComboBox").data("kendoDropDownList");
+
+            $("#empleado_persona_id").val(dropdownlist.value());
+            dropdownlist.bind("change",function(e){$("#empleado_persona_id").val(dropdownlist.value());});
+
+            $("#reserva_ambiente_id").val(dropdownlist2.value());
+            dropdownlist2.bind("change",function(e){$("#reserva_ambiente_id").val(dropdownlist2.value());});
+    });
+
+    $("#form").validate({
+        ignore: "",
+        rules: {
+            razonSocial: {
+                required: true,
+                maxlength: 50
+            },
+            ruc: {
+                required: true,
+                maxlength: 11,
+                minlength:11,
+                digits:true
+            },
+            direccion: {
+                required: false,
+                maxlength: 150
+            },
+            paginaWeb: {
+                required: false,
+                maxlength: 50
+            },
+            numParticipantes: {
+                required: true,
+                number: true,
+                range: [0,50]
+            },
+            nombre: {
+                required: true,
+                maxlength: 50
+            },
+            descripcion: {
+                required: true,
+                maxlength: 150
+            },
+            fechaInicio: {
+                required: true
+            },
+            fechaFin: {
+                required: true
+            },
+            precioSocio: {
+                required: true,
+                number: true,
+                range: [0, 10000]
+            },
+            precioInvitado: {
+                required: true,
+                number: true,
+                range: [0, 10000]
+            },
+            vacantesSocio: {
+                required: true,
+                number: true,
+                range: [0, 1000]
+            },
+            vacantesInvitado: {
+                required: true,
+                number: true,
+                range: [0, 4000]
+            },
+            numeroInvitados: {
+                required: true,
+                number: true,
+                range: [0, 10]
+            },
+            "empleado.persona.id":{
+                required:true
+            },
+            "reserva.ambiente.id":{
+                required:true
+            }  
+        },
+        messages: {
+
+            razonSocial: {
+                required: "*Campo obligatorio",
+                maxlength: "Tamaño máx. 50 caracteres"
+            },
+            ruc: {
+                required: "*Campo obligatorio",
+                maxlength: "Ingrese 11 dígitos",
+                minlength: "Ingrese 11 dígitos",
+                digits:"Ingrese solo dígitos",
+            },
+            direccion: {
+                required: "*Campo obligatorio",
+                maxlength: "Tamaño máx. 150 caracteres"
+            },
+            paginaWeb: {
+                required: "*Campo obligatorio",
+                maxlength: "Tamaño máx. 50 caracteres"
+            },
+            numParticipantes: {
+                required: "*Campo obligatorio",
+                number: "Ingrese solo números",
+                range: "Núm. fuera de rango [0,50]"
+            },           
+            nombre: {
+                required: "*Campo obligatorio",
+                maxlength: "Tamaño máx. 50 caracteres"
+            },
+            descripcion: {
+                required: "*Campo obligatorio",
+                maxlength: "Tamaño máx. 150 caracteres"
+            },
+            fechaInicio: {
+                required: "*Seleccionar"
+            },
+            fechaFin: {
+                required: "*Seleccionar"
+            },
+            precioSocio: {
+                required: "*Campo obligatorio",
+                number: "Ingrese solo números",
+                range: "Precio fuera de rango:[0,10000]"
+            },
+            precioInvitado: {
+                required: "*Campo obligatorio",
+                number: "Ingrese solo números",
+                range: "Precio fuera de rango:[0,10000]"
+            },
+            vacantesSocio: {
+                required: "*Campo obligatorio",
+                number: "Ingrese solo números",
+                range: "Precio fuera de rango:[0,1000]"
+            },
+            vacantesInvitado: {
+                required: "*Campo obligatorio",
+                number: "Ingrese solo números",
+                range: "Precio fuera de rango:[0,4000]"
+            },
+            "empleado.persona.id":{
+                required:"*Seleccionar"
+            },
+            "reserva.ambiente.id":{
+                required: "*Seleccionar"
+            }
+        },
+
+        submitHandler: function ConfirmationBox(form) {
+            var result = confirm("¿Está seguro de realizar los cambios?");
+            if (result == true) {
+                form.submit();
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+    });
+
+    function ErrorMessage(e) {
+        alert("A ocurrido un error en el servidor!\n Vuelva a intentar la operación en unos minutos...");
+    };
+
+    function startChange() {
+        var endPicker = $("#end").data("kendoDatePicker"),
+            startDate = this.value();
+
+        if (startDate) {
+            startDate = new Date(startDate);
+            startDate.setDate(startDate.getDate() + 1);
+            endPicker.min(startDate);
+        }
+    };
+
+    function endChange() {
+        var startPicker = $("#start").data("kendoDatePicker"),
+            endDate = this.value();
+
+        if (endDate) {
+            endDate = new Date(endDate);
+            endDate.setDate(endDate.getDate() - 1);
+            startPicker.max(endDate);
+        }
+    };
+
+    var star = $("#start").kendoDatePicker({
+        change: startChange
+    }).data("kendoDatePicker");
+
+    var end = $("#end").kendoDatePicker({
+        change: endChange
+    }).data("kendoDatePicker");
+
+    start.max(end.value());
+    end.min(start.value());
+
+</script>
+

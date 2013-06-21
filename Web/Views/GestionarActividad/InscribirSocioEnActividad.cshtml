@@ -1,0 +1,66 @@
+﻿@using Web.Models
+@{
+    ViewBag.Title = "InscribirSocioEnActividad";
+}
+
+
+<h1>Actividades Disponibles para los socios</h1>
+
+<div id="kendotable">
+@(Html.Kendo().Grid<Web.Models.Actividad>()
+    .Name("tablaActividades") 
+    .Columns(columns =>
+    {
+        columns.Bound(p => p.nombre).Sortable(true);
+        columns.Bound(p => p.descripcion).Sortable(true);
+        columns.Bound(p => p.fechaInicio).Width(70).Format("{0:dd/MM/yyyy}");
+        columns.Bound(p => p.fechaFin).Width(70).Format("{0:dd/MM/yyyy}");
+        columns.Bound(p => p.vacantesDisponibles).Title("Vacantes");
+        //if(Model.precio != 0)
+          //      {
+            //        columns.Bound(p=>p.precio);
+             //   }
+        columns.Command(c => c.Custom("Inscribir").Click("Registrar"));
+                 
+    })
+    .Selectable()
+    .Filterable(filterable => filterable
+                              .Extra(false)
+                              .Operators(operators => operators
+                                                      .ForString(str => str.Clear()
+                                                                           .StartsWith("Empezar con")
+                                                                           .IsEqualTo("Es igual a")
+                                                                           .IsNotEqualTo("Diferente a"))
+                                                      .ForNumber(number => number.Clear()
+                                                                                 .IsGreaterThan("Es mayor a")
+                                                                                 .IsLessThan("Es menor a")
+                                                                                 .IsEqualTo("Es igual a")
+                                                                                 .IsNotEqualTo("Es diferente a"))
+                                                      )
+                )
+                .DataSource(datasource => datasource
+                                          .Ajax()
+                                              .Events(events => events.Error("MensajeError"))
+                                                  .Read(read => read.Action("LeerActividadesDisponible", "GestionarActividad"))
+                           )
+                           
+    )
+ </div>
+
+
+<script type="text/javascript">
+    function MensajeError(e){
+        alert("A ocurrido un error en el servidor!\nVuelva a intentar la operación en unos minutos...");
+    }
+    function Registrar(e) {
+        e.preventDefault();
+        var grid = $('#tablaActividades').data('kendoGrid');
+        var row = grid.select();
+        //alert("Hola");
+        var dataItem = grid.dataItem(row);
+        var id = dataItem.id;
+        location = "@Url.Action("InscribirASocio")" + "?id=" + id;
+        
+
+    }
+  </script>

@@ -1,0 +1,85 @@
+﻿@model IEnumerable<Web.Models.Sede>
+@using Web.Models
+@{
+    ViewBag.Title = "Sedes";
+}
+
+<h3>@ViewBag.Mantener Sedes</h3>
+
+@(Html.Kendo().Grid<Web.Models.Sede>()
+    .Name("grid")
+    .Columns(columns =>
+    {
+        columns.Bound(p => p.nombre).Sortable(true)
+            .Filterable(filterable => filterable.UI("nombreFiltro")).Title("Nombre");
+        columns.Bound(p => p.descripcion).Sortable(true) 
+            .Filterable(filterable => filterable.UI("descripcionFiltro")).Title("Descripcion");
+        columns.Bound(p => p.direccion).Title("Direccion");
+        columns.Bound(p => p.estado).Title("Estado");
+        columns.Command(command => { command.Edit().Text("Editar"); command.Destroy().Text("Eiminar"); }).Width(190);
+    })
+    .ToolBar(toolbar => toolbar.Create())
+    .Editable(editable => editable.Mode(GridEditMode.PopUp))
+    .Pageable()
+    .Sortable()
+    .Scrollable()
+        .Filterable(filterable => filterable
+            .Extra(false)
+            .Operators(operators => operators
+                .ForString(str => str.Clear()
+                    .StartsWith("Starts with")
+                    .IsEqualTo("Is equal to")
+                    .IsNotEqualTo("Is not equal to")
+                ))
+            )
+    .HtmlAttributes(new { style = "height:430px;" })
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .PageSize(20)
+        .Events(events => events.Error("error_handler"))
+        .Model(model => model.Id(p => p.id))
+        .Create(update => update.Action("agregarSede", "Logistica"))
+        .Read(read => read.Action("getSede", "Logistica"))
+        .Update(update => update.Action("modificarSede", "Logistica"))
+        .Destroy(update => update.Action("eliminarSede", "Logistica")))
+      
+        
+            )
+)
+<script type="text/javascript">
+    function error_handler(e) {
+        if (e.errors) {
+            var message = "Errors:\n";
+            $.each(e.errors, function (key, value) {
+                if ('errors' in value) {
+                    $.each(value.errors, function () {
+                        message += this + "\n";
+                    });
+                }
+            });
+            alert(message);
+        }
+    }
+</script>
+
+<script type="text/javascript">
+    function nombreFiltro(element) {
+        element.kendoAutoComplete({
+            dataSource: {
+                transport: {
+                    read: "@Url.Action("/FilterMenuCustomization_Nombre")"
+                }
+            }
+        });
+    }
+
+    function descripcionFiltro(element) {
+        element.kendoAutoComplete({
+            dataSource: {
+                transport: {
+                    read: "@Url.Action("/FilterMenuCustomization_Descripcion")"
+                }
+            }
+        });
+    }
+</script>

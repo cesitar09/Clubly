@@ -1,0 +1,167 @@
+﻿@model Web.Models.Socio
+@using Web.Models
+@{
+    ViewBag.Title = "MantenerSocio";
+}
+
+<h2>Mantener Socio</h2>
+<fieldset>
+ <legend>Datos del Formulario</legend>
+ 
+    <form id = form action="Modificar" method= post>
+     <ul>
+     <li>
+                 
+                <div class="editor-label">@Html.LabelFor(p => p.id)</div>
+                @Html.TextBoxFor(p => p.id, new {@readonly = "readonly" })
+            </li><li>
+                 
+                <div class="editor-label">@Html.LabelFor(p => p.familia.id)</div>
+                @Html.TextBoxFor(p => p.familia.id, new {@readonly = "readonly" })
+            </li>
+            <li>
+                <div class="editor-label">@Html.LabelFor(p => p.persona.nombre)</div>
+                 @Html.TextBoxFor(p => p.persona.nombre)  
+                  @if (Model!= null && Model.persona != null && Model.persona.nombre == null)
+                {
+                    <div id="validacion">@Html.ValidationMessageFor(p => p.persona.nombre)</div>
+                }           
+        </li><li>  
+                 <div class="editor-label">@Html.LabelFor(p => p.persona.apPaterno)</div>  
+                 @Html.TextBoxFor(p => p.persona.apPaterno)  
+                 @if (Model != null && Model.persona != null && Model.persona.apPaterno == null)
+                {
+                    <div id="validacion">@Html.ValidationMessageFor(p => p.persona.apPaterno)</div>
+                }            
+        </li><li>           
+                    <div class="editor-label">@Html.LabelFor(p => p.persona.apMaterno)</div>
+                    @Html.TextBoxFor(p => p.persona.apMaterno) 
+                    @if (Model != null &&  Model.persona != null && Model.persona.apMaterno == null)
+                {
+                    <div id="validacion">@Html.ValidationMessageFor(p => p.persona.apMaterno)</div>
+                }             
+        </li><li>
+                    <div class="editor-label">@Html.LabelFor(p => p.persona.dni)</div>
+                    @Html.TextBoxFor(p => p.persona.dni)
+                    @if (Model != null && Model.persona != null && Model.persona.dni == 0)
+                {
+                    <div id="validacion">@Html.ValidationMessageFor(p => p.persona.dni)</div>
+                }   
+         </li><li>            
+                    <div class="editor-label">@Html.LabelFor(p => p.persona.direccion)</div>
+                    @Html.TextAreaFor(p => p.persona.direccion)
+                    @if (Model != null && Model.persona != null && Model.persona.direccion == null)
+                {
+                    <div id="validacion">@Html.ValidationMessageFor(p => p.persona.direccion)</div>
+                }                
+        </li><li>
+            @*------------ESTODOCIVIL--------------*@
+     <div class = "editor-label">    @Html.LabelFor(p => p.persona.estadoCivil)    </div>  
+          @(Html.Kendo().ComboBox()
+           .Name("estadoComboBox")
+          .DataTextField("nombre")
+          .DataValueField("nombre")
+          .Filter("contains")
+          .AutoBind(true)
+          .Placeholder("--Seleccionar--")
+          .MinLength(3)     
+          .DataSource(source =>
+          {
+              source.Read(read =>
+              {
+                  read.Action("Leer_Estados", "RRHH");
+              })
+              .ServerFiltering(true);
+          })
+    )  
+        
+    </li>
+    @Html.TextBoxFor(p => p.persona, "", new {style = "display:none;" })
+    @Html.TextBoxFor(p => p.estado, "", new {style = "display:none;" })
+    </ul>
+    <div id="botones">
+  <input type="button" value= "Limpiar"  id="limpiar" onclick="location.href = '@(Url.Action("MantenerSocio", "Membresia"))'" class="button fright"/>
+  <input type="submit" value= "Modificar" onclick="location.href = '@(Url.Action("Modificar", "Membresia"))'" class="button fright"/>
+  <input type="button" value= "Cancelar" id="cancelar" onclick="location.href = '@(Url.Action("Index", "Home"))'" class="button fright"/> 
+    </div>
+  </form>
+  
+  </fieldset>
+   
+   <div id="kendotable">
+    @(Html.Kendo().Grid<Web.Models.Socio>()
+    .Name("Grid")
+    .Columns(columns =>
+    {
+        columns.Bound(p => p.familia.id).Title("Fam.").Width(60).Sortable(true);  
+        columns.Bound(p => p.persona.dni).Width(85).Sortable(true);
+        columns.Bound(p => p.persona.nombre).Width(85).Sortable(true);
+        columns.Bound(p => p.persona.apPaterno).Title("Ap. Paterno").Width(110).Sortable(true);
+        columns.Bound(p => p.persona.apMaterno).Title("Ap. Materno").Width(110).Sortable(true);
+        columns.Bound(p => p.persona.estadoCivil).Title("Est. Civil").Width(90).Sortable(true);
+        columns.Command(command => { command.Custom("Editar").Click("Edit"); command.Destroy().Text("Eliminar"); }).Width(190);
+
+    })  .Selectable()
+               //.Groupable()
+               .Pageable()
+               .Sortable()
+               .Scrollable()
+               .Filterable(filterable => filterable
+                                              .Extra(false)
+                                              .Operators(operators => operators
+                                                                      .ForString(str => str.Clear()
+                                                                          .Contains("Contiene")
+                                                                          .StartsWith("Empezar con")
+                                                                                           .IsEqualTo("Es igual a")
+                                                                                           .IsNotEqualTo("Diferente a"))
+                                                                      .ForNumber(number => number.Clear()
+                                                                                                 .IsGreaterThan("Es mayor a")
+                                                                                                 .IsLessThan("Es menor a")
+                                                                                                 .IsEqualTo("Es igual a")
+                                                                                                 .IsNotEqualTo("Es diferente a"))
+                                                                      )
+                                )
+    .DataSource(datasource => datasource
+                                .Ajax()
+                                    .Read(read => read.Action("Leer_Socio1", "Membresia"))
+                                                        .Batch(false)
+                                                               .ServerOperation(false)
+                                                               .Events(events => events.Error("error_handler"))
+                                                               .Model( model => model.Id(p => p.persona.id))
+                                                               .Destroy(update => update.Action("Eliminar", "Membresia"))
+
+
+
+                )
+)
+</div>
+
+
+
+<script type="text/javascript">
+
+
+$(document).ready(function() {
+        var combobox = $("#estadoComboBox").data("kendoComboBox");
+        combobox.bind("change",function(e){
+            $("#persona_estadoCivil").val(combobox.value());
+           //  alert("idSede: "+combobox.value()); 
+        });
+    });
+
+function error_handler(e) {
+            if (e.errors) {
+                var message = "Errors:\n";
+                $.each(e.errors, function (key, value) {
+                    if ('errors' in value) {
+                        $.each(value.errors, function () {
+                            message += this + "\n";
+                        });
+                    }
+                });
+                alert(message);
+            }
+      }
+     
+  </script>
+  

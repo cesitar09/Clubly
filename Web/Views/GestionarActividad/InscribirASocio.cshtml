@@ -1,0 +1,169 @@
+﻿@model Web.Models.Actividad
+@using Web.Models
+@{
+    ViewBag.Title = "Inscribir en Actividad";
+}
+
+
+<h1>Inscribir a @Model.nombre - @Model.vacantesDisponibles vacante(s)</h1>
+<h2>Socios no incritos</h2>
+
+<div id="kendotableSocio">
+@(Html.Kendo().Grid<Web.Models.Socio>()
+    .Name("tablaSocio")
+    .Columns(columns =>
+    {
+        columns.Bound(p => p.familia.id).Width(90).Title("Cod Familia");
+        //columns.Bound(p => p.id).Width(70).Title("Id Socio");
+        columns.Bound(p => p.persona.dni).Width(70);
+        columns.Bound(p => p.persona.nombre).Width(70);
+        columns.Bound(p => p.persona.apPaterno).Width(90).Title("Ap Paterno");
+        columns.Bound(p => p.persona.apMaterno).Width(90).Title("Ap Materno");
+        //columns.Bound(p =>(p.horaIngreso)).Title("Hora de Ingreso").Width(110);//.Format("{0: h:mm}");                           
+        //columns.Bound(p => p.estado).Title("Estado").Width(60);//.Format("{0}-{1}","Inactivo","Activo");
+        //columns.Command(command => { command.Destroy().Text("Cancelar"); }).Width(90);  
+        columns.Command(c => c.Custom("Agregar").Click("AgregarSocio")).Width(100);                               
+
+    })
+    .Groupable(group=>group.Messages(msg=>msg.Empty("Arrastre aquí para agrupar")))
+    .Sortable()
+    .Scrollable()
+    .Selectable()
+    .Pageable()
+    .Filterable(filterable => filterable
+        .Extra(false)
+        .Operators(operators => operators
+            .ForString(str => str.Clear()
+                .StartsWith("Empezar con")
+                .IsEqualTo("Es igual a")
+                .IsNotEqualTo("Diferente a"))
+            .ForNumber(number => number.Clear()
+                .IsGreaterThan("Es mayor a")
+                .IsLessThan("Es menor a")
+                .IsEqualTo("Es igual a")
+                .IsNotEqualTo("Es diferente a"))
+        )
+    )
+    .DataSource(datasource => datasource
+        .Ajax()
+        .Events(events=>events.Error("MensajeError"))
+        .Read(read => read.Action("LeerSociosNoInscritos", "GestionarActividad",@Model))
+        .Group(groups => groups.Add(socio => socio.familia.id))
+    )
+)
+ </div>
+
+ <h2>Socios inscritos</h2>
+
+<div id="kendotable">
+@(Html.Kendo().Grid<Web.Models.SocioXActividad>()
+    .Name("tablaSocioXActividad") 
+    .Columns(columns =>
+    {
+        //columns.Bound(p => p.Actividad.nombre).Sortable(true);
+        columns.Bound(p => p.Socio.persona.nombre).Width(70);
+        columns.Bound(p => p.Socio.persona.apPaterno).Width(90).Title("Ap Paterno");
+        columns.Bound(p => p.Socio.persona.apMaterno).Width(90).Title("Ap Paterno");
+        columns.Bound(p =>(p.horaIngreso)).Title("Hora de Ingreso").Width(110);//.Format("{0: h:mm}");
+        //columns.Command(command => { command.Destroy().Text("Cancelar"); }).Width(90);      
+        columns.Command(c => c.Custom("Cancelar").Click("CancelarSocio")).Width(100);                                     
+    })
+    .Groupable(group => group.Messages(msg => msg.Empty("Arrastre aquí para agrupar")))
+    .Sortable()
+    .Scrollable()    
+    .Selectable()
+    .Pageable()
+    .Filterable(filterable => filterable
+        .Extra(false)
+        .Operators(operators => operators
+            .ForString(str => str.Clear()
+                .StartsWith("Empezar con")
+                .IsEqualTo("Es igual a")
+                .IsNotEqualTo("Diferente a"))
+            .ForNumber(number => number.Clear()
+                .IsGreaterThan("Es mayor a")
+                .IsLessThan("Es menor a")
+                .IsEqualTo("Es igual a")
+                .IsNotEqualTo("Es diferente a"))
+            )
+    )
+    .DataSource(datasource => datasource
+        .Ajax()
+        .Events(events => events.Error("MensajeError"))
+        //.Update(upd => upd.Action("LeerSocioxActividad", "GestionarActividad", @Model))
+        .Read(read => read.Action("LeerTodoSocioxActividad", "GestionarActividad",@Model))
+        .Model(model => model.Id(p => p.idSocio))
+        .Destroy(destroy => destroy.Action("EliminarInscripcion", "GestionarActividad"))
+        .Group(groups => groups.Add(s => s.Socio.familia.id))
+    )
+)
+ </div>
+
+ <input type="button" value= "Finalizar"  id="cancela" onclick="location.href = '@(Url.Action("CancelarInscripcionTotal", "GestionarActividad"))'" class="button fright"/>
+ <script type="text/javascript">
+//    $(function () {
+//        var grid = $('#tablaSocioXActividad').data('kendoGrid');
+// 
+//        grid.table.on("mousedown", ".k-grid-delete", $.proxy(Recargar, grid));
+//    });
+//    function Recargar(e){
+//        window.location=window.location;
+//    }
+
+    function MensajeError(e){
+        alert("A ocurrido un error en el servidor!\nVuelva a intentar la operación en unos minutos...");
+    }
+
+    function AgregarSocio(e) {
+        e.preventDefault();
+        var grid = $('#tablaSocio').data('kendoGrid');
+        var row = grid.select();
+        var dataItem = grid.dataItem(row);
+        var id = dataItem.persona.id;
+        $.ajax({
+            url: '@Url.Action("AgregarSocioEnActividad")',
+            type: 'POST',
+            datatype: "json",
+            traditional: true,
+            data: { 
+                strIdSocio: JSON.stringify(id),
+                strIdActividad: JSON.stringify(@Model.id)
+            },
+            success: function () { 
+                alert("La operación se realizó con éxito");
+                window.location=window.location;
+            },
+            error: function (xhr, textStatus, exceptionThrown) {  
+                alert($.parseJSON(xhr.responseText));
+            },
+            //timeout: 20000
+        });
+    }
+    function CancelarSocio(e) {
+        e.preventDefault();
+        if(confirm("Este registro será eliminado ¿Desea continuar?"))
+        {
+            var grid = $('#tablaSocioXActividad').data('kendoGrid');
+            var row = grid.select();
+            var dataItem = grid.dataItem(row);
+            var id = dataItem.Socio.persona.id;
+            $.ajax({
+                url: '@Url.Action("EliminarInscripcion")',
+                type: 'POST',
+                datatype: "json",
+                traditional: true,
+                data: { 
+                    strIdSocio: JSON.stringify(id),
+                    strIdActividad: JSON.stringify(@Model.id)
+                },
+                success: function () { 
+                    window.location=window.location;
+                },
+                error: function () {  
+                    window.location=window.location; 
+                },
+               // timeout: 20000
+            });
+        }
+    }
+  </script>

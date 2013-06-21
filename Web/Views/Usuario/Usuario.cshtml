@@ -1,0 +1,87 @@
+﻿@model Web.Models.Usuario
+@using Web.Models
+@{
+    ViewBag.Title = "Usuario";
+}
+
+<div id="kendo-table">
+@(Html.Kendo().Grid<Web.Models.Empleado>()
+    .Name("GridEmpleado")
+    .Groupable()
+    .Pageable()
+    .Filterable()
+    .Selectable()
+    .Columns(columns =>
+    {
+        columns.Bound(p => p.persona.id).Filterable(false);
+        columns.Bound(p => p.persona.nombre);
+        columns.Bound(p => p.persona.apPaterno);
+        columns.Bound(p => p.persona.apMaterno);
+        columns.Command(p => { p.Custom("Agregar Usuario").Click("agregarUsuario"); });
+
+    })
+    .DataSource(datasource => datasource
+                                .Ajax()
+                                .PageSize(20)
+                                .Model(m => m.Id(p => p.persona.id))
+                                .Read(read => read.Action("Leer_Empleado", "Usuario"))
+                )
+)
+</div>
+
+            
+
+<script type="text/x-kendo-template" id="template">
+<fieldset>
+    <legend>Datos</legend>
+    <form ="form" action="GuardarUsuario" method="post" id="Form" >
+        <ul>
+            <li>
+                <div class="editor-label">@Html.LabelFor(p => p.id)</div>
+                @Html.TextBox("idBox", "#= id#", new { @readonly = "readonly" })
+            </li><li>
+                <div class="editor-label">@Html.LabelFor(p => p.nomUsuario)</div>
+                @Html.TextBoxFor(p => p.nomUsuario)
+            </li><li>
+                <div class="editor-label">@Html.Label("Contrasena")</div>
+                @Html.PasswordFor(p => p.contrasena)
+            </li><li>
+                
+                @(Html.Kendo().DropDownListFor(p => p.idPerfil)
+                .DataTextField("nombre")
+                .DataValueField("id")
+                .AutoBind(true)
+                .BindTo(Perfil.SeleccionarTodo())
+                .ToClientTemplate()
+                )
+            </li>
+        </ul>
+        <div id="botones">
+            <input type="submit" value="Guardar" />
+        </div>
+    </form>
+</fieldset>
+</script>
+
+<script>
+    var detailsTemplate = kendo.template($("#template").html());
+    function agregarUsuario(e) {
+        e.preventDefault();
+        var grid = $('#GridEmpleado').data('kendoGrid');
+        var row = grid.select();
+        var dataItem = grid.dataItem(row);
+        var wnd = $("#Usuario").data('kendoWindow');
+        wnd.content(detailsTemplate(dataItem));
+        wnd.center().open();
+    }
+</script>
+
+@(Html.Kendo().Window().Name("Usuario")
+    .Title("Modificar Usuario")
+    .Visible(false)
+    .Modal(true)
+    .Draggable(true)
+    .Width(500)
+    //.Events(ev => ev.Close("onClose"))     
+)
+

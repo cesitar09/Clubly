@@ -1,0 +1,192 @@
+﻿@model Web.Models.Socio
+@using Web.Models
+@{
+    ViewBag.Title = "RegistrarNoTitular";
+}
+
+<h2>Registrar Socio No Titular</h2>
+<fieldset>
+ <legend>Datos del Formulario</legend>
+ 
+    <form id = form action="Guardar" method= post>
+     <ul>
+     <li>
+                 <div class="editor-label">@Html.LabelFor(p => p.persona.nombre)</div>
+                 @Html.TextBoxFor(p => p.persona.nombre)  
+                  @if (Model!= null && Model.persona != null && Model.persona.nombre == null)
+                {
+                    <div id="validacion">@Html.ValidationMessageFor(p => p.persona.nombre)</div>
+                }           
+        </li><li>  
+                 <div class="editor-label">@Html.LabelFor(p => p.persona.apPaterno)</div>  
+                 @Html.TextBoxFor(p => p.persona.apPaterno)  
+                 @if (Model != null && Model.persona != null && Model.persona.apPaterno == null)
+                {
+                    <div id="validacion">@Html.ValidationMessageFor(p => p.persona.apPaterno)</div>
+                }            
+        </li><li>           
+                    <div class="editor-label">@Html.LabelFor(p => p.persona.apMaterno)</div>
+                    @Html.TextBoxFor(p => p.persona.apMaterno) 
+                    @if (Model != null &&  Model.persona != null && Model.persona.apMaterno == null)
+                {
+                    <div id="validacion">@Html.ValidationMessageFor(p => p.persona.apMaterno)</div>
+                }             
+        </li><li>
+                    <div class="editor-label">@Html.LabelFor(p => p.persona.dni)</div>
+                    @Html.TextBoxFor(p => p.persona.dni)
+                    @if (Model != null && Model.persona != null && Model.persona.dni == 0)
+                {
+                    <div id="validacion">@Html.ValidationMessageFor(p => p.persona.dni)</div>
+                }   
+         </li><li>            
+                    <div class="editor-label">@Html.LabelFor(p => p.persona.direccion)</div>
+                    @Html.TextBoxFor(p => p.persona.direccion)
+                    @if (Model != null && Model.persona != null && Model.persona.direccion == null)
+                {
+                    <div id="validacion">@Html.ValidationMessageFor(p => p.persona.direccion)</div>
+                }                
+        </li><li>
+            @*------------ESTODOCIVIL--------------*@
+     <div class = "editor-label">    @Html.LabelFor(p => p.persona.estadoCivil)    </div>  
+          @(Html.Kendo().ComboBox()
+           .Name("estadoComboBox")
+          .DataTextField("nombre")
+          .DataValueField("nombre")
+          .Filter("contains")
+          .AutoBind(true)
+          .Placeholder("--Seleccionar--")
+          .MinLength(3)     
+          .DataSource(source =>
+          {
+              source.Read(read =>
+              {
+                  read.Action("Leer_Estados", "RRHH");
+              })
+              .ServerFiltering(true);
+          })
+    )  
+        </li><li>   @Html.TextBoxFor(p => p.persona.estadoCivil, new { style = "display: none;" })      
+      </li><li>     
+    
+    </li><li>   @Html.TextBoxFor(p => p.persona.id)
+        </li>
+    
+    </ul>
+    <div id="botones">
+  <input type="button" value= "Limpiar"  id="limpiar" onclick="location.href = '@(Url.Action("MantenerEmpleado", "RRHH"))'" class="button fright"/>
+  <input type="submit" value= "Guardar" onclick="location.href = '@(Url.Action("Guardar", "RRHH"))'" class="button fright"/>
+  <input type="button" value= "Cancelar" id="cancelar" onclick="location.href = '@(Url.Action("Index", "Home"))'" class="button fright"/> 
+    </div>
+  </form>
+  
+  </fieldset>
+   
+   <div id="kendotable">
+    @(Html.Kendo().Grid<Web.Models.Socio>()
+    .Name("Grid")
+    .Columns(columns =>
+    {
+        columns.Bound(p => p.persona.dni).Width(90).Sortable(true);
+        //.Filterable(filterable => filterable.UI("nombreFiltro"));
+        columns.Bound(p => p.persona.nombre).Width(90).Sortable(true);
+        columns.Bound(p => p.persona.apPaterno).Title("Ap. Paterno").Width(120).Sortable(true);
+        columns.Bound(p => p.persona.apMaterno).Title("Ap. Materno").Width(120).Sortable(true);
+        columns.Bound(p => p.persona.estadoCivil).Sortable(true);
+        
+
+    })  .Selectable()
+               .Groupable()
+               .Pageable()
+               .Sortable()
+               .Scrollable()
+               .Filterable(filterable => filterable
+                                              .Extra(false)
+                                              .Operators(operators => operators
+                                                                      .ForString(str => str.Clear()
+                                                                          .Contains("Contiene")
+                                                                                           .StartsWith("Empezar con")
+                                                                                           .IsEqualTo("Es igual a")
+                                                                                           .IsNotEqualTo("Diferente a"))
+                                                                      .ForNumber(number => number.Clear()
+                                                                                                 .IsGreaterThan("Es mayor a")
+                                                                                                 .IsLessThan("Es menor a")
+                                                                                                 .IsEqualTo("Es igual a")
+                                                                                                 .IsNotEqualTo("Es diferente a"))
+                                                                      )
+                                )
+    .DataSource(datasource => datasource
+                                .Ajax()
+                                    .Read(read => read.Action("Leer_Socio", "Membresia"))
+        //                                                .Batch(false)
+          //                                                      .ServerOperation(false)
+            //                                                   .Events(events => events.Error("error_handler"))
+              //                                                 .Model( model => model.Id(p => p.persona.id))
+                //                                              .Destroy(update => update.Action("Eliminar", "Membresia"))
+
+
+
+                )
+)
+</div>
+
+
+
+<script type="text/javascript">
+$(document).ready(function() {
+var combobox = $("#familiaComboBox").data("kendoComboBox");
+        combobox.bind("change",function(e){
+            $("#familia_id").val(combobox.value());
+             //alert("idSede: "+combobox.value()); 
+        });
+        
+    });
+
+$(document).ready(function() {
+        var combobox = $("#estadoComboBox").data("kendoComboBox");
+        combobox.bind("change",function(e){
+            $("#persona_estadoCivil").val(combobox.value());
+           //  alert("idSede: "+combobox.value()); 
+        });
+    });
+
+function error_handler(e) {
+            if (e.errors) {
+                var message = "Errors:\n";
+                $.each(e.errors, function (key, value) {
+                    if ('errors' in value) {
+                        $.each(value.errors, function () {
+                            message += this + "\n";
+                        });
+                    }
+                });
+                alert(message);
+            }
+      }
+    function nombreFiltro(element) {
+        element.kendoAutoComplete({
+            dataSource: {
+                transport: {
+                    read: "@Url.Action("/FilterMenuCustomization_Nombre", "RRHH")"
+                }
+            }
+        });
+    }
+
+    function Edit(e){
+        e.preventDefault();
+        var grid = $('#Grid').data('kendoGrid');
+        var row = grid.select();
+        var dataItem = grid.dataItem(row);
+        var id = dataItem.id;
+        var sede = dataItem.sede.id;
+   location = "@Url.Action("Editar")"+"?persona.id=" + id ;
+    }
+  </script>
+  <script>
+      function onAdditionalData() {
+          return {
+              text: $("#FamiliaComboBox").val()
+          };
+      }
+     
+</script>

@@ -1,0 +1,111 @@
+﻿    @model Web.Models.Evento
+
+@{
+    ViewBag.Title = "Busqueda de Eventos";
+}
+
+<h2>Lista de Eventos Disponibles</h2><br/>
+<div>
+@(Html.Kendo().Grid<Web.Models.Evento>()
+    .Name("Grid") 
+    .Columns(columns =>
+    {
+        columns.Bound(p => p.nombre)
+            .Width(80)
+            //.Filterable(filterable => filterable.UI("nombreFiltro"))
+            ;
+        columns.Bound(p => p.descripcion)
+            .Width(100)
+            //.Filterable(filterable => filterable.UI("descripcionFiltro"))
+            ;
+        columns.Bound(p => p.fechaInicio)
+            .Width(70)
+            .Title("Inicio")
+            .Format("{0:dd/MM/yyyy}");
+            ;
+        columns.Bound(p => p.fechaFin)
+            .Width(70)
+            .Title("Fin")
+            .Format("{0:dd/MM/yyyy}");           
+            ;
+        columns.Bound(p => p.vacantesSocio)
+            .Width(70)
+            .Title("Vacantes")
+            ;
+        columns.Command(command => command
+            .Custom("Inscribir")
+            .Click("inscribir")
+            //.Action("Inscribir?id='@model.Id'", "InscribirEventoEmpleado")
+            ).Width(70)
+            ;
+        //columns.Template(p => @Html.ActionLink("New Report", "Create", "Report", new { ID = p.id.ToString() }, htmlAttributes: new { @class = "k-button k-button-icontext k-grid-NewReport" }).ToHtmlString());
+    //    columns.Template(@<text>
+    //            @Html.ActionLink("Inscribir", "InscribirEventoEmpleado", new { id = item.id }).
+    //            </text>)
+    //        .Title("")
+    //        .Width(70)
+    //        ;
+    })
+
+    .Sortable()
+    .Scrollable(scr=>scr.Height(450))
+        .Filterable(filterable => filterable
+            .Extra(false)
+            .Operators(operators => operators
+                .ForString(str => str.Clear()
+                    .Contains("Contiene"))
+                .ForNumber(number => number.Clear()
+                    .IsGreaterThan("Es mayor a")
+                    .IsLessThan("Es menor a")
+                    .IsEqualTo("Es igual a"))
+                .ForDate(date=>date.Clear()
+                    .IsGreaterThanOrEqualTo("Es mayor a")
+                    .IsLessThanOrEqualTo("Es menor a"))
+            )
+        )
+    .DataSource(datasource => datasource
+        .Ajax()
+        .Read(read => read.Action("leerEventos", "InscribirEventoEmpleado"))
+        .Model(model=>model.Id(p=>p.id))
+        .Sort(sort => sort.Add(evento => evento.fechaInicio))
+        .ServerOperation(false)
+    )
+)
+
+<script type="text/javascript">
+    function inscribir()
+    {
+        //alert("a");
+        //window.location="google.com";
+        var grid =$('#Grid').data('kendoGrid');
+        //alert("A");
+        var evento=grid.dataItem(grid.select());
+        alert("a");
+        window.location="www.google.com";
+        window.location ="@Url.Action("Inscribir", "InscribirEventoEmpleado")";
+        var grid = $('#Grid').data('kendoGrid');   //get a reference to the grid data 
+        var evento = grid.dataItem(grid.select()); //get a reference to the currently selected row
+        window.location.href = "@Url.Action("Inscribir", "InscribirEventoEmpleado")"+"?id="+evento.id;
+    }
+    function nombreFiltro(element) {
+        element.kendoDropDownList({
+            dataSource: {
+                transport: {
+                    read: "@Url.Action("/FilterMenuCustomization_Nombre")"
+                }
+            },
+            optionLabel: "--Select Value--"
+        });
+    }
+
+    function descripcionFiltro(element) {
+        element.kendoAutoComplete({
+            dataSource: {
+                transport: {
+                    read: "@Url.Action("/FilterMenuCustomization_Descripcion")"
+                }
+            }
+        });
+    }
+  </script>
+  </div>

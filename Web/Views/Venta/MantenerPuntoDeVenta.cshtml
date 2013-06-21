@@ -1,0 +1,130 @@
+﻿@model Web.Models.PuntoDeVenta
+@using Web.Models
+@{
+    ViewBag.Title = "Mantener Punto de venta";
+    ViewBag.lala = "3";
+}
+
+<h1>@ViewBag.Title</h1>
+
+<fieldset>
+ <legend>Datos del Punto De Venta</legend>
+ @using (Html.BeginForm("InsertarPuntoDeVenta", "Venta", FormMethod.Post)){
+    <ul>
+    <li>
+       <div class="editor-label">@Html.LabelFor(p => p.id)</div>
+       @Html.TextBoxFor(p => p.id, new { @readonly = "readonly" })
+    </li><li>
+         <div class="editor-label">@Html.LabelFor(p => p.nombre)</div>
+                @Html.TextBoxFor(p => p.nombre)
+                @if (Model != null && Model.nombre == null)
+                {
+                    <div id="validacion">@Html.ValidationMessageFor(p => p.nombre)</div>
+                }
+    </li><li>
+         <div class="editor-label">@Html.LabelFor(s => s.sede)</div>
+        <div class = "combosede">          
+          @(Html.Kendo().ComboBoxFor(s => s.codSede)
+          .DataTextField("nombre")
+          .DataValueField("id")
+                  .Filter("contains")
+          .AutoBind(true)
+          .MinLength(3)
+          .DataSource(source =>
+          {
+              source.Read(read =>
+              {
+                  read.Action("Leer_Sedes", "RRHH")
+                   ;//.Data("onAdditionalData");
+              })
+              .ServerFiltering(true);
+          })
+          .Value(Model != null && Model.sede != null ? Model.sede.nombre : null)
+    )  </div>
+    </li>
+         @Html.TextBoxFor(p => p.estado, "", new {style = "display:none;" })
+    </ul>
+
+    <div id="botones">
+            <input type="button" value="Limpiar" id="Limpiar" onclick="location.href = '@(Url.Action("MantenerPuntoDeVenta", "Venta"))'" />
+            <input type="submit" value=@(Model == null ? "Insertar" : "Modificar") />
+        </div>
+ }
+    </fieldset>
+
+    <div id="kendotable">
+    @(Html.Kendo().Grid<Web.Models.PuntoDeVenta>()
+    .Name("Grid")
+    .Columns(columns =>
+    {
+        columns.Bound(p => p.id).Width(50);
+            //.Filterable(filterable => filterable.UI("idFiltro"));
+        columns.Bound(p => p.nombre).Sortable(true);
+            //.Filterable(filterable => filterable.UI("nombreFiltro"));
+        columns.Bound(p => p.sede.nombre).Sortable(true).Title("Sede");
+            //.Filterable(filterable => filterable.UI("sedeFiltro"));
+        columns.Command(c => { c.Custom("Editar").Click("EditarPuntoDeVenta"); c.Destroy().Text("Eliminar"); }).Width(200);
+
+    })  .Editable(editable => { editable.Mode(GridEditMode.InLine); editable.DisplayDeleteConfirmation("El regitro será eliminado ¿Desea continuar?"); })
+        .Pageable()
+        .Sortable()
+        .Scrollable()
+        .Filterable(filterable => filterable
+        .Extra(false)
+        .Operators(operators => operators
+            .ForString(str => str.Clear()
+                .StartsWith("Inicia con")
+                .IsEqualTo("Contiene")
+                .IsNotEqualTo("No contiene")
+            ))
+        )
+    .DataSource(d => d
+        .Ajax()
+        .Read(r => r.Action("LeerPuntoDeVenta", "Venta"))
+        .Model(m => m.Id(p => p.id))
+        .Destroy(a => a.Action("EliminarPuntoDeVenta", "Venta"))
+            )
+        .Selectable()
+    )
+</div>
+
+<script type="text/javascript">
+    function EditarPuntoDeVenta(e) {
+        e.preventDefault();
+        var grid = $('#Grid').data('kendoGrid');
+        var row = grid.select();
+        var dataItem = grid.dataItem(row);
+        var id = dataItem.id;
+        location = "@Url.Action("EditarPuntoDeVenta")" + "?id=" + id;
+    }
+
+//    function nombreFiltro(element) {
+//        element.kendoAutoComplete({
+//            dataSource: {
+//                transport: {
+//                    read: "@Url.Action("/FilterMenuCustomization_Nombre")"
+//                }
+//            }
+//        });
+//    }
+
+//    function sedeFiltro(element) {
+//        element.kendoAutoComplete({
+//            dataSource: {
+//                transport: {
+//                    read: "@Url.Action("/FilterMenuCustomization_Sede")"
+//                }
+//            }
+//        });
+//    }
+
+//    function estadoFiltro(element) {
+//        element.kendoAutoComplete({
+//            dataSource: {
+//                transport: {
+//                    read: "@Url.Action("/FilterMenuCustomization_Estado")"
+//                }
+//            }
+//        });
+//    }
+</script>   
