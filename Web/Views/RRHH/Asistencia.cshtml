@@ -1,4 +1,4 @@
-﻿@model Web.Models.Empleado
+﻿    @model Web.Models.Empleado
 
 @{
     ViewBag.Title = "Asistencia";
@@ -36,6 +36,8 @@
          { <script type="text/javascript">alert("El codigo o nombre ingresados no existen")</script>} 
          else if (ViewData["message"].Equals("YAAM"))
          { <script type="text/javascript">alert("Usted ya registro su Entrada y su Salida")</script>}
+         else if (ViewData["message"].Equals("ANC"))
+         { <script type="text/javascript">alert("Usted aun no puede registrar su hora de Salida")</script>}
 </form>
 }
   </fieldset>
@@ -60,7 +62,10 @@
                 //si la respuesta es: { me : "algo" }
                 var me = data.me;
                 $("#nombre").val(me);
-                }
+                },
+                error: function () {
+            alert("Ocurrio un error");
+        }
        });
       });
 
@@ -75,17 +80,19 @@
           rules: {
               "persona.id": {
                   required: true,
-                  maxlength: 5,
+                  digits : true,
                   minlength: 5,
-                  digits : true
+                  maxlength: 5
+                  
               }
           },
           messages: {
               "persona.id": {
                   required: "*Campo Obligatorio",
-                  maxlength: "El codigo debe tener 5 digitos",
-                  minlength : "El codigo debe tener 5 digitos",
-                  digits : "Solo se permiten digitos"
+                  digits : "Solo se permiten digitos",
+                  minlength: "El codigo debe tener 5 digitos",
+                  maxlength: "El codigo debe tener 5 digitos"
+                  
               }
           },
           submitHandler: function (form) {

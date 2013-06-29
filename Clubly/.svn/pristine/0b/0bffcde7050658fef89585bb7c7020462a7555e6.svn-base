@@ -1,0 +1,313 @@
+﻿@model Web.Models.EventoPrivado
+@using Web.Models
+@{
+    ViewBag.Title = "Mantener Evento";   
+}
+
+
+<h1>Mantener Evento</h1>
+<fieldset>
+ <legend>Datos del Formulario</legend>
+ 
+    <form id = "form" action="insertarEventoNoCorp" method= post>
+     <ul>
+     <li>
+        @Html.LabelFor(p => p.id)
+        @Html.TextBoxFor(p => p.id, new { @readonly = "readonly" })
+         </li><li>
+                    <div class="editor-label">@Html.LabelFor(p => p.numeroInvitados)</div>
+                    @Html.TextBoxFor(p => p.numeroInvitados)   
+         </li><li>  
+                    <div class="editor-label">@Html.LabelFor(p => p.nombre)</div>
+                    @Html.TextBoxFor(p => p.nombre)                              
+         </li><li>           
+                    <div class="editor-label">@Html.LabelFor(p => p.precioSocio)</div>
+                    @Html.TextBoxFor(p => p.precioSocio)          
+         </li><li>         
+                    <div class="editor-label">@Html.LabelFor(p => p.descripcion)</div>  
+                    @Html.TextBoxFor(p => p.descripcion)              
+         </li><li>                    
+                    <div class="editor-label">@Html.LabelFor(p => p.precioInvitado)</div>
+                    @Html.TextBoxFor(p => p.precioInvitado)                    
+         </li><li>
+                    <div class="editor-label">@Html.LabelFor(p => p.vacantesSocio)</div>
+                    @Html.TextBoxFor(p => p.vacantesSocio)
+         </li><li>
+                    <div class="editor-label">@Html.LabelFor(p => p.vacantesInvitado)</div>
+                    @Html.TextBoxFor(p => p.vacantesInvitado)
+         </li><li> 
+                    @*-------DATEPICKER INICIO-------*@
+                    <div class="editor-label">@Html.LabelFor(p => p.fechaInicio)</div>
+                    @(Html.Kendo().DateTimePickerFor(p => p.fechaInicio)
+                        .Min(new DateTime(1990, 1, 1)) 
+                        .Max(new DateTime(2020, 12, 31)) 
+                        .Value(DateTime.Today) 
+                        .Events(e => e.Change("startChange"))
+                    )
+         </li><li>  
+                    @*-------DATEPICKER FIN-------*@                      
+                    <div class="editor-label">@Html.LabelFor(p => p.fechaFin)</div>
+                    @(Html.Kendo().DateTimePickerFor(p => p.fechaFin)
+                        .Min(new DateTime(1990, 1, 1))
+                        .Max(new DateTime(2020, 12, 31))
+                        .Value(DateTime.Today) 
+                        .Events(e => e.Change("endChange"))
+                    )
+         </li><li>
+                    @*------------EMPLEADO--------------*@
+                    <div class = "editor-label">    @Html.LabelFor(p => p.empleado)    </div>  
+                    @(Html.Kendo().DropDownList()
+                    .Name("empleadoComboBox")       
+                    .DataTextField("persona.nombre")
+                    .DataValueField("id")
+                    .AutoBind(true)
+                    .BindTo(Empleado.seleccionarTodo()) 
+                    .Value(Model != null && Model.empleado != null ? Model.empleado.persona.id.ToString() : null)
+                    )
+        </li><li>
+                    @*------------SEDE--------------*@
+                    <div> <label> Sede </label>   </div>
+                    @(Html.Kendo().DropDownList()
+                    .Name("sedes")
+                    .HtmlAttributes(new { style = "width:300px" })
+                    .OptionLabel("Seleccione la sede...")
+                    .DataTextField("nombre")
+                    .DataValueField("id")
+                    .AutoBind(true)
+                    .BindTo(Sede.SeleccionarTodo())
+                    )
+        </li><li>
+        </li><li>
+                    <div> <label> Ambiente </label>   </div>
+                    @(Html.Kendo().DropDownList()
+                    .Name("Ambiente")
+                    .HtmlAttributes(new { style = "width:300px" })
+                    .OptionLabel("Seleccione el ambiente...")
+                    .DataTextField("nombre")
+                    .DataValueField("id")
+                    .DataSource(source => {
+                        source.Read(read =>
+                        {
+                            read. Action("getAmbiente", "Logistica")
+                                .Data("filtrarSede");
+                        })
+                        .ServerFiltering(true);
+                    })
+                    .Enable(false)
+                    .AutoBind(false)
+                    .CascadeFrom("sedes")
+                    )
+                    <script>
+                        function filterProducts() {
+                            return {
+                                categories: $("#sedes").val()
+                            };
+                        }
+                    </script>
+        </li>
+    </ul>     
+            @Html.TextBoxFor(p => p.estado  , new { style = "display: none;" })     
+            @Html.TextBoxFor(p => p.empleado.persona.id , new { style = "display: none;" })      
+
+    <div id="botones">
+        <input type="button" value= "Limpiar"  id="limpiar" onclick="location.href = '@(Url.Action("MantenerEventos", "GestionarEventos"))'" class="button fright"/>
+        <input type="submit" value=  @(Model == null ? "Insertar" : "Modificar")  />
+    </div>
+    @if (ViewData["message"] == null)
+    { }
+    else if (ViewData["message"].Equals("F"))
+    { <script type= "text/javascript">alert("Lo sentimos!\n No se pudo realizar la operacion\nVuelva a intentarlo en otro momento. ")</script>}
+    else if (ViewData["message"].Equals("E"))
+    { <script type= "text/javascript">alert("La operación se realizó con éxito!")</script>}                                                                                                                                      
+  </form>
+  
+  </fieldset>
+   
+   <div id="kendotable">
+    @(Html.Kendo().Grid<Web.Models.EventoPrivado>()
+    .Name("Grid")
+    .Columns(columns =>
+    {
+        columns.Bound(p => p.nombre).Sortable(true);
+        columns.Bound(p => p.fechaInicio).Sortable(true);
+        columns.Bound(p => p.fechaFin).Sortable(true);  
+        columns.Bound(p => p.vacantesSocio).Sortable(true);   
+        columns.Bound(p => p.vacantesInvitado).Sortable(true);
+        columns.Command(command => { command.Custom("Editar").Click("Edit"); command.Destroy().Text("Eliminar"); }).Width(181);
+
+    })
+    .Editable(editable => { editable.Mode(GridEditMode.InLine); editable.DisplayDeleteConfirmation("El registro será eliminado ¿Desea continuar?"); })
+    .Selectable()
+    .Pageable()
+    .Sortable()
+    .Filterable(filterable => filterable
+         .Extra(false)
+         .Operators(operators => operators
+         .ForString(str => str.Clear()
+         .Contains("Contiene")
+         .StartsWith("Empezar con")
+         .IsEqualTo("Es igual a")
+         .IsNotEqualTo("Diferente a"))
+         .ForNumber(number => number.Clear()
+        .IsGreaterThan("Es mayor a")
+        .IsLessThan("Es menor a")
+        .IsEqualTo("Es igual a")
+        .IsNotEqualTo("Es diferente a"))
+     )
+    )
+    .DataSource(datasource => datasource
+            .Ajax()
+            .PageSize(6)
+            .Read(read => read.Action("leerEventosCorp", "GestionarEventos"))
+            .Events(events => events.Error("ErrorMessage"))
+            .Model(model => model.Id(p => p.id))
+            .Destroy(update => update.Action("eliminarEventoNoCorp", "GestionarEventos"))
+        )
+    )
+</div>
+
+
+
+<script type="text/javascript">
+
+$("#form").validate({
+    ignore: "",
+		rules: {
+            "nombre":  {
+                required : true ,
+                maxlength : 50     
+                },
+            "descripcion":  {
+                required : true,
+                maxlength : 200
+                },
+            "fechaInicio":  {
+                required : true
+                },
+			"fechaFin" : {    
+                required : true
+                },
+            "precioSocio" :{
+                required : true,
+                number : true,
+                range : [0,10000]
+                },
+            "precioInvitado" : {
+                required: true,
+                number: true,
+                range: [0, 10000]
+                },
+            "vacantesSocio": {
+                required: true,
+                number : true,
+                range : [0,1000]
+                },
+            "vacantesInvitado" : {
+                required: true,
+                number: true,
+                range: [0, 4000]
+                },
+            "numeroInvitados" : {
+                required: true,
+                number: true,
+                range: [0,10]
+                },
+            "empleado":{
+				required: true
+			}
+		},
+		messages: {
+		    "nombre": {
+		        required: "*Campo obligatorio",
+		        maxlength: "Tamaño máx. 50 caracteres"
+		    },
+		    "descripcion": {
+		        required: "*Campo obligatorio",
+		        maxlength: "Tamaño máx. 200 caracteres"
+		    },
+		    "fechaInicio": {
+		        required: "*Campo obligatorio"
+		    },
+		    "fechaFin": {
+		        required: "*Campo obligatorio"
+		    },
+		    "precioSocio": {
+		        required: "*Campo obligatorio",
+		        number: "Ingrese solo números",
+		        range: "Precio fuera de rango:[0,10000]"
+		    },
+		    "precioInvitado": {
+		        required: "*Campo obligatorio",
+		        number: "Ingrese solo números",
+		        range: "Precio fuera de rango:[0,10000]"
+		    },
+		    "vacantesSocio": {
+		        required: "*Campo obligatorio",
+		        number: "Ingrese solo números",
+		        range: "Precio fuera de rango:[0,1000]"
+		    },
+		    "vacantesInvitado": {
+		        required: "*Campo obligatorio",
+		        number: "Ingrese solo números",
+		        range: "Precio fuera de rango:[0,4000]"
+		    },
+		    "numeroInvitados": {
+		        required: "*Campo obligatorio",
+		        number: "Ingrese solo números",
+		        range: "Precio fuera de rango:[0,10]"
+		    },
+		    "empleado": {
+		        required: "*Campo obligatorio"
+		    }
+		},
+
+		submitHandler: function ConfirmationBox(form){
+            var result = confirm ("¿Está seguro de realizar los cambios?");
+            if (result == true){
+                form.submit();
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+});
+
+$(document).ready(function() {
+    var dropdownlist = $("#empleadoComboBox").data("kendoDropDownList");
+          
+    $("#empleado_persona_id").val(dropdownlist.value());
+    dropdownlist.bind("change",function(e){ 
+        $("#empleado_persona_id").val(dropdownlist.value()); 
+    });
+});
+
+
+function ErrorMessage(e) {
+    alert("A ocurrido un error en el servidor!\n Vuelva a intentar la operación en unos minutos...");
+};
+
+function startChange() {
+    var endPicker = $("#end").data("kendoDatePicker"),
+            startDate = this.value();
+
+    if (startDate) {
+        startDate = new Date(startDate);
+        startDate.setDate(startDate.getDate() + 1);
+        endPicker.min(startDate);
+    }
+};
+
+function endChange() {
+    var startPicker = $("#start").data("kendoDatePicker"),
+            endDate = this.value();
+
+    if (endDate) {
+        endDate = new Date(endDate);
+        endDate.setDate(endDate.getDate() - 1);
+        startPicker.max(endDate);
+    }
+};
+
+</script>
+

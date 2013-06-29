@@ -1,0 +1,64 @@
+﻿@using Web.Models
+@{
+    ViewBag.Title = "ParametrosFinanzas";
+}
+
+<h2>ParametrosFinanzas</h2>
+<fieldset>
+    <legend> Parametros Reporte de Finanzas</legend>
+
+
+    @using (@Html.BeginForm("ReporteFinanzas","Reportes", FormMethod.Post)){
+
+            
+            <div class="editor-label">@Html.Label("Fecha Inicial")</div>
+            @(Html.Kendo().DatePicker()
+            .HtmlAttributes(new { style= "width:150px"})
+                .Name("fechaINI")
+                .Min(new DateTime(1990, 1, 1))
+                .Max(new DateTime(2020, 12, 31))
+                //.Value(DateTime.Today)
+                .Events(e => e.Change("startChange"))
+
+            )
+            
+
+            <div class="editor-label">@Html.Label("Fecha Final")</div>
+            @(Html.Kendo().DatePicker()
+            .HtmlAttributes(new { style= "width:150px"})
+                .Name("fechaFIN")
+                .Min(new DateTime(1990, 1, 1))
+                .Max(new DateTime(2020, 12, 31))
+                //.Value(DateTime.Today)
+                .Events(e => e.Change("endChange"))
+
+            )
+
+            <input type="submit" value="Generar Reporte") />
+    }
+
+</fieldset>
+
+<script>
+    function startChange() {
+        var endPicker = $("#fechaFIN").data("kendoDatePicker"),
+            startDate = this.value();
+        
+        if (startDate) {
+            startDate = new Date(startDate);
+            startDate.setDate(startDate.getDate() + 1);
+            endPicker.min(startDate);
+        }
+    }
+
+    function endChange() {
+        var startPicker = $("#fechaINI").data("kendoDatePicker"),
+            endDate = this.value();
+       
+        if (endDate) {
+            endDate = new Date(endDate);
+            endDate.setDate(endDate.getDate() - 1);
+            startPicker.max(endDate);
+        }
+    }
+</script>

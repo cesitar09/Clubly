@@ -17,6 +17,7 @@ namespace Negocio
             //{
                 Datos.Context.context().Usuario.AddObject(usuario);
                 Datos.Context.context().SaveChanges();
+                Negocio.Util.logito.ElLogeador("Se ingreso el usuario", usuario.nomUsuario);
             //}catch(Exception ex)
             //{
             //    return ex;
@@ -55,6 +56,7 @@ namespace Negocio
                 auxUsuario.Perfil = Negocio.Perfil.seleccionarTodo().Single(p => p.id == usuario.Perfil.id);
                 //auxUsuario.Permiso = usuario.Permiso;
                 Datos.Context.context().SaveChanges();
+                Negocio.Util.logito.ElLogeador("Se modifico el usuario", usuario.nomUsuario);
             }
             catch (Exception ex)
             {
@@ -63,11 +65,9 @@ namespace Negocio
             return null;
         }
 
-        public static int esValido(short id, String contrasena)
+        public static int esValido(string nombre , String contrasena)
         {
-            try
-            {
-                if (Datos.Context.context().Usuario.Any(p => p.id == id && p.contrasena == contrasena))
+                if (Datos.Context.context().Usuario.Any(p => p.nomUsuario == nombre && p.contrasena == contrasena))
                 {
                     return 1;
                 }
@@ -75,11 +75,11 @@ namespace Negocio
                 {
                     return 2;
                 }
-            }
-            catch (Exception ex)
-            {
-                return 3;
-            }
+        }
+
+        public static short obtenerid(string nombre, string contrasena) {
+            Datos.Usuario usuario = Context.context().Usuario.Single(p => p.nomUsuario == nombre && p.contrasena == contrasena);
+                return usuario.id;
         }
     }
 }

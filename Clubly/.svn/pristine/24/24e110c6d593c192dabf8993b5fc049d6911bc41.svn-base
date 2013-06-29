@@ -1,0 +1,118 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Data.Linq;
+using System.Web;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using Newtonsoft.Json;
+using Negocio.Util;
+
+namespace Web.Models
+{
+    public class Pago
+    {
+        [DisplayName("Id de pago")]
+        public short id { get; set; }
+
+        [JsonProperty("Fecha Registro")]
+        [Required(ErrorMessage = "Debe seleccionar una fecha")]
+        [DisplayName("Fecha Inicio")]
+        public DateTime fechaRegistro { get; set; }
+
+        [JsonProperty("Fecha Registro")]
+        [Required(ErrorMessage = "Debe seleccionar una fecha")]
+        [DisplayName("Fecha Limite")]
+        public DateTime fechaLimite { get; set; }
+
+        [JsonProperty("Monto")]
+        [Required(ErrorMessage = "Debe ingresar un precio")]
+        [DisplayName("Monto")]
+        public double? monto { get; set; }
+
+        [JsonProperty("Estado")]
+        public short estado { get; set; }
+
+        public Pago()
+        {
+        }
+
+        public Pago(Datos.Pago pago)
+        {
+            id = pago.id;
+
+            monto = pago.monto;
+            fechaRegistro = pago.fechaRegistro;
+            fechaLimite = pago.fechaLimite;
+            estado = pago.estado;
+
+        }
+
+        //Convertidores
+
+        public static Models.Pago Convertir(Datos.Pago pagos)
+        {
+            return new Pago(pagos);
+        }
+
+        public static IEnumerable<Models.Pago> ConvertirLista(IEnumerable<Datos.Pago> dListaPagos)
+        {
+            return dListaPagos.Select(pago => new Models.Pago(pago));
+        }
+
+        public static Datos.Pago Invertir(Models.Pago mPago)
+        {
+            Datos.Pago dPago = new Datos.Pago();
+
+            dPago.id = mPago.id;
+            //dPago.monto = mPago.monto;
+            dPago.fechaRegistro = mPago.fechaRegistro;
+            dPago.fechaLimite = mPago.fechaLimite;
+            dPago.estado = mPago.estado;
+
+            return dPago;
+        }
+
+        public static IEnumerable<Datos.Pago> ConvertirListaInverso(IEnumerable<Models.Pago> mPago)
+        {
+            return mPago.Select(act => Invertir(act));
+        }
+
+        // querys de busqueda
+
+        public static IEnumerable<Models.Pago> SeleccionarTodo()
+        {
+            IEnumerable<Datos.Pago> pago = Negocio.Pago.SeleccionarTodo();
+            return ConvertirLista(pago);
+        }
+
+        public static Models.Pago buscarId(short id)
+        {
+            return Convertir(Negocio.Pago.BuscarId(id));
+        }
+
+        //interaccion bd
+
+        public static int insertar(Models.Pago pago)
+        {
+            if (Negocio.Pago.Insertar(Invertir(pago)) == null)
+                return 1;
+            else
+                return 0;
+        }
+
+        /*public static int modificar(Models.Pago pago)
+        {
+            if (Negocio.Pago.Modificar(Invertir(pago)) == null)
+                return 1;
+            else
+                return 0;
+        }
+
+        public static void eliminar(Models.Pago pago)
+        {
+            Negocio.Pago.(Invertir(pago));
+        }*/
+
+    }
+}

@@ -15,23 +15,23 @@ namespace Web.Models
         //public short id { get; set; }
         public Models.Persona persona { get; set; }
 
-        [DisplayName("Sueldo")]
+        [DisplayName("*Sueldo")]
         [Required(ErrorMessage = " Ingrese un valor")]
         [Range(00.1, 999999, ErrorMessage= "Ingrese un numero valido")]
         public double sueldo { get; set; }
         
-        [DisplayName("Tipo de empleado")]
+        [DisplayName("*Cargo")]
         [Required(ErrorMessage = "Seleccione un tipo de empleado ")]
          public Models.TipoEmpleado tipoEmpleado { get; set; }
 
-        [DisplayName("Turno de trabajo")]
+        [DisplayName("*Turno de trabajo")]
        public Models.TurnoDeTrabajo turnodetrabajo { get; set; }
 
         //[DisplayName("Usuario")]
         //public Models.Usuario usuario { get; set; }
 
       
-       [DisplayName("Sede")]
+       [DisplayName("*Sede")]
        [Required(ErrorMessage= " Seleccione una Sede" )]
         public Models.Sede sede {get; set;}
         
@@ -102,15 +102,13 @@ namespace Web.Models
         }
 
         //Negocio
-        public static int insertar(Models.Empleado empleado)
+        public static void insertar(Models.Empleado empleado)
         {
             empleado.persona.estado = 1;
-            if (Negocio.Empleado.insertar(Invertir(empleado)) == null)
-                return 1;
-            else
-                return 0;
+            Negocio.Empleado.insertar(Invertir(empleado));
+                
         }
-        public static int modificar(Models.Empleado emp, Models.Empleado empleado)
+        public static void modificar(Models.Empleado emp, Models.Empleado empleado)
         {
             
             Datos.Empleado e = Negocio.Empleado.buscarId(emp.persona.id);
@@ -125,28 +123,29 @@ namespace Web.Models
             e.Sede = Negocio.Sede.buscarId(empleado.sede.id);
             e.TipoEmpleado = Negocio.TipoEmpleado.buscarId(empleado.tipoEmpleado.id);
             e.TurnoDeTrabajo = Negocio.TurnoDeTrabajo.buscarId(empleado.turnodetrabajo.id);
-            if (Negocio.Empleado.modificar(e) == null)
-                return 1;
-            else 
-                return 0;
+            Negocio.Empleado.modificar(e); 
          
         }
-        public static int eliminar(Models.Empleado empleado)
+        public static void eliminar(Models.Empleado empleado)
         {
             Models.Persona persona = Models.Persona.buscarID(empleado.persona.id);
-            if (Models.Persona.eliminar(persona) == 0)
-                return 0;
-            else
-                return 1;
-        }
+            Models.Persona.eliminar(persona);
+            }
         public static IEnumerable<Models.Empleado> seleccionarTodo()
         {
             return ConvertirLista(Negocio.Empleado.seleccionarTodo());
         }
      
-        public static Models.Empleado buscarId(short id)
+        public static Models.Empleado buscarId(long id)
         {
-            return Convertir(Negocio.Empleado.buscarId(id));
+            Datos.Empleado emp = Negocio.Empleado.buscarId(id);
+            if (emp != null) return Convertir(emp);
+            else return null;
+        }
+
+        public static bool existeDni(Int32 dni, short id) {
+
+            return Negocio.Empleado.existeDNI(dni, id);
         }
     }
 }

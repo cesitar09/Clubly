@@ -101,11 +101,11 @@
     .Columns(columns =>
         {
             columns.Bound(p => p.familia.id);
-            //columns.Bound(p => p.familia.socioTitular.apellido);
-            //columns.Bound(p => p.invitado.nombre);
-            //columns.Bound(p => p.invitado.dni);
-            columns.Bound(p => p.horaIngreso).Title("Hora de Ingreso");
-            columns.Bound(p => p.pago.monto);
+            //columns.Bound(p => p.familia.usuario.nomUsuario);
+            columns.Template(p => p.invitado).ClientTemplate("#=invitado.nombre# + + #=invitado.apPaterno# + + #=invitado.apMaterno#").Title("Invitado");
+            columns.Bound(p => p.invitado.dni);
+            columns.Bound(p => p.fechaIngreso).Format("{0:H}:{0:mm}:{0:ss}").Title("Hora de Ingreso");
+            //columns.Bound(p => p.pago.monto);
         }
         )
         .DataSource(dataSource => dataSource
@@ -115,6 +115,8 @@
         )
         .Pageable()
         .Sortable()
+        .Filterable()
+        .Groupable()
     )
 </div>
 

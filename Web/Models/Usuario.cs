@@ -46,11 +46,14 @@ namespace Web.Models
         //metodos para convertir
         public Usuario(Datos.Usuario usuario)
         {
-            id = usuario.id;
-            nomUsuario = usuario.nomUsuario;
-            contrasena = usuario.contrasena;
-            perfil = Models.Perfil.buscarId(usuario.Perfil.id);
-            estado = usuario.estado;
+            if (usuario != null)
+            {
+                id = usuario.id;
+                nomUsuario = usuario.nomUsuario;
+                contrasena = usuario.contrasena;
+                perfil = Models.Perfil.buscarId(usuario.Perfil.id);
+                estado = usuario.estado;
+            }
 
         }
         public static Usuario Convertir(Datos.Usuario usuario)
@@ -79,8 +82,8 @@ namespace Web.Models
             return listaUsuarios.Select(usuario => Invertir(usuario));
         }
 
-        public static int esValido(short id, string contrasena) {
-            return Negocio.Usuario.esValido(id, contrasena);
+        public static int esValido(string nomb, string contrasena) {
+            return Negocio.Usuario.esValido(nomb, contrasena);
         }
 
         public static Models.Usuario buscarId(short id) {

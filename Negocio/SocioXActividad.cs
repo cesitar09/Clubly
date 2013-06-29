@@ -12,69 +12,107 @@ namespace Negocio
     public class SocioXActividad
     {
 
-    //CONEXION BASE DE DATOS
-        public static Entities context()
-        {
-            return Datos.Context.context();
-        }
-
     //QUERY PARA INSERTAR
         public static int Insertar(Datos.SocioXActividad socioXActividad)
         {
             bool actividadActualizada = false;
+            bool inscripcionActualizada = false;
             Datos.Actividad actividad=null;
+            Datos.Socio socio = null;
 
-            using (Entities tempContext = new Entities())
+            //Busca cupo en la actividad
+            try
             {
-                //Busca cupo en la actividad
-                try
+                socio = Negocio.Socio.BuscarId(socioXActividad.idSocio);
+                actividad = Negocio.Actividad.BuscarId(socioXActividad.idActividad);
+                Datos.SocioXActividad eliminado = Context.context().SocioXActividad.SingleOrDefault(e =>
+                    (e.idActividad == socioXActividad.idActividad) &&
+                    (e.idSocio == socioXActividad.idSocio));
+                //Paso 1: comprueba que no se encuentre inscrito
+                if (eliminado == null || eliminado.estado == 0)
                 {
-                    actividad = Negocio.Actividad.BuscarId(socioXActividad.idActividad);
-                    Datos.SocioXActividad eliminado = tempContext.SocioXActividad.SingleOrDefault(e =>
-                        (e.idActividad == socioXActividad.idActividad) &&
-                        (e.idSocio == socioXActividad.idSocio));
-                    //Paso 1: comprueba que no se encuentre inscrito
-                    if (eliminado == null || eliminado.estado == 0)
+                    //Paso 2: trata de reservar cupo modificando la cantidad de vacantesDisponibles
+                    //Si ha habido otra transaccion que obtuvo un cupo, vuelve a intentarlo
+                    while (actividad.vacantesDisponibles > 0 && !actividadActualizada)
                     {
-                        //Paso 2: trata de reservar cupo modificando la cantidad de vacantesDisponibles
-                        //Si ha habido otra transaccion que obtuvo un cupo, vuelve a intentarlo
-                        while (actividad.vacantesDisponibles > 0 && actividadActualizada == false)
+                        try
                         {
-                            try
-                            {
-                                actividad.vacantesDisponibles--;
-                                context().SaveChanges();
-                                actividadActualizada = true;    //ejecuta esto si no hubo problemas al obtener un cupo
-                            }
-                            catch (OptimisticConcurrencyException)    //ocurre una excepcion si otro usuario ha modificado el valor de vacantesDisponibles al mismo tiempo
-                            {
-                                Debug.WriteLine("Error al separar cupo para la actividad "+actividad.nombre);
-                                context().Refresh(RefreshMode.StoreWins, actividad);
-                            }
+                            actividad.vacantesDisponibles--;
+                            Context.context().SaveChanges();
+                            actividadActualizada = true;    //ejecuta esto si no hubo problemas al obtener un cupo
                         }
-                        //Paso 3: Si obtuvo cupo correctamente inserta en la tabla socioXActividad
-                        if (actividadActualizada)
+                        catch (OptimisticConcurrencyException)    //ocurre una excepcion si otro usuario ha modificado el valor de vacantesDisponibles al mismo tiempo
+                        {
+                            Debug.WriteLine("Error al separar cupo para la actividad " + actividad.nombre);
+                            Context.context().Refresh(RefreshMode.StoreWins, actividad);
+                        }
+                    }
+                    //Paso 3: Si obtuvo cupo correctamente inserta en la tabla socioXActividad
+                    if (actividadActualizada)
+                    {
+                        try
                         {
                             if (eliminado == null)
                             {   //si no esta en la bd
-                                tempContext.SocioXActividad.AddObject(socioXActividad);
-                                tempContext.SaveChanges();
+                                if (actividad.precio > 0)
+                                {
+                                    Datos.Pago pago = new Datos.Pago();
+                                    pago.fechaRegistro = DateTime.Now;
+                                    pago.fechaLimite = actividad.fechaInicio.AddDays(-Parametros.SeleccionarParametros().diasLimitePago);
+                                    pago.ConceptoDePago = ConceptoDePago.buscarId(2);
+                                    pago.descripcion = "Incripción de " + socio.Persona.nombre + " " + socio.Persona.apPaterno + " " + 
+                                        socio.Persona.apMaterno + " para la actividad " + actividad.nombre;
+                                    pago.monto = actividad.precio;
+                                    pago.Familia = Negocio.Familia.buscarIdSocio(socioXActividad.idSocio);
+                                    pago.estado = Pago.PENDIENTE;
+                                    socioXActividad.Pago = pago;
+                                }
+                                Context.context().SocioXActividad.AddObject(socioXActividad);
+                                Context.context().SaveChanges();
+                                inscripcionActualizada = true;
                             }
                             else
                             {   //Si se encuentra en la bd como inactivo
+                                if (actividad.precio > 0)
+                                {
+                                    Datos.Pago pago = eliminado.Pago;
+                                    pago.fechaLimite = actividad.fechaInicio.AddDays(-Parametros.SeleccionarParametros().diasLimitePago);
+                                    pago.ConceptoDePago = ConceptoDePago.buscarId(2);
+                                    pago.descripcion = "Incripción de " + socio.Persona.nombre + " " + socio.Persona.apPaterno + " " +
+                                        socio.Persona.apMaterno + " para la actividad " + actividad.nombre;
+                                    pago.monto = actividad.precio;
+                                    pago.estado = Pago.PENDIENTE;
+                                }
                                 eliminado.estado = 1;
-                                tempContext.SaveChanges();
+                                Context.context().SaveChanges();
+                                inscripcionActualizada = true;
                             }
                             return 1;
                         }
-                        return 0;
+                        catch
+                        {
+                            while (actividadActualizada && !inscripcionActualizada)
+                            {
+                                try
+                                {
+                                    actividad.vacantesDisponibles++;
+                                    Context.context().SaveChanges();
+                                    actividadActualizada = false;    //ejecuta esto si no hubo problemas al obtener un cupo
+                                }
+                                catch (OptimisticConcurrencyException)    //ocurre una excepcion si otro usuario ha modificado el valor de vacantesDisponibles al mismo tiempo
+                                {
+                                    Context.context().Refresh(RefreshMode.StoreWins, actividad);
+                                }
+                            }
+                        }
                     }
                     return 0;
                 }
-                catch
-                {
-                    throw;
-                }
+                return 0;
+            }
+            catch
+            {
+                throw;
             }
         }
 
@@ -83,32 +121,34 @@ namespace Negocio
         {
             //using (Entities context = new Entities())
             //{
-                IEnumerable<Datos.SocioXActividad> listaSocioXActividad = context().SocioXActividad.Where
+            IEnumerable<Datos.SocioXActividad> listaSocioXActividad = Context.context().SocioXActividad.Where
                     (p => p.estado != 0 && p.Socio.Persona.estado!=0 && p.Actividad.estado!=0);
                 return listaSocioXActividad;
             //}
         }
         public static IEnumerable<Datos.SocioXActividad> BuscarIdActividad(short idActividad)
         {
-            IEnumerable<Datos.SocioXActividad> listaSocioXActividad = context().SocioXActividad.Where(p => 
+            IEnumerable<Datos.SocioXActividad> listaSocioXActividad = Context.context().SocioXActividad.Where(p => 
                 ( (p.estado != 0) && (p.idActividad==idActividad) ));
             return listaSocioXActividad;
         }
 
         //Buscar todas las activdades en las que un socio se ha incrito
-        public static IEnumerable<Datos.SocioXActividad> BuscarActividadIdFamilia(short idFamilia)
+
+        // Metodo movido a Negocio.Actividad
+        /*public static IEnumerable<Datos.SocioXActividad> BuscarActividadIdFamilia(short idFamilia)
         {
-            IEnumerable<Datos.SocioXActividad> listaSocioXActividad = context().SocioXActividad
+            IEnumerable<Datos.SocioXActividad> listaSocioXActividad = Context.context().SocioXActividad
                 .Where(p => (p.estado != 0) && (p.Socio.Familia.id == idFamilia));
             return listaSocioXActividad;
-        }
+        }*/
 
         //Busca a una actividad especifica para un socio especifico
         public static IEnumerable<Datos.SocioXActividad> BuscarIdActividadIdFamilia(int idActividad, int idFamilia)
         {
             //using (Entities context = new Entities())
             //{
-                IEnumerable<Datos.SocioXActividad> listaSocioXActividad = context().SocioXActividad
+            IEnumerable<Datos.SocioXActividad> listaSocioXActividad = Context.context().SocioXActividad
                     .Where(p => (p.estado != 0) && (p.idActividad == idActividad) && (p.Socio.Familia.id == idFamilia));
                 return listaSocioXActividad;
             //}
@@ -126,52 +166,76 @@ namespace Negocio
             bool actividadActualizada = false;
             Datos.Actividad actividad = null;
 
-            using (Entities tempContext = new Entities())
+            //Busca cupo en la actividad
+            try
             {
-                //Busca cupo en la actividad
+                actividad = Negocio.Actividad.BuscarId(idActividad);
+                while (actividadActualizada == false)
+                {
+                    try
+                    {
+                        actividad.vacantesDisponibles++;
+                        Context.context().SaveChanges();
+                        actividadActualizada = true;
+                    }
+                    catch (OptimisticConcurrencyException)    //ocurre una excepcion si otro usuario ha modificado el valor de vacantesDisponibles
+                    {
+                        Debug.WriteLine("error de concurrencia");
+                        Context.context().Refresh(RefreshMode.StoreWins, actividad);
+                    }
+                }
+            }
+            catch
+            {   //entra aqui si hubo una excepcion en el buscarid
+                throw;
+            }
+            //Inserta si alcanzo cupo
+            if (actividadActualizada)
+            {
                 try
                 {
-                    actividad = Negocio.Actividad.BuscarId(idActividad);
-                    while (actividadActualizada == false)
+                    Datos.SocioXActividad encontrado = Context.context().SocioXActividad.FirstOrDefault(e =>
+                        (e.idActividad == idActividad) && (e.idSocio == idSocio));
+                    if (encontrado != null)
+                    {
+                        encontrado.estado = 0;
+                        if (encontrado.Pago != null)
+                        {
+                            switch (encontrado.Pago.estado)
+                            {
+                                case Pago.CANCELADO:
+                                    encontrado.Pago.estado = Pago.PORDEVOLVER;
+                                    break;
+                                case Pago.PENDIENTE:
+                                    encontrado.Pago.estado = 0;
+                                    break;
+                            }
+                        }
+                        Context.context().SaveChanges();
+                    }
+                }
+                catch (Exception)
+                {
+                    while (actividadActualizada == true)
                     {
                         try
                         {
-                            actividad.vacantesDisponibles++;
-                            context().SaveChanges();
-                            actividadActualizada = true;
+                            actividad.vacantesDisponibles--;
+                            Context.context().SaveChanges();
+                            actividadActualizada = false;
                         }
                         catch (OptimisticConcurrencyException)    //ocurre una excepcion si otro usuario ha modificado el valor de vacantesDisponibles
                         {
                             Debug.WriteLine("error de concurrencia");
-                            context().Refresh(RefreshMode.StoreWins, actividad);
+                            Context.context().Refresh(RefreshMode.StoreWins, actividad);
                         }
                     }
-                }
-                catch
-                {
-                    //entra aqui si hubo una excepcion en el buscarid
-                }
-                //Inserta si alcanzo cupo
-                if (actividadActualizada)
-                {
-                    try
-                    {
-                        Datos.SocioXActividad encontrado = tempContext.SocioXActividad.FirstOrDefault(e =>
-                            (e.idActividad == idActividad) && (e.idSocio == idSocio));
-                        if (encontrado != null)
-                        {
-                            encontrado.estado = 0;
-                            tempContext.SaveChanges();
-                        }
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
+                    throw;
                 }
             }
+
         }
-    
+    //Naty, revisa esto
         public static void EliminarTodo(short idSocio,short idActividad)
         {
             //using (Entities tempContext = new Entities())
@@ -182,18 +246,16 @@ namespace Negocio
                 {
                     foreach (var socioxAct in encontrado)
                     {
-                        using (Entities tempContext = new Entities())
+                        Datos.SocioXActividad eliminado = null;
+                        eliminado = Context.context().SocioXActividad.SingleOrDefault(e =>
+                        (e.idActividad == socioxAct.idActividad) &&
+                        (e.idSocio == socioxAct.idSocio));
+                        if (eliminado != null)
                         {
-                            Datos.SocioXActividad eliminado = null;
-                            eliminado = tempContext.SocioXActividad.SingleOrDefault(e =>
-                            (e.idActividad == socioxAct.idActividad) &&
-                            (e.idSocio == socioxAct.idSocio));
-                            if (eliminado != null)
-                            {
-                                eliminado.estado = 0;
-                                tempContext.SaveChanges();
-                            }                       
-                        }                    
+                            eliminado.estado = 0;
+                            Context.context().SaveChanges();
+                        }
+
                     }                    
                 }
             }

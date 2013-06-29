@@ -149,7 +149,7 @@ input.k-textbox, textarea.k-textbox, input.k-textbox:hover, textarea.k-textbox:h
 }
 .k-icon, .k-tool-icon
 {
-    background-image: url('Kendo/2013.1.319/Bootstrap/sprite.png');
+    background-image: url('Kendo/2013.1.319/Black/sprite.png');
     border-color: transparent;
 }
 .k-loading, .k-state-hover .k-loading

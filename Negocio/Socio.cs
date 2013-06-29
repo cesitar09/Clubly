@@ -9,6 +9,9 @@ namespace Negocio
 {
     public class Socio
     {
+        public const bool TITULAR = true;   //atributo tipo
+        public const bool NOTITULAR = false; //atributo tipo
+
         public static Entities context()
         {
             return Datos.Context.context();
@@ -50,8 +53,9 @@ namespace Negocio
         //Buscar por Id de familia
         public static IEnumerable<Datos.Socio> BuscarIdFamilia(short idFamilia)
         {
-            IEnumerable<Datos.Socio> socios = context().Socio.Where(s => (s.Familia.id==idFamilia)&&(s.Persona.estado!=0));
-            return socios;
+            IEnumerable<Datos.Socio> socios = context().Socio;
+            return socios.Where(s => ((s.Familia.id == idFamilia) && (s.Persona.estado != 0)));
+            //return socios;
         }
 
         //Buscar Socios Titulares

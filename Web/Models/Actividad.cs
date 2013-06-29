@@ -18,7 +18,7 @@ namespace Web.Models
         [JsonProperty("Nombre")]
         [Required(ErrorMessage = "Debe ingresar un nombre")]
         [StringLength(50)]
-        [DisplayName("Nombre")]
+        [DisplayName("*Nombre")]
         public string nombre { get; set; }
 
         [JsonProperty("Descipción")]
@@ -29,22 +29,22 @@ namespace Web.Models
 
         [JsonProperty("Fecha Inicio")]
         [Required(ErrorMessage = "Debe seleccionar una fecha")]
-        [DisplayName("Fecha Inicio")]
+        [DisplayName("*Fecha Inicio")]
         public DateTime fechaInicio { get; set; }
 
         [JsonProperty("Fecha de Fin")]
         [Required(ErrorMessage = "Debe seleccionar una fecha")]
-        [DisplayName("Fecha de Fin")]
+        [DisplayName("*Fecha de Fin")]
         public DateTime fechaFin { get; set; }
 
         [JsonProperty("Precio")]
         [Required(ErrorMessage = "Debe ingresar un precio")]
-        [DisplayName("Precio (S/.)")]
+        [DisplayName("*Precio (S/.)")]
         public double precio { get; set; }
 
         [JsonProperty("Vacantes")]
         [Required(ErrorMessage = "Debe ingresar un número de vacantes")]
-        [DisplayName("Vacantes")]
+        [DisplayName("*Vacantes")]
         public short vacantesTotales { get; set; }
 
         [JsonProperty("Vacantes Disponibles")]
@@ -52,12 +52,13 @@ namespace Web.Models
         public short vacantesDisponibles { get; set; }
 
         [Required(ErrorMessage = "Debe ingresar un Tipo de Actividad")]
-        [DisplayName("Tipo de Actividad")]
+        [DisplayName("*Tipo de Actividad")]
         public TipoActividad tipoActividad { get; set; }
 
         [JsonProperty("Estado")]
         public string estado { get; set; }
 
+        [DisplayName("*Ambiente")]
         public ReservaAmbiente reserva { get; set; }
 
         private static ListaEstados listaEstados = null;
@@ -91,7 +92,7 @@ namespace Web.Models
         }
 
 
-//CONVERTIDORES
+        //CONVERTIDORES
 
         //Convertir un Dato a Model
         public static Models.Actividad Convertir(Datos.Actividad actividades)
@@ -108,7 +109,7 @@ namespace Web.Models
         //Convierte un Model a Dato
         public static Datos.Actividad Invertir(Models.Actividad mActividad)
         {
-            Datos.Actividad dActividad ;
+            Datos.Actividad dActividad;
             if (mActividad.id == 0)
                 dActividad = new Datos.Actividad();
             else
@@ -154,6 +155,33 @@ namespace Web.Models
 
             return dActividad;
         }
+
+        public static Datos.Actividad InvertirActRestringido(Models.Actividad mActividad)
+        {
+            Datos.Actividad dActividad;
+            
+
+            if (mActividad.id == 0)
+                dActividad = new Datos.Actividad();
+            else
+                dActividad = Negocio.Actividad.BuscarId(mActividad.id);
+
+            dActividad.nombre = mActividad.nombre;
+            dActividad.descripcion = mActividad.descripcion;
+            //dActividad.precio = mActividad.precio;
+            //dActividad.fechaInicio = mActividad.fechaInicio;
+            //dActividad.fechaFin = mActividad.fechaFin;
+            dActividad.estado = ListaEstados().EstadoTexto(mActividad.estado);
+            //Solo se pueden aumentar vacantes
+            if (mActividad.vacantesTotales > Actividad.buscarId(mActividad.id).vacantesTotales)
+            {
+                dActividad.vacantesTotales = mActividad.vacantesTotales;
+                dActividad.vacantesDisponibles = mActividad.vacantesTotales;
+            }
+            //dActividad.TipoActividad = Negocio.TipoActividad.buscarId(mActividad.tipoActividad.id);
+
+            return dActividad;
+        }
         //CONVIERTE EL MODELO DE LA PARTE DE RESERVAS A DATOS
         public static Datos.ReservaAmbiente InvertirRes(Models.Actividad mActividad)
         {
@@ -162,7 +190,7 @@ namespace Web.Models
             if (mActividad.id == 0)
                 dreserva = new Datos.ReservaAmbiente();
             else
-                dreserva = Negocio.ReservaAmbiente.buscarId(mActividad.reserva.id);
+                dreserva = Negocio.ReservaAmbiente.buscarIdActividad(mActividad.id);
 
             dreserva.Actividad = InvertirAct(mActividad);
             dreserva.Ambiente = Negocio.Ambiente.buscarId(mActividad.reserva.ambiente.id);
@@ -173,11 +201,28 @@ namespace Web.Models
             return dreserva;
         }
 
+        public static Datos.ReservaAmbiente InvertirResRestringido(Models.Actividad mActividad)
+        {
+            Datos.ReservaAmbiente dreserva;
+
+            if (mActividad.id == 0)
+                dreserva = new Datos.ReservaAmbiente();
+            else
+                dreserva = Negocio.ReservaAmbiente.buscarIdActividad(mActividad.id);
+
+            dreserva.Actividad = InvertirActRestringido(mActividad);
+            dreserva.Ambiente = Negocio.Ambiente.buscarId(mActividad.reserva.ambiente.id);
+            //dreserva.horaInicio = mActividad.fechaInicio;
+            //dreserva.horaFin = mActividad.fechaFin;
+            dreserva.estado = ListaEstados().EstadoTexto(mActividad.estado);
+
+            return dreserva;
+        }
+
         public static IEnumerable<Datos.Actividad> ConvertirListaInverso(IEnumerable<Models.Actividad> mActividad)
         {
             return mActividad.Select(act => Invertir(act));
         }
-
 
         //QUERY DE BUSQUEDA
 
@@ -189,7 +234,16 @@ namespace Web.Models
 
         public static Models.Actividad buscarId(short id)
         {
-            return Convertir(Negocio.Actividad.BuscarId(id));
+            Actividad act = Convertir(Negocio.Actividad.BuscarId(id));
+            act.reserva = ReservaAmbiente.Convertir(Negocio.ReservaAmbiente.buscarIdActividad(id));
+            return act;
+        }
+
+        // HAY INSCRITOS DE INSCRITOS
+
+        public static bool HayInscritos(Models.Actividad actividad)
+        {
+            return Negocio.Actividad.HayInscritos(actividad.id);
         }
 
         //INTERACCIÓN BD
@@ -202,21 +256,37 @@ namespace Web.Models
             else
                 return 0;
         }
-        
+
         public static int insertarAR(Models.Actividad act)
         {
             //if (Negocio.Actividad.Insertar(InvertirAct(act)) == null)
-                
-                if (Negocio.ReservaAmbiente.insertar(InvertirRes(act)) == null)
-                    return 1;
+
+            if (Negocio.ReservaAmbiente.insertar(InvertirRes(act)) == null)
+                return 1;
             return 0;
         }
 
         public static int modificarAR(Models.Actividad act)
         {
-            if (Negocio.Actividad.Modificar(InvertirAct(act)) == null)
-                if (Negocio.ReservaAmbiente.modificar(InvertirRes(act)) == null)
-                    return 1;
+            if (Actividad.HayInscritos(act) == false)
+            {
+                Datos.ReservaAmbiente res = InvertirRes(act);
+                Negocio.ReservaAmbiente.eliminar(res);//Libero temporalmente la reserva
+                if (Ambiente.AmbienteReservado(act.fechaInicio, act.fechaFin, act.reserva.ambiente.id) == false)
+                {
+                    if (Negocio.Actividad.Modificar(InvertirAct(act)) == null)
+                        if (Negocio.ReservaAmbiente.modificar(InvertirRes(act)) == null)
+                            return 1;
+                }
+                res.estado = 1;
+                Negocio.ReservaAmbiente.modificar(res);//Volvemos al estado anterior
+            }
+            else 
+            { 
+                if (Negocio.Actividad.Modificar(InvertirActRestringido(act)) == null)
+                    if (Negocio.ReservaAmbiente.modificar(InvertirResRestringido(act)) == null)
+                        return 1;
+            }
             return 0;
         }
 
@@ -230,12 +300,27 @@ namespace Web.Models
 
         public static void eliminar(Models.Actividad act)
         {
-           // Negocio.Actividad.Eliminar(Invertir(act));
+            // if(Negocio.SocioXActividad.SeleccionarTodo(){
             Datos.Actividad activ = Negocio.Actividad.BuscarId(act.id);
             Datos.ReservaAmbiente reser = Negocio.ReservaAmbiente.buscarIdActividad(act.id);
 
             Negocio.ReservaAmbiente.eliminar(reser);
             Negocio.Actividad.Eliminar(activ);
+        }
+
+        public static IEnumerable<Models.Actividad> SeleccionarActividadesDisponibles()
+        {
+            return ConvertirLista(Negocio.Actividad.SeleccionarActividadesDisponibles());
+        }
+
+        internal static IEnumerable<Models.Actividad> BuscarActividadIdFamilia(short idFamilia)
+        {
+            return ConvertirLista(Negocio.Actividad.BuscarActividadIdFamilia(idFamilia));
+        }
+
+        public static IEnumerable<Actividad> SeleccionarActividadesDisponiblesSocio()
+        {
+            return ConvertirLista(Negocio.Actividad.SeleccionarActividadesDisponiblesSocio());
         }
     }
 }

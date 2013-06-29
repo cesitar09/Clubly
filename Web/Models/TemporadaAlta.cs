@@ -51,6 +51,14 @@ namespace Web.Models
 
         }
 
+        //....Valida si hay Sorteos....//
+        //public static bool HaySorteos(Models.TemporadaAlta tempA)
+        //{
+
+        //    return Negocio.TemporadaAlta.HaySorteos(tempA.id);
+        //}
+
+
         public static Datos.TemporadaAlta Invertir(Models.TemporadaAlta mtempA)
         {
             Datos.TemporadaAlta dtempA;
@@ -98,14 +106,24 @@ namespace Web.Models
         public static int insertarTemporadaAlta(Models.TemporadaAlta tempA)
         {
             if (Negocio.TemporadaAlta.insertar(Invertir(tempA)) == null)
+            {
+                TemporadaAlta tempSorteo = SeleccionarTodo().Last();
+                Models.Sorteo.insertarSorteos(tempSorteo);
                 return 1;
+            }
             else
+            {
                 return 0;
+            }
         }
-
+    
         public static void eliminarTemporadaAlta(Models.TemporadaAlta tempA)
         {
+
+            Models.Sorteo.eliminarSorteos(tempA);  
             Negocio.TemporadaAlta.eliminar(Invertir(tempA));
+            
+                      
         }
 
     }

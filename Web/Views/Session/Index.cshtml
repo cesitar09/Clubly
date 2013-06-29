@@ -9,8 +9,8 @@
         <form ="form" action = "../Session/login" method = post id="form">
         <ul>
             <li class="center">
-                @Html.LabelFor(m => m.usuario) 
-                @Html.TextBoxFor(m => m.usuario)
+                @Html.LabelFor(m => m.nombreusuario) 
+                @Html.TextBoxFor(m => m.nombreusuario)
                 
             </li><li class="center">
                 @Html.LabelFor(m => m.contrasena)
@@ -26,8 +26,10 @@
     { }
     else if (ViewData["message"].Equals("F"))
     { <script type= "text/javascript">alert("El usuario o la contraseña son incorrectos ")</script>}
-    else if (ViewData["message"].Equals("FF"))
-    { <script type= "text/javascript"> alert("Lo sentimos!\n No se pudo realizar la operacion\nVuelva a intentarlo en otro momento. ")</script>}                                                                                     
+    //else if (ViewData["message"].Equals("FF"))
+    //{ <script type= "text/javascript"> alert("Lo sentimos!\n No se pudo realizar la operacion\nVuelva a intentarlo en otro momento. ")</script>}
+    else
+    { <script type= "text/javascript"> alert("@ViewData["message"]")</script> }                                                                                   
       </form>
     </fieldset>
 
@@ -35,19 +37,18 @@
 
         $("#form").validate({
             rules: {
-                usuario: {
+                nombreusuario: {
                     required: true,
-                    digits:true
+                    maxlength: 50
                 },
                 contrasena: {
                     required: true
                 }
             },
-
             messages: {
-                usuario: {
-                    required: "*Campo obligatorio", 
-                    digits: "Ingrese solo dígitos"
+                nombreusuario: {
+                    required: "*Campo obligatorio",
+                    maxlength: "Tamaño máx. 50 caracteres"
                 },
                 contrasena: {
                     required: "*Campo obligatorio"
@@ -57,15 +58,6 @@
             submitHandler: function(form) {
                     form.submit();		
             }
-//            submitHandler: function ConfirmationBox(form) {
-//                var result = confirm("¿Está seguro de realizar los cambios?");
-//                if (result == true) {
-//                    form.submit();
-//                    return true;
-//                }
-//                else {
-//                    return false;
-//                }
-//            }
+
         });
 </script>

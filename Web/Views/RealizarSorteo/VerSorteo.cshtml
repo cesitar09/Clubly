@@ -1,0 +1,62 @@
+﻿@model IEnumerable<Web.Models.Sorteo>
+@using Web.Models
+@{
+    ViewBag.Title = "Ver Sorteos";
+}
+
+<h2>Ver Sorteos</h2>
+
+<fieldset>
+<legend>Sorteo A Realizar</legend>
+
+ <div id="botones"> 
+            @if (Model == null)
+            {
+                
+            }
+            @if(Model != null)
+            {                             
+            <input type="button" value="Sortear" id="Nuevo" onclick="location.href = '@(Url.Action("Sortear", "RealizarSorteo"))'" />
+            }
+     </div>
+</fieldset>
+
+@*
+<div id="kendotable">
+@(Html.Kendo().Grid<Web.Models.Sorteo>()
+    .Name("Grid")
+    .Columns(columns =>
+    {
+
+        columns.Bound(p => p.FechaSorteo);
+        columns.Bound(p => p.sede.nombre);
+        columns.Bound(p => p.tipoBungalow.nombre);
+
+    })
+    .Editable(editable => { editable.Mode(GridEditMode.InLine); editable.DisplayDeleteConfirmation("El regitro será eliminado ¿Desea continuar?"); })
+    .Filterable(filterable => filterable
+            .Extra(false)
+            .Operators(operators => operators
+                .ForString(str => str.Clear()
+                    .Contains("Contiene")
+                    .StartsWith("Empezar con")
+                    .IsEqualTo("Es igual a")
+                    .IsNotEqualTo("Diferente a"))
+                .ForNumber(number => number.Clear()
+                    .IsGreaterThan("Es mayor a")
+                    .IsLessThan("Es menor a")
+                    .IsEqualTo("Es igual a")
+                    .IsNotEqualTo("Es diferente a")))
+                )
+                .Pageable()
+                .DataSource(datasource => datasource
+                                          .Ajax()
+                                          .Events(events => events.Error("ErrorMessage"))
+                                              .Read(read => read.Action("getSorteos", "RealizarSorteoController"))
+                                          )
+                                          .Selectable()
+                  ) 
+    </div>
+    *@
+
+

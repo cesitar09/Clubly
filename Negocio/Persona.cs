@@ -27,10 +27,10 @@ namespace Negocio
         public static IEnumerable<Datos.Persona> seleccionarTodo() {
             return context().Persona.Where(persona => persona.estado != 0);
         }
-        public static  Exception modificar(Datos.Persona persona)
+        public static  void modificar(Datos.Persona persona)
         {
-            try
-            {
+            //try
+            //{
                 Datos.Persona per = context().Persona.Single(p => p.id == persona.id);
                 per.nombre = persona.nombre;
                 per.apMaterno = persona.apMaterno;
@@ -41,17 +41,17 @@ namespace Negocio
                 per.estadoCivil = persona.estadoCivil;
                 context().Persona.ApplyCurrentValues(per);
                 context().SaveChanges();
-            }
-            catch (Exception ex) {
-                return ex;
-            }
-            return null;
+            //}
+            //catch (Exception ex) {
+            //    return ex;
+            //}
+            //return null;
 
         }
-        public static Exception insertarPersona(Datos.Persona persona)
+        public static void insertarPersona(Datos.Persona persona)
         {
-            try
-            {
+            //try
+            //{
                 Datos.Persona per = new Datos.Persona(); 
                 per.nombre = persona.nombre;
                 per.apMaterno = persona.apMaterno;
@@ -62,26 +62,40 @@ namespace Negocio
                 per.estadoCivil = persona.estadoCivil;
                 context().Persona.AddObject(per);
                 context().SaveChanges();
-            }
-            catch (Exception ex)
-            {
-                return ex;
-            }
-            return null;
+            //}
+            //catch (Exception ex)
+            //{
+            //    return ex;
+            //}
+            //return null;
 
         }
-        public static Exception eliminar(Datos.Persona persona) {
-            try
-            {
+        public static void eliminar(Datos.Persona persona) {
+            //try
+            //{
                 Datos.Persona eliminado = context().Persona.Single(p => p.id == persona.id);
                 eliminado.estado = 0;
                 context().Persona.ApplyCurrentValues(eliminado);
                 context().SaveChanges();
+            //}
+            //catch (Exception ex) {
+            //    return ex;
+            //}
+            //return null;
+        }
+
+        public static bool existeDNI(Int32 dni, short id ) {
+            IEnumerable<Datos.Persona> listper = Negocio.Persona.seleccionarTodo();
+            if (listper != null)
+            {
+                foreach (var p in listper)
+                {
+                    if (p.id != id && p.dni == dni)
+                        return true;
+                }
+                return false;
             }
-            catch (Exception ex) {
-                return ex;
-            }
-            return null;
+            else return false;
         }
      
     }

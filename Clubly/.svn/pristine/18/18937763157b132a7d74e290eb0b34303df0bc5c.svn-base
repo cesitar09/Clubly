@@ -1,0 +1,117 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+using Newtonsoft.Json;
+using Kendo.Mvc.UI;
+using Web.Controllers;
+using Web.Models;
+using System.Data.Linq;
+using Kendo.Mvc.Extensions;
+using System.Web.Script.Serialization;
+
+
+namespace Web.Controllers
+{
+    public class ActividadController : Controller
+    {
+        //
+        // GET: /InscribirActividadSocio/
+        public ActionResult InscribirseEnActividad(Models.Actividad actividad)
+        {
+            return View(actividad);
+        }
+
+
+        // Esto es para mi tabla kendo, que te va a mostrar todas las actividades para llenar la data
+        public ActionResult LeerActividadesDisponible([DataSourceRequest] DataSourceRequest request)
+        {
+            IEnumerable<Models.Actividad> ListaActividades = Models.Actividad.SeleccionarTodo();
+           try{
+                DataSourceResult result = ListaActividades.ToDataSourceResult(request);
+                return Json(result); 
+            }
+            catch (Exception e)
+            {
+            Console.WriteLine("{0} Exception caught.", e);
+            }
+            return null;
+        }
+
+
+        ////Para llenar los campos de filtro por Nombre
+        //public ActionResult FilterMenuCustomization_Nombre()
+        //{
+        //    return Json(Models.Actividad.SeleccionarTodo().Select(e => e.nombre).Distinct(), JsonRequestBehavior.AllowGet);
+        //}
+
+        ////Para llenar los campos de filtro por Descripcion
+        //public ActionResult FilterMenuCustomization_Descripcion()
+        //{
+        //    return Json(Models.Actividad.SeleccionarTodo().Select(e => e.descripcion).Distinct(), JsonRequestBehavior.AllowGet);
+        //}
+
+
+        // Esto es para devolver la lista de socios para el listView
+        public ActionResult LeerSocios([DataSourceRequest] DataSourceRequest request)
+        {
+            IEnumerable<Models.Socio> listaSocios = Models.Socio.BuscarIdFamilia(1);
+            DataSourceResult result = listaSocios.ToDataSourceResult(request);
+            return Json(result);
+        }
+        // Esto es para devolver la lista de socios para el listView
+        // Esto es para mi tabla kendo, que te da toda la data a mostrar socioxActiviad
+        public ActionResult LeerSocioxActividad([DataSourceRequest] DataSourceRequest request, Models.Actividad actividad)
+        {
+            IEnumerable<Models.SocioXActividad> ListaSocioXActividades = Models.SocioXActividad.BuscarIdActividadIdFamilia(actividad.id,1);
+            DataSourceResult result = ListaSocioXActividades.ToDataSourceResult(request);
+            return Json(result);
+        }
+
+        //Metodo que llama el Cancelar para mostrar la pagina inicial otra vez
+        public ActionResult CancelarInscripcion()
+        {
+            return RedirectToAction("InscribirseEnActividad", "Actividad");
+        }
+        public ActionResult CancelarInscripcion([DataSourceRequest] DataSourceRequest request, Web.Models.SocioXActividad socioXActividad)
+        {
+            if (socioXActividad != null)
+            {
+                SocioXActividad.Eliminar(socioXActividad);
+            }
+
+            return View("RealizarInscripcion",socioXActividad.Actividad);
+        }
+
+
+        public ActionResult EditarInscripcion(Web.Models.Actividad actividad)
+        {
+            actividad = Actividad.SeleccionarporId(actividad.id);
+            return View("InscribirseEnActividad", actividad);
+
+        }
+
+        //Metodo que llama a la parte de incribir a los familiares y pueda inscribirlos
+        public ActionResult RealizarInscripcion(Models.Actividad actividad)
+        {
+            Models.Actividad actividadXid = Models.Actividad.SeleccionarporId(actividad.id);
+            return View(actividadXid);
+        }
+
+        public ActionResult AgregarSocioEnActividad(string strIdSocio, string strIdActividad)
+        {
+            var js = new JavaScriptSerializer();
+            //short idSocio = (short)js.DeserializeObject(strIdSocio);
+            //short idActividad = (short)js.DeserializeObject(strIdActividad);
+            short idSocio = short.Parse(strIdSocio);
+            short idActividad = short.Parse(strIdActividad);
+            Models.SocioXActividad.Insertar(idSocio, idActividad);
+            Models.Actividad actividad = Models.Actividad.SeleccionarporId(idActividad);
+            return View("InscribirSocioEnActividad", actividad);
+        }
+    }
+}
+
+    
+

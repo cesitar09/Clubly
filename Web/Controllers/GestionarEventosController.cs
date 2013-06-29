@@ -13,6 +13,7 @@ using System.Data;
 using System.Data.SqlClient;
 using Negocio.Util;
 using System.ComponentModel.DataAnnotations;
+using System.IO;
 
 namespace Web.Controllers
 {
@@ -50,57 +51,129 @@ namespace Web.Controllers
             return View("MantenerEventosCorp", eventoCorp);
         }
 
+        public bool ValidarFechas(Models.Evento evento)
+        {
+            if (evento.fechaFin > evento.fechaInicio) return true;
+            return false;
+        }
+
         //INSERTAR
         [HttpPost]
         public ActionResult insertarEventoNoCorp(Web.Models.Evento evento)
         {
-
-            if (evento != null)
+            if (ValidarFechas(evento))
             {
+                if (evento != null)
+                {                    
                     if (evento.id == 0)
                     {
-                        evento.estado = ListaEstados.ESTADO_ACTIVO;
-                        if (Evento.insertarEventREs(evento) == 1)
+                        if (Ambiente.AmbienteReservado(evento.fechaInicio, evento.fechaFin, evento.reserva.ambiente.id) == false)
                         {
-                            ViewData["message"] = "E";
+                            if (Evento.insertarEventRes(evento) == 1)
+                            {
+                                string nombre = (string)Session["Nombre"];
+                                Negocio.Util.logito.ElLogeador("Insertó evento", nombre);
+                                ViewData["message"] = "E";
+                            }
+                            else
+                            {  
+                                string nombre = (string)Session["Nombre"];
+                                Negocio.Util.logito.ElLogeador("No pudo insertar evento", nombre);
+                                ViewData["message"] = "F"; 
+                            }
                         }
-                        else { ViewData["message"] = "F"; }
+                        else
+                        {
+                            string nombre = (string)Session["Nombre"];
+                            Negocio.Util.logito.ElLogeador("No pudo insertar evento - Ambiente reservado", nombre); 
+                            ViewData["message"] = "Reservado";
+                        }
                     }
                     else
                     {
-                        if (Evento.modificar(evento) == 1)
+                        if (Evento.modificarEventRes(evento) == 1)
                         {
+                            string nombre = (string)Session["Nombre"];
+                            Negocio.Util.logito.ElLogeador("Modificó evento", nombre);
                             ViewData["message"] = "E";
                         }
-                        else { ViewData["message"] = "F"; }
-                    }                
+                        else
+                        {
+                            string nombre = (string)Session["Nombre"];
+                            Negocio.Util.logito.ElLogeador("No pudo modificar evento", nombre); 
+                            ViewData["message"] = "F";
+                        }
+                    }
+                }
+            }
+            else
+            {
+                string nombre = (string)Session["Nombre"];
+                Negocio.Util.logito.ElLogeador("No pudo insertar/modificar evento - fecha no válida", nombre);
+                ViewData["message"] = "FNV";
             }
             return View("MantenerEventos", evento);
         }
 
-        [HttpPost]
-        public ActionResult insertarEventoCorp(Web.Models.EventoCorporativo eventoCorp)
-        {
 
-            if (eventoCorp != null)
+        [HttpPost]
+        public ActionResult insertarEventoCorp(Web.Models.EventoCorporativo eventoCorp, HttpPostedFileBase file)
+        {
+            if (ValidarFechas(eventoCorp))
             {
-                if (eventoCorp.id == 0)
-                {
-                    eventoCorp.estado = ListaEstados.ESTADO_ACTIVO;
-                    if (EventoCorporativo.insertarCorpRes(eventoCorp) == 1)
+                if (eventoCorp != null)
+                {                    
+                    if (eventoCorp.id == 0)
                     {
-                        ViewData["message"] = "E";
+                        if (Ambiente.AmbienteReservado(eventoCorp.fechaInicio, eventoCorp.fechaFin, eventoCorp.reserva.ambiente.id) == false)
+                        {
+                            if (EventoCorporativo.insertarCorp(eventoCorp) == 1)
+                            {   //Agregar archivo de lista de participantes                            
+                                if (file != null && file.ContentLength > 0)
+                                {
+                                    var fileExtension = Path.GetExtension(file.FileName);
+                                    var path = Path.Combine(Server.MapPath("~/Content/ListaParticipantesEvento/"),"ListaParticipantes-"+eventoCorp.razonSocial+fileExtension);
+                                    file.SaveAs(path);
+                                } 
+                                string nombre = (string)Session["Nombre"];
+                                Negocio.Util.logito.ElLogeador("Insertó evento corporativo", nombre);
+                                ViewData["message"] = "E";
+                            }
+                            else
+                            {
+                                string nombre = (string)Session["Nombre"];
+                                Negocio.Util.logito.ElLogeador("No pudo insertar evento corporativo", nombre); 
+                                ViewData["message"] = "F";
+                            }
+                        }
+                        else
+                        {
+                            string nombre = (string)Session["Nombre"];
+                            Negocio.Util.logito.ElLogeador("No pudo insertar evento corporativo - Ambiente reservado", nombre);
+                            ViewData["message"] = "Reservado";}
                     }
-                    else { ViewData["message"] = "F"; }
-                }
-                else
-                {
-                    if (EventoCorporativo.modificar(eventoCorp) == 1)
+                    else
                     {
-                        ViewData["message"] = "E";
+                        if (EventoCorporativo.modificarCorp(eventoCorp) == 1)
+                        {
+                            string nombre = (string)Session["Nombre"];
+                            Negocio.Util.logito.ElLogeador("Modificó evento", nombre);
+                            ViewData["message"] = "E";
+                        }
+                        else
+                        {
+                            string nombre = (string)Session["Nombre"];
+                            Negocio.Util.logito.ElLogeador("No pudo modificar evento", nombre); 
+                            ViewData["message"] = "F";
+                        }
                     }
-                    else { ViewData["message"] = "F"; }
                 }
+            }
+            else
+            {
+                string nombre = (string)Session["Nombre"];
+                Negocio.Util.logito.ElLogeador("No pudo insertar/modificar evento - Fecha no válida", nombre);
+                ViewData["message"] = "FNV";
             }
             return View("MantenerEventosCorp", eventoCorp);
         }
@@ -110,6 +183,8 @@ namespace Web.Controllers
         {
             if (evento != null)
             {
+                string nombre = (string)Session["Nombre"];
+                Negocio.Util.logito.ElLogeador("Eliminó evento", nombre);
                 Evento.eliminar(evento);
             }
             return View("MantenerEventos", evento);
@@ -119,6 +194,8 @@ namespace Web.Controllers
         {
             if (eventoCorp != null)
             {
+                string nombre = (string)Session["Nombre"];
+                Negocio.Util.logito.ElLogeador("Eliminó evento corporativo", nombre);
                 EventoCorporativo.eliminar(eventoCorp);
             }
             return View("MantenerEventosCorp", eventoCorp);
@@ -150,6 +227,50 @@ namespace Web.Controllers
             ViewData["message"] = null;
             return View((IView)null);
         }
-        //******************* 
+        //*******************CONTROLADOR PARA INSERTAR UNA LISTA 
+        public ActionResult BajarArchivoEvento(Web.Models.EventoCorporativo eventoCorp)
+        {
+            Models.EventoCorporativo eve = EventoCorporativo.buscarIdCorp(eventoCorp.id);
+            Stream download = null;
+            string path = "~/Content/ListaParticipantesEvento/ListaParticipantes-" + eve.razonSocial + ".txt";
+            
+            try
+            {
+                download = new FileStream(Server.MapPath(path),FileMode.Open,FileAccess.Read);
+
+                Response.ContentType = "text/plain";
+                string nombDescarga = "attachment; filename=ListaParticipantes-"+eve.razonSocial+".txt";
+                Response.AppendHeader("Content-Disposition", nombDescarga);
+
+                // Write the file to the Response
+                const int bufferLength = 10000;
+                byte[] buffer = new Byte[bufferLength];
+                int length = 0;
+
+                do
+                {
+                    if (Response.IsClientConnected)
+                    {
+                        length = download.Read(buffer, 0, bufferLength);
+                        Response.OutputStream.Write(buffer, 0, length);
+                        buffer = new Byte[bufferLength];
+                    }
+                    else
+                    {
+                        length = -1;
+                    }
+                }
+                while (length > 0);
+                Response.Flush();
+                Response.End();                
+                download.Close();
+            }
+            catch (Exception)
+            {
+                ViewData["message"] = "NoFile";               
+                return View("MantenerEventosCorp",eve);
+            }
+            return View();
+        }
     }
 }

@@ -51,6 +51,9 @@ namespace Negocio
             }
         }
 
-
+        public static Datos.Perfil BuscarId(int idPerfil)
+        {
+            return Context.context().Perfil.SingleOrDefault(p => p.id == idPerfil);
+        }
     }
 }

@@ -17,11 +17,11 @@ namespace Web.Models
         [DisplayName("Id")]
         public short id { get; set; }
 
-        [DisplayName("Nombre de la sede")]
+        [DisplayName("Nombre de la sede*")]
         public String nombre { get; set; }
-        [DisplayName("Dirección")]
+        [DisplayName("Dirección*")]
         public String direccion { get; set; }
-        [DisplayName("Descripción")]
+        [DisplayName("Descripción*")]
         public String descripcion { get; set; }
         public short estado { get; set; }
 
@@ -79,6 +79,10 @@ namespace Web.Models
 
         /////////////////////////////////////////////////////////
 
+        public static bool HayAmbBung(Models.Sede sede) {
+            return Negocio.Sede.HayAmbienteoBungalow(sede.id);
+        }
+
         public static IEnumerable<Sede> SeleccionarTodo()
         {
             IEnumerable<Datos.Sede> sede = Negocio.Sede.seleccionarTodo();
@@ -94,25 +98,19 @@ namespace Web.Models
             return Convertir(Negocio.Sede.buscarId(id));
         }
 
-        public static int modificarSede(Models.Sede sede)
+        public static void modificarSede(Models.Sede sede)
         {
-            if (Negocio.Sede.modificar(Invertir(sede)) == null)
-                return 1;
-            else
-                return 0;
+            Negocio.Sede.modificar(Invertir(sede));
         }
 
         public static int insertarSede(Models.Sede nuevasede)
         {
-            if (Negocio.Sede.insertar(Invertir(nuevasede)) == null)
-                return 1;
-            else
-                return 0;
+            return Negocio.Sede.insertar(Invertir(nuevasede));
         }
 
         public static void eliminarSede(Models.Sede sede)
         {
-            Negocio.Sede.eliminar(Invertir(sede));
+            Negocio.Sede.eliminar(Negocio.Sede.buscarId(sede.id));
         }
 
         public static void habilitarSede(Models.Sede sede)

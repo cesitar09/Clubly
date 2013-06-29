@@ -5,7 +5,7 @@
 }
 
 
-<h1>Inscribir a @Model.nombre - @Model.vacantesDisponibles vacante(s)</h1>
+<h1>Inscribir a @Model.nombre - Vacantes: @Model.vacantesDisponibles/@Model.vacantesTotales - S/. @Model.precio</h1>
 <h2>Socios no incritos</h2>
 
 <div id="kendotableSocio">
@@ -64,7 +64,6 @@
         columns.Bound(p => p.Socio.persona.nombre).Width(70);
         columns.Bound(p => p.Socio.persona.apPaterno).Width(90).Title("Ap Paterno");
         columns.Bound(p => p.Socio.persona.apMaterno).Width(90).Title("Ap Paterno");
-        columns.Bound(p =>(p.horaIngreso)).Title("Hora de Ingreso").Width(110);//.Format("{0: h:mm}");
         //columns.Command(command => { command.Destroy().Text("Cancelar"); }).Width(90);      
         columns.Command(c => c.Custom("Cancelar").Click("CancelarSocio")).Width(100);                                     
     })

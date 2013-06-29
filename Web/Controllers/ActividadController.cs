@@ -24,19 +24,22 @@ namespace Web.Controllers
 
 
  //PRIMERA VISTA
-        // Esto es para mi tabla kendo, que te va a mostrar todas las actividades para llenar la data
-        public ActionResult LeerActividadesDisponible([DataSourceRequest] DataSourceRequest request)
+    //Metodo para mostrar en la tabla kendo
+        public ActionResult LeerActividadesDisponibles([DataSourceRequest] DataSourceRequest request)
         {
-            IEnumerable<Models.Actividad> ListaActividades = Models.Actividad.SeleccionarTodo();
-           try{
+            try
+            {
+                IEnumerable<Models.Actividad> ListaActividades = Models.Actividad.SeleccionarActividadesDisponiblesSocio();
                 DataSourceResult result = ListaActividades.ToDataSourceResult(request);
-                return Json(result); 
+                return Json(result);
             }
             catch (Exception e)
             {
-            Console.WriteLine("{0} Exception caught.", e);
+                Console.WriteLine("Excepcion en GestionarActividadController\n", e);
+                DataSourceResult result = new DataSourceResult();
+                result.Errors = "error";
+                return Json(result);
             }
-            return null;
         }
 
         //Metodo que llama a la segunda vista y muestra los familiares a inscribirse
@@ -52,8 +55,10 @@ namespace Web.Controllers
         //Esto es para la tabla kendo, que te da todos los socios
         public ActionResult LeerSociosNoInscritos([DataSourceRequest] DataSourceRequest request, Models.Actividad actividad)
         {
-            IList<Models.Socio> listaSocios = Models.Socio.SeleccionarTodo().ToList();
-            IEnumerable<Models.SocioXActividad> listaInscritos = Models.SocioXActividad.BuscarIdActividadIdFamilia(actividad.id, 10001);
+            short idUsuario = (short)Session["IdUsuario"];
+            Familia familia = Models.Familia.buscarIdUsuario(idUsuario);
+            IList<Models.Socio> listaSocios = Models.Socio.BuscarIdFamilia(familia.id).ToList();
+            IEnumerable<Models.SocioXActividad> listaInscritos = Models.SocioXActividad.BuscarIdActividadIdFamilia(actividad.id, familia.id);
             foreach (SocioXActividad inscrito in listaInscritos)
             {
                 listaSocios.Remove(listaSocios.FirstOrDefault(s => s.persona.id == inscrito.idSocio));
@@ -73,7 +78,9 @@ namespace Web.Controllers
         // Esto es para mi tabla kendo, que te da toda la data a mostrar Todos los socios en una actividad especifica de una familia
         public ActionResult LeerSocioxActividad([DataSourceRequest] DataSourceRequest request, Models.Actividad actividad)
         {
-            IEnumerable<Models.SocioXActividad> ListaSocioXActividades = Models.SocioXActividad.BuscarIdActividadIdFamilia(actividad.id,10001);
+            short idUsuario = (short)Session["IdUsuario"];
+            Familia familia = Models.Familia.buscarIdUsuario(idUsuario);
+            IEnumerable<Models.SocioXActividad> ListaSocioXActividades = Models.SocioXActividad.BuscarIdActividadIdFamilia(actividad.id,familia.id);
             DataSourceResult result = ListaSocioXActividades.ToDataSourceResult(request);
             return Json(result);
 
@@ -121,17 +128,16 @@ namespace Web.Controllers
 
 //TERCERA VISTA
  
-        // Esto es para mi tabla kendo, que te da toda la data a mostrar socioxActiviad
+        //// Esto es para mi tabla kendo, que te da toda la data a mostrar socioxActiviad
         public ActionResult LeerActividadxSocio([DataSourceRequest] DataSourceRequest request)
         {
-            IEnumerable<Models.SocioXActividad> ListaSocioXActividades = Models.SocioXActividad.BuscarActividadIdFamilia(10001);
+            short idUsuario = (short)Session["IdUsuario"];
+            Familia familia = Models.Familia.buscarIdUsuario(idUsuario);
+            IEnumerable<Models.Actividad> ListaSocioXActividades = Models.Actividad.BuscarActividadIdFamilia(familia.id);
 
             DataSourceResult result = ListaSocioXActividades.ToDataSourceResult(request);
             return Json(result);
         }
-        
-        
-        
         
         //Metodo que llama el Cancelar y cancela todo para mostrar la pagina inicial otra vez
         public ActionResult CancelarInscripcionTotal()
@@ -154,26 +160,12 @@ namespace Web.Controllers
             return Json("");
         }
 
-
-
-
-
-
-
-
-
-
         public ActionResult EditarInscripcion(Web.Models.Actividad actividad)
         {
             actividad = Actividad.buscarId(actividad.id);
             return View("InscribirseEnActividad", actividad);
 
         }
-
-        
-
- 
-
         
     }
 }

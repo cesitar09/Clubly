@@ -18,7 +18,7 @@
                 @Html.TextBoxFor(p => p.id, new { @readonly = "readonly" })
             </li><li>
 
-    <div class="editor-label">
+    <div class="editor-label" >
             @Html.LabelFor(p => p.dni)
     </div> 
         
@@ -105,15 +105,38 @@
             @Html.TextBoxFor(p => p.estado, new { @readonly = "readonly" })
    
       }
-    </li></ul>
+    </li><li >
+     <label>Tipo de solicitud </label>
+       @(Html.Kendo().DropDownList()
+          .Name("tiposolicitud")
+          .DataTextField("Text")
+          .DataValueField("Value")
+          //.Events(e => e.Change("change"))
+          .BindTo(new List<SelectListItem>() {
+              new SelectListItem() {
+                  Text = "Normal",
+                  Value = "1"
+              },
+              new SelectListItem() {
+                  Text = "Traslado",
+                  Value = "2"
+              }
+          })
+          .Value(Model != null && Model.familiatraslado!= 0 ? "2": "1")
+          .Enable(Model == null || Model.estado == null || Model.estado.Equals("Pendiente")? true: false)
+    )</li><li id="di">
+     @Html.LabelFor(p => p.familiatraslado, new { id = "label" })  
+        @Html.TextBoxFor(p => p.familiatraslado, new { id = "textbox" })
+    </li>
+    </ul>
 
     <div id="botones">                                          
             <input type="button" value="Nuevo" id="Nuevo" onclick="location.href = '@(Url.Action("VerSolicitudesDeMembresia", "SolicitudMembresia"))'" />
             <input  name="submit" type="submit" id = "modificar" value=@(Model == null || Model.id == 0 ? "Insertar" : "Modificar") />
             @if (Model != null && Model.estado != null && Model.estado.Equals("Pendiente"))
             {
-            <input name="submit" type="submit" id = "acpetar" value= "Aceptar"/>
-            <input name="submit" type="submit" id = "rechazar" value= "rechazar"/>
+            <input name="submit" type="submit" id = "acpetar" value= "Aprobar"/>
+            <input name="submit" type="submit" id = "rechazar" value= "Rechazar"/>
                 
             }
      </div>
@@ -123,10 +146,13 @@
          else if (ViewData["message"].Equals("F"))
          {<script type="text/javascript">              alert("Lo sentimos!\nNo se pudo realizar la operación.\nVuelva intentarlo en otro momento. ")</script> }
          else if (ViewData["message"].Equals("E"))
-         { <script type="text/javascript">               alert("La operación se realizó con éxito!")</script>} 
+         { <script type="text/javascript">               alert("La operación se realizó con éxito!") </script>}
+         else if (ViewData["message"].Equals("FF"))
+         {   <script type="text/javascript">    alert("No se pueda aprobar la solicitud mientas tenga la familia tenga pagos o reservas pendientes") </script> }
    </form>  
 }
 
+@*<input type="text" id="me"/>*@
 </fieldset>
 
 <div id="kendotable">
@@ -136,10 +162,11 @@
     {
         //       columns.Bound(p => p.dni).Sortable(true);
         //.Filterable(filterable => filterable.UI("dniFiltro"));
+        columns.Bound(p => p.id);
         columns.Bound(p => p.nombre);
         columns.Bound(p => p.apPaterno);
         //      columns.Bound(p => p.apMaterno);
-        //       columns.Bound(p => p.correo);
+        // columns.Bound(p => p.familiatraslado.id);
         columns.Bound(p => p.fechaRegistro).Title("fechaRegistro").Width(70).Format("{0:dd/MM/yyyy}");
         columns.Bound(p => p.estado);
         columns.Command(c => { c.Custom("Editar").Click("EditarSolicitud"); c.Destroy().Text("Eliminar"); });
@@ -207,72 +234,156 @@
 </script>
 
  <script type="text/javascript">
-    // validate signup form on keyup and submit  
-$("#Form").validate({
-		rules: {
-			dni: {
-                required: true,
-                digits: true,
-                maxlength:8,
-                minlength:8
-            },
-			nombre: {
-                required: true,
-                maxlength: 50
-            },
-            apPaterno: {
-                required: true,
-                maxlength: 50
-            },
-			apMaterno:{
-                required: true,
-                maxlength: 50
-            },
-            correo   : {
-				required: true,
-                email: true
-			}
+    // validate signup form on keyup and submit
+     $("#Form").validate({
+         rules: {
+             dni: {
+                 required: true,
+                 digits: true,
+                 maxlength: 8,
+                 minlength: 8
+             },
+             nombre: {
+                 required: true,
+                 maxlength: 50
+             },
+             apPaterno: {
+                 required: true,
+                 maxlength: 50
+             },
+             apMaterno: {
+                 required: true,
+                 maxlength: 50
+             },
+             correo: {
+                 required: true,
+                 email: true
+             },
+             familiatraslado: {
+                 digits: true,
+                 maxlength: 5,
+                 minlength: 5
 
-		},
-		messages: {
-            dni : {
-                required: "*Campo obligatorio",
-                digits: "Ingrese solo dígitos",
-                maxlength: "Ingrese 8 dígitos",
-                minlength: "Ingrese 8 dígitos"
-            },
-			nombre: {
-                required: "*Campo obligatorio",
-                maxlength: "Tamaño máx. 50 caracteres"
-            },
-			apPaterno:{
-                required: "*Campo obligatorio",
-                maxlength: "Tamaño máx. 50 caracteres"
-            },
-			apMaterno: {
-                required: "*Campo obligatorio",
-                maxlength: "Tamaño máx. 50 caracteres"
-            },
-            correo: {
-				required: "*Campo obligatorio",
-                digits: "Formato inválido"
-			}
-		},
-        submitHandler: function ConfirmationBox(form) {
-        var result = confirm("¿Está seguro de realizar los cambios?");
-        if (result == true) {
-            form.submit();
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
-		
-});
+             }
+
+         },
+         messages: {
+             dni: {
+                 required: "*Campo obligatorio",
+                 digits: "Ingrese solo dígitos",
+                 maxlength: "Ingrese 8 dígitos",
+                 minlength: "Ingrese 8 dígitos"
+             },
+             nombre: {
+                 required: "*Campo obligatorio",
+                 maxlength: "Tamaño máx. 50 caracteres"
+             },
+             apPaterno: {
+                 required: "*Campo obligatorio",
+                 maxlength: "Tamaño máx. 50 caracteres"
+             },
+             apMaterno: {
+                 required: "*Campo obligatorio",
+                 maxlength: "Tamaño máx. 50 caracteres"
+             },
+             correo: {
+                 required: "*Campo obligatorio",
+                 digits: "Formato inválido"
+             },
+             familiatraslado: {
+                 digits: "Ingrese solo digitos",
+                 maxlength: "Ingrese 5 digitos",
+                 minlength: "ingrese 5 digitos"
+
+             }
+         },
+         submitHandler: function ConfirmationBox(form) {
+//             if ($("#textbox").val()) re = validarpendientes();
+//             alert(re); 
+             var result = confirm("¿Está seguro de realizar los cambios?");
+             if (result == true) {
+//                 alert("primer true");
+//                 
+              //   alert(re);
+//                 if (re == "1") {
+//                     alert("No puede hacer un traslado mientras tenga pagos de membresia pendientes");
+//                     return false;
+//                 } else if (re == "2") {
+//                     var result2 = confirm("Tiene reservas pendientes. si realiza el cambio se eliminaran. ¿Desea Proceder?");
+//                     if (result2 == true) {
+//                         alert("segundo true");
+//                         form.submit();
+//                         return true;
+//                     } else {
+//                         return false;
+//                     }
+//                 } else {
+//                     alert("tercero true");
+                     form.submit();
+                     return true;
+                 }
+//             }
+             else {
+                 return false;
+             }
+         }
+
+     });
 
 function ErrorMessage(e) {
     alert("A ocurrido un error en el servidor!\nVuelva a intentar la operación en unos minutos...");
 }
+
+
+$(document).ready(function () {
+    var dropdownlist = $("#tiposolicitud").data("kendoDropDownList");
+    //    var label = document.getElementById("label");
+    //    var textbox = document.getElementById("textbox");
+    var di = document.getElementById("di");
+    //    $('#label').hide();
+    //    $('#textbox').hide();
+    $('#di').hide();
+    if (dropdownlist.value() == 2) {
+        $('#di').show();
+    }
+});
+//    
+
+$('#tiposolicitud').change(function () {
+    var dropdownlist = $("#tiposolicitud").data("kendoDropDownList");
+        var di = document.getElementById("di");
+        $('#textbox').val('');
+                if (dropdownlist.value() == 2) {
+                    $('#di').show();
+                    $("#tiposolicitud").val(dropdownlist.value());
+                } else {
+                    $('#di').hide();
+                    $("#tiposolicitud").val(dropdownlist.value());
+                }
+});
+
+//function validarpendientes() {
+//    var valtext = $("#textbox").val();
+//    var jsonCliente = {
+//        data: valtext
+//    };
+//    $.ajax({
+//        type: "POST",
+//        data: JSON.stringify(jsonCliente),
+//        dataType: "json",
+//        contentType: "application/json; charset=utf-8",
+//        url: "/SolicitudMembresia/Validarpendientes",
+//        success: function (data) {
+//            //si la respuesta es: { me : "algo" }
+//            var me = data.me;
+//            $("#me").val(me);
+//            alert("valorcito" + me);
+//            // return me;
+//        },
+//        error: function () {
+//            alert(error);
+//        }
+//    });
+//}
 </script>
 

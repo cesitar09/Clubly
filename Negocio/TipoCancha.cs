@@ -27,6 +27,10 @@ namespace Negocio
             return context().TipoCancha.FirstOrDefault(p => p.id == idCancha);
         }
 
+        public static IEnumerable<Datos.TipoCancha> BuscarPorSede(short idSede)
+        {
+            return context().Cancha.Where(p => p.Sede.id == idSede).Select(p => p.TipoCancha);
+        }
         
     }
 }

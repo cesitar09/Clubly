@@ -73,7 +73,7 @@
 }
 .k-block, .k-widget, .k-inline-block, .k-textbox > input, .k-input[type="text"], .k-input[type="number"], .k-textbox, .k-picker-wrap .k-input, .k-button, .k-draghandle
 {
-    font-size: 100%;
+    font-size: 90%;
     font-family: Calibri;
     border-style: solid;
     border-width: 1px;
@@ -1841,7 +1841,6 @@ form.k-filter-menu .k-widget, form.k-filter-menu .k-textbox
 }
 .k-grid tbody .k-button, .k-ie8 .k-grid tbody button.k-button
 {
-    min-width: 64px;
 }
 .k-grid tbody button.k-button
 {

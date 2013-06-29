@@ -1,0 +1,63 @@
+﻿@model Web.Models.ComprobanteDePago
+@using Web.Models
+@{
+    ViewBag.Title = "MostrarComprobanteDePago";
+}
+
+<h2>Comprobante De Pago</h2>
+
+<fieldset>
+ <legend>Datos</legend>  
+ @using (Html.BeginForm("mostrarComprobanteDePago", "Finanzas", FormMethod.Post, new { @id = "Form" }))
+ {
+    <form id="myform">
+    <ul>
+        <li>
+            <div class="editor-label">@Html.LabelFor(p => p.id)</div>
+            @Html.TextBoxFor(p => p.id, new { @readonly = "readonly" })
+      
+        </li><li>
+            <div class="editor-label">@Html.LabelFor(p => p.fecha)</div>
+            @Html.TextBoxFor(p => p.fecha, new { @readonly = "readonly" })
+        </li><li>
+            <div class="editor-label">@Html.LabelFor(p => p.monto)</div>
+            @Html.TextBoxFor(p => p.monto, new { @readonly = "readonly" })
+        </li><li>
+            <div class="editor-label">@Html.LabelFor(p => p.descuento)</div>
+            @Html.TextBoxFor(p => p.descuento, new { @readonly = "readonly" })
+        </li><li>
+            <div class="editor-label">@Html.LabelFor(p => p.montoAPagar)</div>
+            @Html.TextBoxFor(p => p.montoAPagar, new { @readonly = "readonly" })
+        </li>
+   
+    </ul>
+    
+  <div id="botones">
+  <input type="submit" value="Imprimir" id= "printButton" runat="server" onclick = "javascript: window.print();" /  >
+  </div>
+
+  
+  </form> 
+ }
+
+ </fieldset>
+
+ <div id="kendotable">
+@(Html.Kendo().Grid(Model.listaPagos)
+    .Name("tablaPagos") 
+    .Columns(columns =>
+    {
+        columns.Bound(p => p.id).Width(100).Title("Id Pago");
+        //columns.Bound(p => p.conceptoDePago.descripcion );
+        columns.Bound(p => p.descripcion).Title("Descripción");
+        columns.Bound(p => p.monto);
+       
+    })
+    //.Selectable()
+    //.Pageable()
+            //.Scrollable()
+                               
+    )
+     
+ </div>
+

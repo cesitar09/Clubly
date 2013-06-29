@@ -24,6 +24,7 @@ namespace Negocio
             {
                 SolicitudMembresia.estado = 1;
                 SolicitudMembresia.fechaRegistro = DateTime.Now;
+              
                 context().SolicitudMembresia.AddObject(SolicitudMembresia);
                 context().SaveChanges();
             }
@@ -59,30 +60,64 @@ namespace Negocio
             return null;
         }
 
-        public static int Aceptar(Datos.SolicitudMembresia solicitudMembresia)
-        {
+        public static int Aprobar(Datos.SolicitudMembresia solicitudMembresia)
+            {
+                //Crear usuario
+                Datos.Usuario usuario = new Datos.Usuario();
+                usuario.nomUsuario = solicitudMembresia.apPaterno + "." + solicitudMembresia.apMaterno;
+                usuario.contrasena = "1234";
+                usuario.estado = 0;
+                //Asignar Perfil
+                usuario.Perfil = Perfil.BuscarId(12);   //perfil Socio
 
-            solicitudMembresia.estado = 3;
-            return context().SaveChanges();
+                //Crear Familia
+                Datos.Familia familia = new Datos.Familia();
+                familia.SolicitudMembresia = solicitudMembresia;
+                familia.Usuario = usuario;
+                familia.tipo = Familia.NOVITALICIO;
+                familia.saldo = 0;
+                familia.estado = 1;
+                //Crear Socio
+                Datos.Socio socio = new Datos.Socio();
+                socio.Familia = familia;
+                socio.titular = Socio.TITULAR;
+                //Crear Persona
+                Datos.Persona persona = new Datos.Persona();
+                persona.dni = solicitudMembresia.dni;
+                persona.nombre = solicitudMembresia.nombre;
+                persona.apPaterno = solicitudMembresia.apPaterno;
+                persona.apMaterno = solicitudMembresia.apMaterno;
+                persona.correo = solicitudMembresia.correo;
+                persona.estado = 1;
+                persona.estadoCivil = solicitudMembresia.estadoCivil;
+                persona.direccion = solicitudMembresia.direccion;
+                socio.Persona = persona;
+                //Insertar Socio
+                context().Socio.AddObject(socio);
+                solicitudMembresia.estado = 3;
+            
+                return context().SaveChanges();
 
-        }
-        public static int Eliminar(Datos.SolicitudMembresia solicitudMembresia)
-        {
+            }
+            public static int Eliminar(Datos.SolicitudMembresia solicitudMembresia)
+            {
+                solicitudMembresia.estado = 0;
+                return context().SaveChanges();
 
-            solicitudMembresia.estado = 0;
-            return context().SaveChanges();
+            }
 
-        }
+            public static int Rechazar(Datos.SolicitudMembresia solicitudMembresia)
+            {
 
-        public static int Rechazar(Datos.SolicitudMembresia solicitudMembresia)
-        {
+                solicitudMembresia.estado = 2;
+                return context().SaveChanges();
 
-            solicitudMembresia.estado = 2;
-            return context().SaveChanges();
+            }
 
-        }
-
+            //public static int ValidarAprobacion(Datos.SolicitudMembresia solicitudMembresia) { 
+            //    if(context().)
         
+            //}
 
+        }
     }
-}

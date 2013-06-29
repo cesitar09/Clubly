@@ -32,8 +32,8 @@
                     .DataTextField("nombre")
                     .DataValueField("id")
                     .Placeholder("--Seleccionar--")
-                    .BindTo(Sede.SeleccionarTodo())
-                    .Value(Model != null ? Sede.Enlistar(Model.sedes) : null)
+                    .BindTo((IEnumerable<Sede>)ViewData["sedeSeleccionarTodo"])
+                    .Value(Model != null ? (IEnumerable<string>)ViewData["enlistarSedes"] : null)
                 )
        
             </li>
@@ -41,15 +41,8 @@
         </ul>
         <div id="botones">
             <input type="button" value="Limpiar" id="Limpiar" onclick="location.href = '@(Url.Action("MantenerConcesionario", "Logistica"))'" />
-            <input type="submit" value=@(Model == null || Model.id == 0 ? "Insertar" : "Modificar") />
+            <input type="submit" value="@(Model == null || Model.id == 0 ? "Insertar" : "Modificar")" />
         </div> 
-        
-         if (ViewData["message"] == null)
-         { }
-         else if (ViewData["message"].Equals("F"))
-         {<script type="text/javascript">alert("Lo sentimos!\nNo se pudo realizar la operación.\nVuelva intentarlo en otro momento. ")</script> }
-         else if (ViewData["message"].Equals("E"))
-         { <script type="text/javascript">alert("La operación se realizó con éxito!")</script>}
     }
 </fieldset>
 
@@ -61,7 +54,7 @@
             columns.Bound(p => p.nombre);
             columns.Bound(p => p.direccion);
             columns.Bound(p => p.ruc);
-            columns.Command(c => { c.Custom("Editar").Click("EditarConcesionario"); c.Destroy().Text("Eliminar"); }).Width(181);
+            columns.Command(c => { c.Custom("Editar").Text("<span class='k-icon k-edit'></span>").Click("EditarConcesionario"); c.Destroy().Text(" "); });
         }
         )
         .Editable(editable => { editable.Mode(GridEditMode.InLine); editable.DisplayDeleteConfirmation("El regitro será eliminado ¿Desea continuar?"); })
@@ -86,10 +79,17 @@
             .Events(events => events.Error("ErrorMessage"))
             .Model(m => m.Id(p => p.id))
             .Destroy(a => a.Action("EliminarConcesionario", "Logistica"))
-            )
-            .Selectable()
+       )
+       .Selectable()
     )
 </div>
+
+@if (ViewData["message"] != null)
+{
+    <script type="text/javascript">
+        alert("@ViewData["message"]");
+    </script>
+}
 
 <script type="text/javascript">
 
@@ -137,9 +137,10 @@
             }
         }
     });
+    
 
     function ErrorMessage(e) {
-        alert("A ocurrido un error en el servidor!\nVuelva a intentar la operación en unos minutos...");
+        alert("No se pudo acceder a los datos de la tabla.");
     }
 
     function EditarConcesionario(e) {

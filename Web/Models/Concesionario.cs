@@ -16,26 +16,21 @@ namespace Web.Models
         [DisplayName("Id")]
         public short id { get; set; }
 
-        [Required]
         [DisplayName("RUC")]
         //[MaxLength(11, ErrorMessage = "No se debe exceder de 11 carácteres.")]
         public string ruc { get; set; }
 
-        [Required]
         //[MaxLength(50, ErrorMessage="No se debe exceder de 50 carácteres.")]
         [DisplayName("Nombre")]
         public string nombre { get; set; }
 
-        [Required]
         //[MaxLength(100, ErrorMessage = "No se debe exceder de 100 carácteres.")]
         [DisplayName("Dirección")]
         public string direccion { get; set; }
 
-        [Required]
         [DisplayName("Estado")]
         public short estado { get; set; }
 
-        [Required]
         [DisplayName("Sedes")]
         public IEnumerable<Models.Sede> sedes { get; set; }
 
@@ -107,25 +102,24 @@ namespace Web.Models
             return Convertir(concesionario);
         }
 
-        public static int modificar(Models.Concesionario concesionario)
+        public static void modificar(Models.Concesionario concesionario)
         {
-            if (Negocio.Concesionario.modificar(Invertir(concesionario), concesionario.sedesAux) == null)
-                return 1;
-            else
-                return 0;
+            Negocio.Concesionario.modificar(Invertir(concesionario), concesionario.sedesAux);
         }
 
-        public static int insertar(Models.Concesionario concesionario)
+        public static void insertar(Models.Concesionario concesionario)
         {
-            if (Negocio.Concesionario.insertar(Invertir(concesionario)) == null)
-                return 1;
-            else
-                return 0;
+            Negocio.Concesionario.insertar(Invertir(concesionario));
         }
 
         public static void eliminar(Models.Concesionario concesionario)
         {
             Negocio.Concesionario.eliminar(Invertir(concesionario));
+        }
+
+        public static void eliminar(short id)
+        {
+            Negocio.Concesionario.eliminar(id);
         }
 
         public static IEnumerable<String> listaSedes()

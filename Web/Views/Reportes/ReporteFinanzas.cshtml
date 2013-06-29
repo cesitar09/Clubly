@@ -1,0 +1,52 @@
+﻿@model Web.Models.ReporteFinanzas
+@using Web.Models
+@{
+    ViewBag.Title = "Reporte de Finanzas";
+}
+
+<h3>@ViewBag.Title</h3>
+<fieldset>
+ <div id="kendotable">
+@(Html.Kendo().Grid(Model.listaconceptos)
+    .Name("Grid")
+    .Columns(columns =>
+    {
+        columns.Bound(p=>p.descripcion).Sortable(true).Width(180);
+        columns.Bound(p=>p.monto).Sortable(true).Width(180);
+        columns.Bound(p=>p.porcentaje).Sortable(true).Width(180);
+        
+
+    })
+     .Selectable()
+     .Filterable(filterable => filterable
+        .Extra(false)
+        .Operators(operators => operators
+            .ForString(str => str.Clear()
+                .Contains("Contiene")
+                .StartsWith("Empezar con")
+                .IsEqualTo("Es igual a")
+                .IsNotEqualTo("Diferente a"))
+            .ForNumber(number => number.Clear()
+                .IsGreaterThan("Es mayor a")
+                .IsLessThan("Es menor a")
+                .IsEqualTo("Es igual a")
+                .IsNotEqualTo("Es diferente a"))
+        )
+    )
+    .DataSource(datasource => datasource
+        .Ajax()
+        .Events(events => events.Error("ErrorMessage"))
+        .Model(model => model.Id(p => p.id))
+        //.Read(read => read.Action("getTemporadaAlta", "Administracion"))
+            .Destroy(update => update.Action("eliminarTemporadaAlta", "Administracion"))
+
+    )
+        
+)
+</div>
+</br>
+<h1 align="center">Total de Ingresos = @Model.total</h1>
+</br>
+</br>
+<input align="center" type="submit" value="Imprimir Reporte" id= "printButton" runat="server" onclick = "javascript: window.print();" /  >
+</fieldset>

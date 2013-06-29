@@ -1,0 +1,29 @@
+﻿@model Web.Models.Persona
+@using Web.Models
+@{
+    ViewBag.Title = "Usuario";
+}
+
+<div id="kendo-table">
+@(Html.Kendo().Grid<Web.Models.Empleado>()
+    .Name("GridEmpleado")
+    .Groupable()
+    .Pageable()
+    .Filterable()
+    .Columns(columns =>
+    {
+        columns.Bound(p => p.persona.id).Filterable(false);
+        columns.Bound(p => p.persona.nombre);
+        columns.Bound(p => p.persona.apPaterno);
+        columns.Bound(p => p.persona.apMaterno);
+        columns.Command(p => { p.Custom("Agregar Perfil").Click(""); });
+
+    })
+    .DataSource(datasource => datasource
+                                .Ajax()
+                                .PageSize(5)
+                                .Model(m => m.Id(p => p.persona.id))
+                                .Read(read => read.Action("Leer_Empleado", "Usuario"))
+                )
+)
+</div>

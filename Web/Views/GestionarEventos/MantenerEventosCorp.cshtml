@@ -9,13 +9,15 @@
 
 <fieldset>
  <legend>Datos del Formulario</legend>
- <form id = "form" action="insertarEventoCorp" method= post>
+ @using (Html.BeginForm("insertarEventoCorp", "GestionarEventos", FormMethod.Post, new { @id = "Form" , enctype = "multipart/form-data"}))
+ {
+     <form>
      <fieldset>
         <legend>Datos de la Empresa</legend>
         <ul>
             <li>
             @Html.LabelFor(p => p.razonSocial)
-            @Html.TextBoxFor(p => p.razonSocial)
+            @Html.TextBoxFor(p => p.razonSocial, new { id = "razon" })
             </li><li>
             @Html.LabelFor(p => p.ruc)
             @Html.TextBoxFor(p => p.ruc)
@@ -28,7 +30,7 @@
             </li><li> 
             @Html.LabelFor(p => p.numParticipantes)
             @Html.TextBoxFor(p => p.numParticipantes)
-            </li>          
+            </li>         
         </ul>
     </fieldset>
     <fieldset>
@@ -36,46 +38,32 @@
     <ul>
     <li>
     @Html.LabelFor(p => p.id)
-    @Html.TextBoxFor(p => p.id, new { @readonly = "readonly" })
+    @Html.TextBoxFor(p => p.id, new { @readonly = "readonly", id = "id" } )
     </li><li>
     </li><li>  
     @Html.LabelFor(p => p.nombre)
-    @Html.TextBoxFor(p => p.nombre)                              
-    </li><li>           
-    @Html.LabelFor(p => p.precioSocio)
-    @Html.TextBoxFor(p => p.precioSocio)          
+    @Html.TextBoxFor(p => p.nombre)          
     </li><li>         
     @Html.LabelFor(p => p.descripcion) 
-    @Html.TextBoxFor(p => p.descripcion)              
-    </li><li>                    
-    @Html.LabelFor(p => p.precioInvitado)
-    @Html.TextBoxFor(p => p.precioInvitado)                    
-    </li><li>
-    @Html.LabelFor(p => p.vacantesSocio)
-    @Html.TextBoxFor(p => p.vacantesSocio)
-    </li><li>
-    @Html.LabelFor(p => p.vacantesInvitado)
-    @Html.TextBoxFor(p => p.vacantesInvitado)
+    @Html.TextBoxFor(p => p.descripcion)                                
     </li><li> 
             @*-------DATEPICKER INICIO-------*@
             <div class="editor-label">@Html.LabelFor(p => p.fechaInicio)</div>
-            @(Html.Kendo().DateTimePickerFor(p => p.fechaInicio)
+            @(Html.Kendo().DatePickerFor(p => p.fechaInicio)
 
                 .HtmlAttributes(new { style = "width:160px" })
-                .Min(new DateTime(1990, 1, 1)) 
-                .Max(new DateTime(2020, 12, 31)) 
-                .Value(DateTime.Today) 
+                .Min(new DateTime(1990, 1, 1))
+                .Max(new DateTime(2020, 12, 31))
                 .Events(e => e.Change("startChange"))
             )
     </li><li>  
             @*-------DATEPICKER FIN-------*@                      
             <div class="editor-label">@Html.LabelFor(p => p.fechaFin)</div>
-            @(Html.Kendo().DateTimePickerFor(p => p.fechaFin)
+            @(Html.Kendo().DatePickerFor(p => p.fechaFin)
 
                 .HtmlAttributes(new { style = "width:160px" })
                 .Min(new DateTime(1990, 1, 1))
                 .Max(new DateTime(2020, 12, 31))
-                .Value(DateTime.Today) 
                 .Events(e => e.Change("endChange"))
             )
     </li><li>
@@ -89,8 +77,8 @@
             .DataTextField("persona.nombre")
             .DataValueField("persona.id")
             .AutoBind(true)
-            .BindTo(Empleado.seleccionarTodo())  
-            .Value(Model != null && Model.empleado != null ? Model.empleado.persona.id.ToString() :null)
+            .BindTo(Empleado.seleccionarTodo())
+            .Value(Model != null && Model.empleado != null ? Model.empleado.persona.id.ToString() : null)
             )       
             @Html.TextBoxFor(p => p.empleado.persona.id, new { style = "display: none;" })
     </li><li>
@@ -104,42 +92,57 @@
             .DataTextField("nombre")
             .DataValueField("id")
             .AutoBind(true)
-            .BindTo(Ambiente.SeleccionarTodo())  
-            .Value(Model != null && Model.reserva != null ? Model.reserva.ambiente.id.ToString() :null)
+            .BindTo(Ambiente.SeleccionarTodo())
+            .Value(Model != null && Model.reserva != null ? Model.reserva.ambiente.id.ToString() : null)
             )       
             @Html.TextBoxFor(p => p.reserva.ambiente.id, new { style = "display: none;" })
+    </li><li>
+            @if (Model == null)
+            {
+                <input type="file" name="file" />
+            }
+    </li><li>
+        <div id="botones">
+        @if (Model != null)
+        {<input type="button" value= "Descargar"  id="descargar Lista Participantes" onclick="onDownload();" class="button fright"/>}                                                                                                                                                                    
+        <input type="button" value= "Limpiar"  id="limpiar" onclick="location.href = '@(Url.Action("MantenerEventosCorp", "GestionarEventos"))'" class="button fright"/>
+        <input type="submit" value=  "@(Model == null ? "Insertar" : "Modificar")"/>
+        </div>
+    </li><li>     
+    @Html.TextBoxFor(p => p.estado, new { style = "display: none;" })
+    @Html.TextBoxFor(p => p.fechaInicio, new { style = "display: none;" })
+    @Html.TextBoxFor(p => p.fechaFin, new { style = "display: none;" })  
     </li>
     </ul>
-    </fieldset>     
-    @Html.TextBoxFor(p => p.estado  , new { style = "display: none;" })
-    @Html.TextBoxFor(p => p.fechaInicio, new { style = "display: none;" })
-    @Html.TextBoxFor(p => p.fechaFin, new { style = "display: none;" })       
-
-    <div id="botones">
-        <input type="button" value= "Limpiar"  id="limpiar" onclick="location.href = '@(Url.Action("MantenerEventosCorp", "GestionarEventos"))'" class="button fright"/>
-        <input type="submit" value=  @(Model == null ? "Insertar" : "Modificar")  />
-    </div>
+    </fieldset>
     @if (ViewData["message"] == null)
     { }
     else if (ViewData["message"].Equals("F"))
     { <script type= "text/javascript">          alert("Lo sentimos!\n No se pudo realizar la operacion\nVuelva a intentarlo en otro momento. ")</script>}
     else if (ViewData["message"].Equals("E"))
-    { <script type= "text/javascript">          alert("La operación se realizó con éxito!")</script>}                                                                                                                                      
+    { <script type= "text/javascript">          alert("La operación se realizó con éxito!")</script>}
+    else if (ViewData["message"].Equals("FNV"))
+    {<script type="text/javascript">            alert("Lo sentimos!\Las fechas no son válidas. Deberá elegir un rango correcto\Intente nuevamente.")</script> }
+    else if (ViewData["message"].Equals("Reservado"))
+    { <script type="text/javascript">           alert("Lo sentimos!\nEl ambiente seleccionado está reservado en este período.\nIntente en un período diferente o seleccione otro ambiente\nGracias.")</script> }
+    else if (ViewData["message"].Equals("NoFile"))
+    { <script type="text/javascript">           alert("No se encontró un listado para el evento.")</script> }
+         
   </form>
-  
+ }
   </fieldset>
-   
+     
    <div id="kendotable">
     @(Html.Kendo().Grid<Web.Models.EventoCorporativo>()
     .Name("Grid")
     .Columns(columns =>
     {
-        columns.Bound(p => p.nombre).Sortable(true);
-        columns.Bound(p => p.fechaInicio).Sortable(true);
-        columns.Bound(p => p.fechaFin).Sortable(true);  
-        columns.Bound(p => p.razonSocial).Sortable(true);   
-        columns.Bound(p => p.numParticipantes).Sortable(true);
-        columns.Command(command => { command.Custom("Editar").Click("Edit"); command.Destroy().Text("Eliminar"); }).Width(181);
+        columns.Bound(p => p.nombre).Sortable(true).Width(100);
+        columns.Bound(p => p.fechaInicio).Sortable(true).Format("{0:dd/MM/yyyy}").Width(100);
+        columns.Bound(p => p.fechaFin).Sortable(true).Format("{0:dd/MM/yyyy}").Width(100);
+        columns.Bound(p => p.razonSocial).Sortable(true).Width(100);
+        columns.Bound(p => p.numParticipantes).Sortable(true).Width(50);
+        columns.Command(command => { command.Custom("Editar").Text("<span class='k-icon k-edit'></span>").Click("onChange"); command.Destroy().Text(" "); });
 
     })
     .Editable(editable => { editable.Mode(GridEditMode.InLine); editable.DisplayDeleteConfirmation("El registro será eliminado ¿Desea continuar?"); })
@@ -187,7 +190,26 @@
             dropdownlist2.bind("change",function(e){$("#reserva_ambiente_id").val(dropdownlist2.value());});
     });
 
-    $("#form").validate({
+    function onChange(e) {
+
+        e.preventDefault();
+        var grid = $('#Grid').data('kendoGrid');
+        var row = grid.select();
+        var dataItem = grid.dataItem(row);
+        var id = dataItem.id;
+        location = "@Url.Action("modificarEventoCorp")"+ "?id=" + id;
+    };
+
+    function onDownload() 
+    {
+        var razonSocial = $('#id').val();
+        var result = confirm("Desea guardar el archivo de texto?");
+            if (result == true) {
+             return location = "@Url.Action("BajarArchivoEvento")"+ "?id=" + razonSocial;
+            }
+    };
+
+    $("#Form").validate({
         ignore: "",
         rules: {
             razonSocial: {
@@ -218,7 +240,7 @@
                 maxlength: 50
             },
             descripcion: {
-                required: true,
+                required: false,
                 maxlength: 150
             },
             fechaInicio: {
@@ -228,27 +250,27 @@
                 required: true
             },
             precioSocio: {
-                required: true,
+                required: false,
                 number: true,
                 range: [0, 10000]
             },
             precioInvitado: {
-                required: true,
+                required: false,
                 number: true,
                 range: [0, 10000]
             },
             vacantesSocio: {
-                required: true,
+                required: false,
                 number: true,
                 range: [0, 1000]
             },
             vacantesInvitado: {
-                required: true,
+                required: false,
                 number: true,
                 range: [0, 4000]
             },
             numeroInvitados: {
-                required: true,
+                required: false,
                 number: true,
                 range: [0, 10]
             },

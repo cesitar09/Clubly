@@ -38,6 +38,8 @@
         {<script type="text/javascript">alert("Lo sentimos!\nNo se pudo realizar la operación.\nVuelva intentarlo en otro momento. ")</script> }
         else if (ViewData["message"].Equals("E"))
         { <script type="text/javascript">alert("La operación se realizó con éxito!")</script>} 
+        else if (ViewData["message"].Equals("ELIMINA"))
+        { <script type="text/javascript">alert("Lo sentimos!\nNo se puede eliminar esta Sede ya que tiene Ambientes o Bungalows habilitados en ella. ")</script>} 
         
  
  </form>
@@ -55,7 +57,7 @@
         columns.Bound(p => p.descripcion).Sortable(true)
             .Filterable(filterable => filterable.UI("descripcionFiltro"));
         columns.Bound(p => p.direccion);
-        columns.Command(command => { command.Custom("Editar").Click("onChange");command.Destroy().Text("Eliminar"); }).Width(200);
+        columns.Command(command => { command.Custom("Editar").Click("onChange");command.Custom("Eliminar").Click("elimina"); }).Width(200);
 
     })
      .Editable(editable => { editable.Mode(GridEditMode.InLine); editable.DisplayDeleteConfirmation("El regitro será eliminado ¿Desea continuar?"); })
@@ -152,6 +154,15 @@ function habilitar(e){
         var dataItem = grid.dataItem(row);
         var id = dataItem.id;
         location = "@Url.Action("habilitarSede")" + "?id=" + id;
+    }
+
+function elimina(e){
+        e.preventDefault();
+        var grid = $('#Grid').data('kendoGrid');
+        var row = grid.select();
+        var dataItem = grid.dataItem(row);
+        var id = dataItem.id;
+        location = "@Url.Action("eliminarSede")" + "?id=" + id;
     }
 
     function nombreFiltro(element) {

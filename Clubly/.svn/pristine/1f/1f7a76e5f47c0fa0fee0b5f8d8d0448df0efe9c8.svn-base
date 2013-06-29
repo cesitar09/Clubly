@@ -1,0 +1,64 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using Datos;
+using System.Collections;
+using System.Data.Objects.DataClasses;
+using System.Data.Objects;
+
+namespace Negocio
+{
+    public class Perfil
+    {
+        
+
+        public static Exception insertar(Datos.Perfil perfil)
+        {
+            try
+            {
+                Datos.Context.context().Perfil.AddObject(perfil);
+                Datos.Context.context().SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                return ex;
+            }
+            return null;
+        }
+
+        public static IEnumerable<Datos.Perfil> seleccionarTodo()
+        {
+            try
+            {
+                return Datos.Context.context().Perfil;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        public static void Modificar(Datos.Perfil nuevoPerfil)
+        {
+            try
+            {
+                var propertiesFromNewEntity = nuevoPerfil.GetType().GetProperties();
+                var currentEntity = Datos.Context.context().Perfil.Single(p => p.id == nuevoPerfil.id);
+                var propertiesFromCurrentEntity = currentEntity.GetType().GetProperties();
+
+                for (int i = 0; i < propertiesFromCurrentEntity.Length; i++)
+                {
+                    propertiesFromCurrentEntity.SetValue(propertiesFromNewEntity.GetValue(i), i);
+                }
+                Datos.Context.context().SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+
+    }
+}

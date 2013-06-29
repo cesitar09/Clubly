@@ -36,7 +36,7 @@ namespace Negocio
         {
             try
             {
-                context().ReservaAmbiente.AddObject(reservAmb);
+                context().ReservaAmbiente.ApplyCurrentValues(reservAmb);
                 context().SaveChanges();
             }
             catch (Exception ex)

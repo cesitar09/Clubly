@@ -12,6 +12,9 @@ namespace Negocio
 {
     public class ReservaCancha
     {
+        public const short PENDIENTE = 1;
+        public const short CANCELADA = 2;
+        public const short VENCIDA = 3;
 
 //CONEXION BASE DE DATOS
         public static Entities context()
@@ -23,15 +26,11 @@ namespace Negocio
 //QUERY PARA INSERTAR
         public static int Insertar(Datos.ReservaCancha reservaCancha)
         {
-            try
-            {
+            
                 context().ReservaCancha.AddObject(reservaCancha);
                 context().SaveChanges();
                 return 1;
-            }
-            catch (Exception ex){
-                return 0;
-            }
+            
         }
 
 
@@ -43,7 +42,7 @@ namespace Negocio
                 context().SaveChanges();
                 return 1;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return 0;
             }
@@ -67,7 +66,7 @@ namespace Negocio
             IEnumerable<Datos.ReservaCancha> listaSocioXCancha = context().ReservaCancha.Where(p => (p.estado != 0) && (p.Familia.id == idFamilia));
             return listaSocioXCancha;
         }
-
+        
 
 //QUERY DE ELIMINAR
         //Metodos para eliminar una Reserva

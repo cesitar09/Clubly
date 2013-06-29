@@ -31,6 +31,7 @@ namespace Web.Models
 
         
         public Usuario usuario { get; set; }
+
         /*public InvitadoxFamilia invitado { get; set; }
         public InvitadoxFamiliaxEventoPrivado invitadoEvento { get; set; }
         public Pago pago { get; set; }
@@ -45,8 +46,6 @@ namespace Web.Models
         //metodos para convertir
         public Familia() 
         {
-            
-
 
         }
         public Familia (Models.SolicitudMembresia sol)
@@ -92,19 +91,24 @@ namespace Web.Models
             if (familia.id == 0)
                 datosFamilia = new Datos.Familia();
             else
-            datosFamilia = Negocio.Familia.buscarId(familia.id);
+                datosFamilia = Negocio.Familia.buscarId(familia.id);
             datosFamilia.id = familia.id;
             datosFamilia.tipo = familia.tipo;
             datosFamilia.saldo = familia.saldo;
             datosFamilia.estado = familia.estado;
             datosFamilia.SolicitudMembresia = SolicitudMembresia.Invertir(familia.solicitud);
-            //datosFamilia.Usuario = Usuario.Invertir(familia.usuario);
             return datosFamilia; 
         }
         public static IEnumerable<Models.Familia> SeleccionarTodo()
         {
             return ConvertirLista(Negocio.Familia.seleccionarTodo());
         }
+
+        public static IEnumerable<Models.Familia> SeleccionarVitalicia()
+        {
+            return ConvertirLista(Negocio.Familia.SeleccionarNoVitalicio());
+        }
+
         public static Models.Familia buscarId(short id)
         {
             return Convertir(Negocio.Familia.buscarId(id));
@@ -120,7 +124,53 @@ namespace Web.Models
         //Metodo agregado por Maki para buscar una familia por IdUsuario 
         internal static Familia buscarIdUsuario(short idUsuario)
         {
+
             return Convertir(Negocio.Familia.buscarIdUsuario(idUsuario));
+        }
+
+        public static string val_pagos_reservas(short idfamilia) {
+            if (Negocio.Familia.pagosPendientes(idfamilia).Count() != 0)
+            {
+                return "1";
+            }
+            else if (Negocio.Familia.reservaPendientes(idfamilia).Count() != 0 || Negocio.Familia.SorteoPendiente(idfamilia).Count() != 0 || Negocio.Familia.campingPendientes(idfamilia).Count() != 0 || Negocio.Familia.canchasPendientes(idfamilia).Count() != 0)
+            {
+                return "2";
+            }
+            else return "3";
+        
+        }
+     
+        public static void eliminarpendientes(short idfamilia){
+            IEnumerable<Datos.ReservaBungalow> rebulist = Negocio.Familia.reservaPendientes(idfamilia);
+            if( rebulist != null){
+                foreach (var emp in rebulist) {
+                    emp.estado = 0;
+                }
+            }else {
+                IEnumerable<Datos.ReservaBungalowSorteo> resorteo = Negocio.Familia.SorteoPendiente(idfamilia);
+                if (resorteo != null)
+                {
+                    foreach (var emp in resorteo)
+                    {
+                        emp.estado = 0;
+                    }
+                }
+                else {
+                    IEnumerable<Datos.ReservaCamping> recamp = Negocio.Familia.campingPendientes(idfamilia);
+                    if (recamp != null)
+                        foreach (var emp in recamp)
+                        {
+                            emp.estado = 0;
+                        }
+                    else {
+                        IEnumerable<Datos.ReservaCancha> recan = Negocio.Familia.canchasPendientes(idfamilia);
+                        foreach (var emp in recan) {
+                            emp.estado = 0;
+                        }
+                    }
+                }
+            }
         }
     }
 }

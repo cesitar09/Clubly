@@ -1,0 +1,158 @@
+﻿@model Web.Models.ReservaCancha
+@using Web.Models
+@{
+    ViewBag.Title = "Perfil";
+}
+
+<fieldset>
+    <legend>Datos de la reserva</legend>
+    @using (Html.BeginForm("IngresarReservaCancha", "Reservas", FormMethod.Post, new { @id = "form" }))
+    {
+        <ul>
+            <li>
+                @Html.Label("Sede")
+                @(Html.Kendo().DropDownList()
+                .Name("sedeBox")
+                .DataTextField("nombre")
+                .DataValueField("id")
+                .AutoBind(true)
+                .BindTo(Sede.SeleccionarTodo())
+                )
+             </li><li>
+                @Html.LabelFor(p => p.horaInicio)
+                @Html.TextBox("horainicio")
+             </li><li>
+                @Html.Label("Tipo de cancha")
+                @(Html.Kendo().DropDownList()
+                .Name("tipoBox")
+                .DataTextField("nombre")
+                .DataValueField("id")
+                .AutoBind(true)
+                .BindTo(TipoCancha.SeleccionarTodo())
+                )
+             </li><li>
+                @Html.LabelFor(p => p.horaFin)
+                @Html.TextBox("horafin")
+             </li><li>
+                @Html.Label("Número de cancha")
+                @(Html.Kendo().DropDownListFor(p => p.idCancha)
+                .DataTextField("descripcion")
+                .DataValueField("id")
+                .AutoBind(true)
+                .BindTo(Cancha.SeleccionarTodo())
+                /*BindTo() Depende de la sede y el tipo de cancha elegidos. 
+                 * No sé si el query se puede hacer en cualquier momento
+                 * Ni cómo referirme a los otros combo box
+                 */
+                )
+             </li><li>
+                @Html.LabelFor(p => p.fechaInicio)
+                @Html.TextBoxFor(p => p.fechaInicio)
+             </li><li>
+                @Html.LabelFor(p => p.actividad)
+                @(Html.Kendo().DropDownListFor(p => p.idActividad)
+                .DataTextField("nombre")
+                .DataValueField("id")
+                .AutoBind(true)
+                .BindTo(Actividad.SeleccionarTodo())
+                )
+             </li><li>
+                @Html.LabelFor(p => p.fechaFin)
+                @Html.TextBoxFor(p => p.fechaFin)
+             </li>
+        </ul>
+        <div id="botones">
+            <input type="button" value="Ver canchas" onclick="Javascript: AbrirPopup()"/>
+            <input type="button" value="Limpiar" id="Limpiar" onclick="location.href = '@(Url.Action("ReservarCancha", "Reservas"))'" />
+            <input type="submit" value="Reservar" />
+        </div>
+    }
+</fieldset>
+
+<div id="kendotable">
+    @(Html.Kendo().Grid<Web.Models.ReservaCancha>()
+        .Name("Grid")
+        .Columns(columns =>
+        {
+            columns.Bound(p => p.cancha.descripcion);
+            columns.Bound(p => p.familia.id);
+            columns.Bound(p => p.horaInicio);
+            columns.Bound(p => p.estado);
+            columns.Command(c => { c.Custom("Editar").Click("EditarPerfil"); c.Custom("Cancelar").Click("Cancelar"); });
+        }
+        )
+        .Pageable()
+        .Sortable()
+        .Filterable(filterable => filterable
+        .Operators(operators => operators
+            .ForString(str => str.Clear()
+                .Contains("Contiene")
+                .StartsWith("Empezar con")
+                .IsEqualTo("Es igual a")
+                .IsNotEqualTo("Diferente a"))
+            .ForNumber(number => number.Clear()
+                .IsGreaterThan("Es mayor a")
+                .IsLessThan("Es menor a")
+                .IsEqualTo("Es igual a")
+                .IsNotEqualTo("Es diferente a"))
+        )
+       )
+       .DataSource(d => d.Ajax()
+            .Read(r => r.Action("LeerReservasCanchas", "Reservas"))
+            .Events(events => events.Error("ErrorMessage"))
+            .Model(m => m.Id(p => p.id))
+            )
+            .Selectable()
+    )
+</div>
+
+<script type="text/javascript">
+    function EditarPerfil(e) {
+        e.preventDefault();
+        var grid = $('#Grid').data('kendoGrid');
+        var row = grid.select();
+        var dataItem = grid.dataItem(row);
+        var id = dataItem.id;
+        location = "@Url.Action("EditarReservaCancha")" + "?id=" + id;
+    }
+    function Cancelar(e) {
+        e.preventDefault();
+        var grid = $('#Grid').data('kendoGrid');
+        var row = grid.select();
+        var dataItem = grid.dataItem(row);
+        var id = dataItem.id;
+        location = "@Url.Action("CancelarReservaCancha")" + "?id=" + id;
+    }
+</script>
+
+
+@(Html.Kendo().Window().Name("Permisos")
+    .Title("Permisos del Perfil")
+    .Visible(false)
+    .Modal(true)
+    .Draggable(true)
+       
+)
+
+
+<script type="text/x-kendo-template" id="template2">
+    <img src="../Images/User.png"alt="Artek Alvar Aalto - Armchair 402" />
+</script>
+
+
+
+<script type="text/javascript">
+    var detailsTemplate = kendo.template($("#template2").html());
+    function AbrirPopup() {
+        var i = 0;
+        var wnd = $("#Permisos").data('kendoWindow');
+        wnd.content(detailsTemplate);
+
+        wnd.center().open();
+    }
+    function ErrorMessage(e) {
+        alert("A ocurrido un error en el servidor!\nVuelva a intentar la operación en unos minutos...");
+    }
+</script>
+
+

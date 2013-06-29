@@ -7,31 +7,36 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 using Negocio.Util;
+using Datos;
+using System.Data.Objects.DataClasses;
 
 namespace Web.Models
 {
-    public class Pago
+     public class Pago
     {
-        [DisplayName("Id de pago")]
+        [DisplayName("*Id Pago")]
         public short id { get; set; }
 
-        [DisplayName("Id de familia")]
+        [DisplayName("*Id Familia")]
         public short idfamilia { get; set; }
 
-        [DisplayName("Concepto de pago")]
+        [DisplayName("*Concepto de pago")]
         public ConceptoDePago conceptoDePago { get; set; }
 
-        [JsonProperty("Fecha Registro")]
-        [Required(ErrorMessage = "Debe seleccionar una fecha")]
-        [DisplayName("Fecha Registro")]
+        [DisplayName("*Descripción")]
+        public String descripcion { get; set; }
+
+        //[JsonProperty("Fecha Registro")]
+        //[Required(ErrorMessage = "Debe seleccionar una fecha")]
+        [DisplayName("*Fecha Registro")]
         public DateTime fechaRegistro { get; set; }
 
-        [JsonProperty("Fecha Limite")]
-        [Required(ErrorMessage = "Debe seleccionar una fecha")]
-        [DisplayName("Fecha Limite")]
+        //[JsonProperty("Fecha Limite")]
+        //[Required(ErrorMessage = "Debe seleccionar una fecha")]
+        [DisplayName("*Fecha Limite")]
         public DateTime fechaLimite { get; set; }
 
-        [JsonProperty("Monto")]
+        [JsonProperty("*Monto")]
         [Required(ErrorMessage = "Debe ingresar un precio")]
         [DisplayName("Monto")]
         public double monto { get; set; }
@@ -40,7 +45,7 @@ namespace Web.Models
         public string estado { get; set; }
 
         public static ListaEstados listaEstados = new ListaEstados();
-        public static List<Estado_Pago> listestadopago { get; set; }
+        //public static List<Estado_Pago> listestadopago { get; set; }
 
         public class Estado_Pago
         {
@@ -56,19 +61,22 @@ namespace Web.Models
 
         static Pago() {
             listaEstados = new ListaEstados();
-            listaEstados.AgregarEstado(1, "Pendiente");
-            listaEstados.AgregarEstado(2, "Cancelado");
-            listaEstados.AgregarEstado(3, "Por Devolver");
-            listaEstados.AgregarEstado(4, "Vencido");
-            listaEstados.AgregarEstado(5, "Devuelto");
-            Estado_Pago estado1 = new Estado_Pago(1,"Pendiente");
-            Estado_Pago estado2 = new Estado_Pago(2,"Cancelado");
-            Estado_Pago estado3 = new Estado_Pago(3, "Por Devolver");
-            Estado_Pago estado4 = new Estado_Pago(4, "Vencido");
-            Estado_Pago estado5 = new Estado_Pago(5, "Devuelto");
-            listestadopago = new List<Estado_Pago>();
-            listestadopago.Add(estado1);
-            listestadopago.Add(estado2);
+            listaEstados.AgregarEstado(Negocio.Pago.PENDIENTE, "Pendiente");
+            listaEstados.AgregarEstado(Negocio.Pago.PORDEVOLVER, "Por Devolver");
+            listaEstados.AgregarEstado(Negocio.Pago.DEVUELTO, "Devuelto");
+            listaEstados.AgregarEstado(Negocio.Pago.VENCIDO, "Vencido");
+            listaEstados.AgregarEstado(Negocio.Pago.CANCELADO, "Cancelado");
+
+            //Estado_Pago estado1 = new Estado_Pago(1,"Pendiente");
+            //Estado_Pago estado2 = new Estado_Pago(2,"Cancelado");
+            //Estado_Pago estado3 = new Estado_Pago(3, "Por Devolver");
+            //Estado_Pago estado4 = new Estado_Pago(4, "Vencido");
+            //Estado_Pago estado5 = new Estado_Pago(5, "Devuelto");
+
+
+            //listestadopago = new List<Estado_Pago>();
+            //listestadopago.Add(estado1);
+            //listestadopago.Add(estado2);
            
         }
 
@@ -79,38 +87,36 @@ namespace Web.Models
         public Pago(Datos.Pago pago)
         {
             id = pago.id;
-            //idfamilia = pago.Familia.id;
             idfamilia = pago.Familia.id;
             monto = pago.monto;
+            descripcion = pago.descripcion;
             fechaRegistro = pago.fechaRegistro;
             fechaLimite = pago.fechaLimite;
             DateTime fechaActual = DateTime.Today;
             //estado = pago.estado;
             conceptoDePago = Models.ConceptoDePago.SeleccionarporId(pago.ConceptoDePago.id);
-
-            if (pago.estado == 1)
-            {
-                if (fechaActual.Year > fechaLimite.Day)
-                {
-                    pago.estado = 4;
-                }
-                if (fechaActual.Year == fechaLimite.Day)
-                {
-                    if (fechaActual.Month > fechaLimite.Month)
-                    {
-                        pago.estado = 4;
-                    }
-                }
-                if (fechaActual.Month == fechaLimite.Month)
-                {
-                    if (fechaActual.Day > fechaLimite.Day)
-                    {
-                        pago.estado = 4;
-                    }
-                }
-            }
-                
-           estado = listaEstados.TextoEstado(pago.estado);
+            //    //if (fechaActual.Year > fechaLimite.Year)
+            //    //{
+            //    //    pago.estado = 4;
+            //    //    modificar(this);
+            //    //}
+            //    //if (fechaActual.Year == fechaLimite.Year)
+            //    //{
+            //    //    if (fechaActual.Month > fechaLimite.Month)
+            //    //    {
+            //    //        pago.estado = 4;
+            //    //    }
+            //    //}
+            //    //if (fechaActual.Month == fechaLimite.Month)
+            //    //{
+            //    //    if (fechaActual.Day > fechaLimite.Day)
+            //    //    {
+            //    //        pago.estado = 4;
+            //    //    }
+            //    //}
+          
+            estado = listaEstados.TextoEstado(pago.estado);
+           
         }
 
         //Convertidores
@@ -131,6 +137,7 @@ namespace Web.Models
 
             dPago.id = mPago.id;
             dPago.monto = mPago.monto;
+            dPago.descripcion = mPago.descripcion;
             dPago.fechaRegistro = mPago.fechaRegistro;
             dPago.fechaLimite = mPago.fechaLimite;
             //dPago.estado = mPago.estado;
@@ -141,9 +148,14 @@ namespace Web.Models
             return dPago;
         }
 
-        public static IEnumerable<Datos.Pago> ConvertirListaInverso(IEnumerable<Models.Pago> mPago)
+        public static EntityCollection<Datos.Pago> InvertirLista(IEnumerable<Models.Pago> mPago)
         {
-            return mPago.Select(act => Invertir(act));
+            EntityCollection<Datos.Pago> p = new EntityCollection<Datos.Pago>();
+            foreach (var pago in mPago)
+            {
+                p.Add(Invertir(pago));
+            }
+            return p;
         }
 
         // querys de busqueda
@@ -152,6 +164,12 @@ namespace Web.Models
         {
             IEnumerable<Datos.Pago> pago = Negocio.Pago.SeleccionarTodo();
             return ConvertirLista(pago);
+        }
+
+        public static IEnumerable<Models.Pago> SeleccionarCuotas()
+        {
+            IEnumerable<Datos.Pago> listapago = Negocio.Pago.SeleccionarCuotas();
+            return ConvertirLista(listapago);
         }
 
         public static IEnumerable<Models.Pago> SeleccionarPorFamilia(short id)
@@ -167,26 +185,70 @@ namespace Web.Models
 
         //interaccion bd
 
-        public static int insertar(Models.Pago pago)
+        public static void insertar(Models.Pago pago)
         {
-            if (Negocio.Pago.Insertar(Invertir(pago)) == null)
-                return 1;
-            else
-                return 0;
+            pago.fechaRegistro = DateTime.Now;
+            Parametros par= Parametros.SeleccionarParametros();
+            //Usando Parametros de memebresia, solo para pagos de membresia?
+            if (pago.conceptoDePago.id ==1) pago.fechaLimite = DateTime.Now.AddDays(par.vencimiento);
+            
+            Negocio.Pago.Insertar(Invertir(pago));
         }
 
-        /*public static int modificar(Models.Pago pago)
+        public static void InsertarCuota(Models.Pago cuota)
         {
-            if (Negocio.Pago.Modificar(Invertir(pago)) == null)
-                return 1;
-            else
-                return 0;
+            cuota.conceptoDePago = ConceptoDePago.SeleccionarporId(6);
+            cuota.fechaRegistro = DateTime.Now;
+
+            Negocio.Pago.Insertar(Invertir(cuota));
         }
 
+        public static void Cancelar(Models.Pago cuota)
+        {
+            
+            Negocio.Pago.Cancelar(Invertir(cuota));
+        }
+
+        public static void modificar(Models.Pago pago)
+        {
+            Negocio.Pago.modificar(Invertir(pago));
+        }
+
+        public static void GenerarPagosMembresia()
+        {
+            //Pago pago = new Pago();
+            //pago.conceptoDePago = ConceptoDePago.SeleccionarporId(1);
+            //pago.monto = pago.conceptoDePago.monto.Value;
+            Negocio.Pago.GenerarPagosMembresia();
+
+           /*IEnumerable<Models.Familia> listafamilia = Familia.SeleccionarVitalicia();
+            /*if (listafamilia != null)
+                foreach (Familia fam in listafamilia)
+                {
+                    Pago pago = new Pago();
+                    pago.conceptoDePago = ConceptoDePago.SeleccionarporId(1);
+                    pago.monto = pago.conceptoDePago.monto.Value;
+                    pago.idfamilia = fam.id;
+                    Pago.insertar(pago);
+                }//
+            listafamilia.Select(fam => Pago.insertarPagoFamilia(fam));
+        }
+
+        public static bool insertarPagoFamilia(Familia fam)
+        {
+            Pago pago = new Pago();
+            pago.conceptoDePago = ConceptoDePago.SeleccionarporId(1);
+            pago.monto = pago.conceptoDePago.monto.Value;
+            pago.idfamilia = fam.id;
+            Pago.insertar(pago);
+            return true;
+        }
+
+         /*
         public static void eliminar(Models.Pago pago)
         {
-            Negocio.Pago.(Invertir(pago));
-        }*/
+            Negocio.Pago.(Invertir(pago));*/
+        }
 
     }
 }

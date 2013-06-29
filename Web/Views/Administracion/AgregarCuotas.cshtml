@@ -1,0 +1,190 @@
+﻿@model Web.Models.Pago
+@using Web.Models
+
+@{
+    ViewBag.Title = "Agregar Cuotas";
+}
+
+<h1>@ViewBag.Title</h1>
+
+        <input type="button" value= "Genenerar Pagos de Membresia"  id="generar"  class="button fright"/>
+    
+<fieldset>
+    
+    <legend>Datos del Formulario</legend>
+    @using (Html.BeginForm("InsertarCuotas", "Administracion", FormMethod.Post, new { @id = "Form" }))
+    {
+        <ul><li>
+                <div class="editor-label">@Html.LabelFor(p => p.id)</div>
+                @Html.TextBoxFor(p => p.id, new { @readonly = "readonly" })
+            </li><li> 
+            @*-----------------FAMILIA----------------*@
+            <div class = "editor-label">   @Html.LabelFor(p => p.idfamilia) </div>        
+          @(Html.Kendo().DropDownListFor(p => p.idfamilia)
+           .OptionLabel("--Seleccionar--")
+           //.Name("familiaBox")
+           .DataTextField("id")
+           .DataValueField("id")
+           .AutoBind(true)
+           .BindTo(Familia.SeleccionarTodo())
+           .Value(Model != null && Model.idfamilia != null ? Model.idfamilia.ToString() : null)
+    )  
+    </li><li>
+                <div class="editor-label">@Html.LabelFor(p => p.monto)</div>
+                @Html.TextBoxFor(p => p.monto)
+            </li><li>
+                <div class="editor-label">@Html.LabelFor(p => p.descripcion)</div>
+                @Html.TextBoxFor(p => p.descripcion)
+            </li><li>
+            <div class="editor-label">@Html.LabelFor(p => p.fechaLimite)</div>
+            @(Html.Kendo().DatePickerFor(p => p.fechaLimite)
+            .HtmlAttributes(new { style = "width:150px" })
+                //.Name("end")
+                .Min(DateTime.Now.AddDays(1.0))
+                
+                //.Value(DateTime.Today) 
+                
+            )
+            </li>
+        </ul>
+             @Html.TextBoxFor(p => p.estado, new { style = "display: none;" })
+             @Html.TextBoxFor(p => p.idfamilia, new { style = "display: none;" })
+             @Html.TextBoxFor(p => p.fechaRegistro, new { style = "display: none;" })
+             
+             
+        <div id="botones">
+        <input type="button" value= "Limpiar"  id="cancel" onclick="location.href = '@(Url.Action("AgregarCuotas", "Administracion"))'" class="button fright"/>
+        <input type="submit" value="Insertar"/>
+        </div>
+
+             if (ViewData["message"] == null)
+                 { }                                                                                                         
+                 else if (ViewData["message"].Equals("F"))
+                 {<script type="text/javascript">                      alert("Lo sentimos!\nNo se pudo realizar la operación.\nVuelva intentarlo en otro momento. ")</script> }
+                 else if (ViewData["message"].Equals("E"))
+                 { <script type="text/javascript">                       alert("La operación se realizó con éxito!")</script>} 
+
+
+    }
+</fieldset>
+
+  <div id="kendotable">
+@(Html.Kendo().Grid<Web.Models.Pago>()
+    .Name("Grid")
+    .Columns(columns =>
+    {
+        columns.Bound(p => p.id);
+        columns.Bound(p => p.idfamilia).Title("Familia");
+        columns.Bound(p => p.monto).Title("Monto");
+        columns.Bound(p => p.fechaRegistro).Title("Fecha Registro").Format("{0:dd/MM/yyyy}");
+        columns.Bound(p => p.fechaLimite).Title("Fecha Limite").Format("{0:dd/MM/yyyy}");
+        columns.Command(command => { command.Destroy().Text(" "); });
+    
+    })
+     //.Editable(editable => { editable.Mode(GridEditMode.InLine); editable.DisplayDeleteConfirmation("El registro será eliminado ¿Desea continuar?"); })
+     .Pageable()
+     .Sortable()
+     .Selectable()
+     .Filterable(filterable => filterable
+        .Extra(false)
+        .Operators(operators => operators
+            .ForString(str => str.Clear()
+                .Contains("Contiene")
+                .StartsWith("Empezar con")
+                .IsEqualTo("Es igual a")
+                .IsNotEqualTo("Diferente a"))
+            .ForNumber(number => number.Clear()
+                .IsGreaterThan("Es mayor a")
+                .IsLessThan("Es menor a")
+                .IsEqualTo("Es igual a")
+                .IsNotEqualTo("Es diferente a"))
+        )
+    )
+    .DataSource(datasource => datasource
+        .Ajax()
+        //.Events(events => events.Error("ErrorMessage"))
+        .Model(model => model.Id(p => p.id))
+        .Read(read => read.Action("LeerCuotas", "Administracion"))
+        .Destroy(update => update.Action("EliminarCuota", "Administracion"))    
+    )
+        
+)
+</div>
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        var dropdownlist = $("#familiaBox").data("kendoDropDownList");
+
+        $("#familia_id").val(dropdownlist.value());
+        dropdownlist.bind("change", function (e) {
+            $("#familia_id").val(dropdownlist.value());
+            alert("idFamilia: "+dropdownlist.value()); 
+        });
+
+    });
+
+
+    $("#Form").validate({
+        ignore: "",
+        rules: {
+            idFamilia: {
+                required: true
+            },
+            monto: {
+                required: true,
+                number: true,
+                maxlenght: 7
+            },
+            descripcion: {
+                required: true,
+                maxlength: 150
+                // accept2: "[a-zA-Z0-9 ñÑáéíóú]+"
+            },
+            fechaLimite: {
+                required: true
+                //date: true
+            }
+        },
+        messages: {
+            idFamilia: {
+                required: "*Campo obligatorio"
+
+
+            },
+            monto: {
+                required: "*Campo obligatorio",
+                maxlength: "Ha excedido el maximo de digitos"
+
+            },
+            descripcion: {
+                required: "*Campo obligatorio",
+                maxlength: "Ha excedido el maximo de 150 caracteres"
+
+            },
+
+            fechaLimite: {
+                required: "*Campo obligatorio"
+            }
+
+        },
+
+        submitHandler: function ConfirmationBox(form) {
+            var result = confirm("¿Está seguro de realizar los cambios?");
+            if (result == true) {
+                form.submit();
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+
+    });
+
+    $("#generar").click(function(){
+        var result = confirm("¿Está seguro de realizar los cambios?");
+        if(result==true){
+        location = "@Url.Action("GenerarPagosMembresia")";
+        }else alert("sexo");
+});
+</script>

@@ -9,6 +9,9 @@ using Newtonsoft.Json;
 using Web.Controllers;
 using Web.Models;
 using System.Data;
+using System.Data.SqlClient;
+using Web.Util;
+using Negocio.Util;
 namespace Web.Controllers
 {
     public class RRHHController : Controller
@@ -70,21 +73,81 @@ namespace Web.Controllers
         [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
         public ActionResult MantenerEmpleado( Web.Models.Empleado empleado)
         {
-            ViewData["message"] = null;
-            return View((IView)null);
+            try
+            {
+                ViewData["Leer_TiposEmpleado"] = Models.TipoEmpleado.seleccionarTodo();
+                ViewData["Leer_Sedes"] = Models.Sede.SeleccionarTodo();
+                ViewData["Leer_Turnos"] = Models.TurnoDeTrabajo.seleccionarTodo();
+                Validar.ValidarIEnumerable(ViewData["Leer_TiposEmpleado"]);
+                Validar.ValidarIEnumerable(ViewData["Leer_Sedes"]);
+                Validar.ValidarIEnumerable(ViewData["Leer_Turnos"]);
+                return View((IView)null);
+            }
+            catch (SqlException ex)
+            {
+                ViewData["message"] = TransactionMessages.SQL_EXCEPTION_MESSAGE;
+                ViewData["Leer_TiposEmpleado"] = null;
+                ViewData["Leer_Sedes"] = null;
+                ViewData["Leer_Turnos"] = null;
+                logito.ElLogeador(TransactionMessages.SQL_EXCEPTION_MESSAGE, ex.GetType().ToString());
+                return View((IView)null);
+            }
+            catch (EntityException ex) {
+                ViewData["message"] = TransactionMessages.ENTITY_EXCEPTION_MESSAGE;
+                ViewData["Leer_TiposEmpleado"] = null;
+                ViewData["Leer_Sedes"] = null;
+                ViewData["Leer_Turnos"] = null;
+                logito.ElLogeador(TransactionMessages.ENTITY_EXCEPTION_MESSAGE, ex.GetType().ToString());
+                return View((IView)null);
+            }
+            //ViewData["message"] = null;
+            //return View((IView)null);
         }
 
         [AcceptVerbs(HttpVerbs.Post)]
         public ActionResult Eliminar([DataSourceRequest] DataSourceRequest request, Web.Models.Empleado empleado)
         {
-            if (empleado != null)
+            try
             {
-                if (Empleado.eliminar(empleado) == 1)
-                    ViewData["message"] = "E";
-                else ViewData["message"] = "F";
+                if (empleado != null)
+                {
+                    Empleado.eliminar(empleado);
+                    ViewData["Leer_TiposEmpleado"] = Models.TipoEmpleado.seleccionarTodo();
+                    ViewData["Leer_Sedes"] = Models.Sede.SeleccionarTodo();
+                    ViewData["Leer_Turnos"] = Models.TurnoDeTrabajo.seleccionarTodo();
+                    Validar.ValidarIEnumerable(ViewData["Leer_TiposEmpleado"]);
+                    Validar.ValidarIEnumerable(ViewData["Leer_Sedes"]);
+                    Validar.ValidarIEnumerable(ViewData["Leer_Turnos"]);
+                    ViewData["message"] = TransactionMessages.OK_CHANGE_DATA_MESSAGE;
+                    }
+                return View("MantenerEmpleado");
             }
-
-            return View("MantenerEmpleado");
+            catch (SqlException ex){
+                ViewData["message"] = TransactionMessages.SQL_EXCEPTION_MESSAGE;
+                ViewData["Leer_TiposEmpleado"] = null;
+                ViewData["Leer_Sedes"] = null;
+                ViewData["Leer_Turnos"] = null;
+                logito.ElLogeador(TransactionMessages.SQL_EXCEPTION_MESSAGE, ex.GetType().ToString());
+                return View("MantenerEmpleado",null);
+            }
+            catch (EntityException ex)
+            {
+                ViewData["message"] = TransactionMessages.ENTITY_EXCEPTION_MESSAGE;
+                ViewData["Leer_TiposEmpleado"] = null;
+                ViewData["Leer_Sedes"] = null;
+                ViewData["Leer_Turnos"] = null;
+                logito.ElLogeador(TransactionMessages.ENTITY_EXCEPTION_MESSAGE, ex.GetType().ToString());
+                return View("MantenerEmpleado", null);
+            }
+            catch (InvalidOperationException ex)
+            {
+                ViewData["message"] = TransactionMessages.SINGLE_NOT_FOUND_MESSAGE;
+                ViewData["Leer_TiposEmpleado"] = null;
+                ViewData["Leer_Sedes"] = null;
+                ViewData["Leer_Turnos"] = null;
+                logito.ElLogeador(TransactionMessages.SINGLE_NOT_FOUND_MESSAGE, ex.GetType().ToString());
+                return View("MantenerEmpleado", null);
+            }
         }
 
          [AcceptVerbs( HttpVerbs.Post)]
@@ -95,48 +158,120 @@ namespace Web.Controllers
                 
                     if (empleado.persona == null || empleado.persona.id == 0)
                     {
-                        if (Empleado.insertar(empleado) == 1)
-                            ViewData["message"] = "E";
-                        else ViewData["message"] = "F";
+                        if (Web.Models.Empleado.existeDni(empleado.persona.dni, empleado.persona.id) == false)
+                        {
+                            Empleado.insertar(empleado);
+                            ViewData["Leer_TiposEmpleado"] = Models.TipoEmpleado.seleccionarTodo();
+                            ViewData["Leer_Sedes"] = Models.Sede.SeleccionarTodo();
+                            ViewData["Leer_Turnos"] = Models.TurnoDeTrabajo.seleccionarTodo();
+                            Validar.ValidarIEnumerable(ViewData["Leer_TiposEmpleado"]);
+                            Validar.ValidarIEnumerable(ViewData["Leer_Sedes"]);
+                            Validar.ValidarIEnumerable(ViewData["Leer_Turnos"]);
+                            ViewData["message"] = TransactionMessages.OK_CHANGE_DATA_MESSAGE;
+                        }
+                        else {
+                            ViewData["message"] = "El DNI ingresado ya existe, ingrese uno distinto";
+                        }
                     }
                     else
                     {
-                        Empleado emp = Empleado.buscarId(empleado.persona.id);
-                        
-                        if(Empleado.modificar(emp, empleado)== 1)
-                            ViewData["message"] = "E";
-                        else ViewData["message"] = "F";
+                        if (Web.Models.Empleado.existeDni(empleado.persona.dni, empleado.persona.id) == false)
+                        {
+                            Empleado emp = Empleado.buscarId(empleado.persona.id);
+
+                            Empleado.modificar(emp, empleado);
+                            ViewData["Leer_TiposEmpleado"] = Models.TipoEmpleado.seleccionarTodo();
+                            ViewData["Leer_Sedes"] = Models.Sede.SeleccionarTodo();
+                            ViewData["Leer_Turnos"] = Models.TurnoDeTrabajo.seleccionarTodo();
+                            Validar.ValidarIEnumerable(ViewData["Leer_TiposEmpleado"]);
+                            Validar.ValidarIEnumerable(ViewData["Leer_Sedes"]);
+                            Validar.ValidarIEnumerable(ViewData["Leer_Turnos"]);
+                            ViewData["message"] = TransactionMessages.OK_CHANGE_DATA_MESSAGE;
+                        }
+                        else {
+                            ViewData["message"] = "El DNI ingresado ya existe, ingrese uno distinto";
+                        }
                     }
-
-
-
-                    return View("MantenerEmpleado", empleado);
+                    return View("MantenerEmpleado");
                 
             }
-            catch (ConstraintException) {
-                return View("MantenerEmpleado", empleado);
+            //catch (ConstraintException) {
+            //    return View("MantenerEmpleado", empleado);
+            //}
+            catch (SqlException ex)
+            {
+                ViewData["message"] = TransactionMessages.SQL_EXCEPTION_MESSAGE;
+                ViewData["Leer_TiposEmpleado"] = null;
+                ViewData["Leer_Sedes"] = null;
+                ViewData["Leer_Turnos"] = null;
+                logito.ElLogeador(TransactionMessages.SQL_EXCEPTION_MESSAGE, ex.GetType().ToString());
+                return View("MantenerEmpleado", null);
+            }
+            catch (EntityException ex)
+            {
+                ViewData["message"] = TransactionMessages.ENTITY_EXCEPTION_MESSAGE;
+                ViewData["Leer_TiposEmpleado"] = null;
+                ViewData["Leer_Sedes"] = null;
+                ViewData["Leer_Turnos"] = null;
+                logito.ElLogeador(TransactionMessages.ENTITY_EXCEPTION_MESSAGE, ex.GetType().ToString());
+                return View("MantenerEmpleado", null);
+            }
+            catch (InvalidOperationException ex)
+            {
+                ViewData["message"] = TransactionMessages.SINGLE_NOT_FOUND_MESSAGE;
+                ViewData["Leer_TiposEmpleado"] = null;
+                ViewData["Leer_Sedes"] = null;
+                ViewData["Leer_Turnos"] = null;
+                logito.ElLogeador(TransactionMessages.SINGLE_NOT_FOUND_MESSAGE, ex.GetType().ToString());
+                return View("MantenerEmpleado", null);
             }
         }
 
        
         public ActionResult Editar(Web.Models.Empleado empleado) {
-            if (empleado != null)
+            try
             {
-                //IEnumerable<Models.Sede> sedes = Models.Sede.SeleccionarTodo();
-                //int index;
-                //if (empleado.sede != null)
-                //{
-                //    for (index = 0; index < sedes.Count(); index++)
-                //    {
-                //        if (sedes.ElementAt(index) == empleado.sede) break;
-
-                //    }
-                //    ViewBag.indexSede = index;
-                //}
-                empleado = Empleado.buscarId(empleado.persona.id);
+                if (empleado != null)
+                {
+                    ViewData["Leer_TiposEmpleado"] = Models.TipoEmpleado.seleccionarTodo();
+                    ViewData["Leer_Sedes"] = Models.Sede.SeleccionarTodo();
+                    ViewData["Leer_Turnos"] = Models.TurnoDeTrabajo.seleccionarTodo();
+                    Validar.ValidarIEnumerable(ViewData["Leer_TiposEmpleado"]);
+                    Validar.ValidarIEnumerable(ViewData["Leer_Sedes"]);
+                    Validar.ValidarIEnumerable(ViewData["Leer_Turnos"]);
+                    empleado = Empleado.buscarId(empleado.persona.id);
+                }
+                return View("MantenerEmpleado", empleado);
             }
-            return View("MantenerEmpleado", empleado);
-        }
+            catch (SqlException ex)
+            {
+                ViewData["message"] = TransactionMessages.SQL_EXCEPTION_MESSAGE;
+                ViewData["Leer_TiposEmpleado"] = null;
+                ViewData["Leer_Sedes"] = null;
+                ViewData["Leer_Turnos"] = null;
+                logito.ElLogeador(TransactionMessages.SQL_EXCEPTION_MESSAGE, ex.GetType().ToString());
+                return View("MantenerEmpleado", null);
+            }
+            catch (InvalidOperationException ex)
+            {
+                ViewData["message"] = TransactionMessages.SINGLE_NOT_FOUND_MESSAGE;
+                ViewData["Leer_TiposEmpleado"] = null;
+                ViewData["Leer_Sedes"] = null;
+                ViewData["Leer_Turnos"] = null;
+                logito.ElLogeador(TransactionMessages.SINGLE_NOT_FOUND_MESSAGE, ex.GetType().ToString());
+                return View("MantenerEmpleado", null);
+            }
+            catch (EntityException ex)
+            {
+                ViewData["message"] = TransactionMessages.ENTITY_EXCEPTION_MESSAGE;
+                ViewData["Leer_TiposEmpleado"] = null;
+                ViewData["Leer_Sedes"] = null;
+                ViewData["Leer_Turnos"] = null;
+                logito.ElLogeador(TransactionMessages.ENTITY_EXCEPTION_MESSAGE, ex.GetType().ToString());
+                return View("MantenerEmpleado", null);
+            }
+
+            }
 
         //ASISTENCIA/////////////////////////////////////////////////////
 
@@ -148,9 +283,11 @@ namespace Web.Controllers
         [HttpPost]
         public JsonResult Asistencia(string data)
         {
-            short numero = Convert.ToInt16(data);
+            long numero = Convert.ToInt64(data);
             Empleado emp = Models.Empleado.buscarId(numero);
-            return Json(new{ me = emp.persona.nombre });
+            if (emp != null)
+                return Json(new { me = emp.persona.nombre });
+            else return Json("");
         }
 
         [AcceptVerbs( HttpVerbs.Post)]
@@ -179,7 +316,10 @@ namespace Web.Controllers
                 {
                     ViewData["message"] = "YAAM";    
                 }
-                
+                else if (val == 5)
+                {
+                    ViewData["message"] = "ANC";
+                }
             }
             return View("Asistencia", empleado);
         }

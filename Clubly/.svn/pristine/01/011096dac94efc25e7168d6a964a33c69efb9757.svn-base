@@ -1,0 +1,126 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+using Kendo.Mvc.UI;
+using Kendo.Mvc.Extensions;
+using Newtonsoft.Json;
+using Web.Controllers;
+using Web.Models;
+using System.Data;
+namespace Web.Controllers
+{
+    public class RRHHController : Controller
+    {
+        //
+        // GET: /Empleado/
+
+        public JsonResult L()
+        {
+            IEnumerable<Models.TipoEmpleado> Listatipos = Models.TipoEmpleado.seleccionarTodo();
+            
+            return Json(Listatipos  , JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult Leer([DataSourceRequest] DataSourceRequest request)
+        {
+            try
+            {
+                IEnumerable<Models.Empleado> ListaEmpleado = Models.Empleado.seleccionarTodo();
+                DataSourceResult result = ListaEmpleado.ToDataSourceResult(request);
+                return Json(result);
+            }
+            catch (EntityException e) {
+                return View("MantenerEmpleado");
+            }
+        }    
+            
+
+        public ActionResult Leer_Sedes()
+        {
+            IEnumerable<Models.Sede> ListaSedes = Models.Sede.SeleccionarTodo();
+           
+            return Json(ListaSedes, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult Leer_Estados()
+        {
+            IEnumerable<Models.Persona.Estado_Civil> Listaestados = Models.Persona.listestadocivil.ToList();
+            return Json(Listaestados, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult Leer_Tipos()
+        {
+            IEnumerable<Models.TipoEmpleado> Listatipos = Models.TipoEmpleado.seleccionarTodo();
+           
+            return Json(Listatipos, JsonRequestBehavior.AllowGet);
+        } 
+        public ActionResult FilterMenuCustomization_Nombre()
+        {
+            return Json(Models.Empleado.seleccionarTodo().Select(e => e.persona.nombre).Distinct(), JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult FilterMenuCustomization_Sueldo()
+        {
+            return Json(Models.Empleado.seleccionarTodo().Select(e => e.sueldo).Distinct(), JsonRequestBehavior.AllowGet);
+        }
+
+     
+        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
+        public ActionResult MantenerEmpleado( Web.Models.Empleado empleado)
+        {
+
+
+            return View(empleado);
+        }
+
+        [AcceptVerbs(HttpVerbs.Post)]
+        public ActionResult Eliminar([DataSourceRequest] DataSourceRequest request, Web.Models.Empleado empleado)
+        {
+            if (empleado != null)
+            {
+                    Empleado.eliminar(empleado);
+            }
+
+            return View("MantenerEmpleado");
+        }
+
+         [AcceptVerbs( HttpVerbs.Post)]
+        public ActionResult Guardar(Web.Models.Empleado empleado) {
+            try
+            {
+                if (empleado != null)
+                {
+                    if (ModelState.IsValid)
+                    {
+                        if (empleado.persona.id == 0)
+                        {
+                            Empleado.insertar(empleado);
+                        }
+                        else
+                        {
+                            Empleado emp = Empleado.buscarId(empleado.persona.id);
+                            Empleado.modificar(emp, empleado);
+                        }
+                    }
+                }
+                    
+                    return View("MantenerEmpleado",empleado);
+                
+            }
+            catch (ConstraintException e) {
+                return View("MantenerEmpleado", empleado);
+            }
+        }
+
+       
+        public ActionResult Editar(Web.Models.Empleado empleado) {
+            if (empleado != null)
+            {
+                empleado = Empleado.buscarId(empleado.persona.id);
+            }
+            return View("MantenerEmpleado", empleado);
+        }
+    }
+}

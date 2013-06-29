@@ -4,13 +4,14 @@
     ViewBag.Title = "Realizar Inscripcion";
 }
 
-<h2>Inscribirse a @Model.nombre</h2>
+<h1>Inscribir a @Model.nombre - Vacantes: @Model.vacantesDisponibles/@Model.vacantesTotales - S/. @Model.precio</h1>
+<h2>Familiares no inscritos</h2>
 @(Html.Kendo().Grid<Web.Models.Socio>()
     .Name("tablaSocio") 
     .Columns(columns =>
     {
       
-        columns.Bound(p => p.persona.nombre);
+        columns.Bound(p => p.persona.nombre).Title("");
         
         
     })
@@ -27,37 +28,33 @@
                 "</td>" +
                 "<td>" +
                 
-                                 "<input type='button' value= 'Agregar'  id='Agregar' onclick='Agregar()' class='button fright'/>" +
+                                 "<input type='button' value= 'Inscribir'  id='Agregar' onclick='Agregar()' class='button fright'/>" +
                 "</td>"               +
              "</tr>"
         )
     .Selectable()
     .Sortable()
-    //.Pageable()
+    .Pageable()
     .Scrollable()
     .DataSource(datasource => datasource
         .Ajax()
-                            .Read(read => read.Action("LeerSociosNoInscritos", "Actividad", @Model))
+        .Read(read => read.Action("LeerSociosNoInscritos", "Actividad", @Model))
+        .PageSize(10)
     )
 )
 
-
-
-
-<h2>Lista de Socios Inscritos</h2>
-
+<h2>Familiares inscritos</h2>
 
 
 @(Html.Kendo().Grid<Web.Models.SocioXActividad>()
     .Name("tablaSocioXActividad") 
     .Columns(columns =>
     {
-        columns.Bound(p => p.Socio.persona.nombre).Width(70);
-        columns.Bound(p => p.Socio.persona.apPaterno).Width(90).Title("Ap Paterno");
-        columns.Bound(p => p.Socio.persona.apMaterno).Width(90).Title("Ap Paterno");
-        columns.Bound(p => (p.horaIngreso)).Title("Hora de Ingreso").Width(110);//.Format("{0: h:mm}");
+        columns.Bound(p => p.Socio.persona.nombre);
+        columns.Bound(p => p.Socio.persona.apPaterno).Title("Ap Paterno");
+        columns.Bound(p => p.Socio.persona.apMaterno).Title("Ap Paterno");
         //columns.Command(command => { command.Destroy().Text("Cancelar"); }).Width(90);      
-        columns.Command(c => c.Custom("Cancelar").Click("CancelarSocio")).Width(100);                                         
+        columns.Command(c => c.Custom("Cancelar").Click("CancelarSocio"));                                         
                                     
         
     })
@@ -84,7 +81,7 @@
         .Ajax()
            .Read(read => read.Action("LeerSocioxActividad", "Actividad",@Model))
            .Model(model => model.Id(p => p.idSocio))
-           .Destroy(destroy => destroy.Action("EliminarInscripcion", "Actividad"))
+           //.Destroy(destroy => destroy.Action("EliminarInscripcion", "Actividad"))
     )
 )
  
@@ -115,7 +112,7 @@
         var dataItem = grid.dataItem(row);
         var id = dataItem.persona.id;
         $.ajax({
-            url: '@Url.Action("AgregarSocioEnActividad")',
+            url: '@Url.Action("AgregarSocioEnActividad","GestionarActividad")',
             type: 'POST',
             datatype: "json",
             traditional: true,

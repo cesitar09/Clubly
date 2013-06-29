@@ -64,7 +64,7 @@
                 @Html.TextBoxFor(p => p.vacantesTotales)
             </li><li>
             @*-----------------Ambiente----------------*@
-            <div class = "editor-label">   @Html.LabelFor(p => p.reserva.ambiente) </div>        
+            <div class = "editor-label">   @Html.LabelFor(p => p.reserva) </div>        
 
             @(Html.Kendo().DropDownList()
             .Name("ambienteComboBox")
@@ -99,6 +99,15 @@
          {<script type="text/javascript">alert("Lo sentimos!\nNo se pudo realizar la operación.\nVuelva intentarlo en otro momento. ")</script> }
          else if (ViewData["message"].Equals("E"))
          { <script type="text/javascript">alert("La operación se realizó con éxito!")</script>} 
+         else if (ViewData["message"].Equals("ELIMINA"))
+         { <script type="text/javascript">alert("Lo sentimos!\nNo se puede eliminar la actividad ya que hay socios inscritos.")</script>} 
+         else if (ViewData["message"].Equals("M"))
+         { <script type="text/javascript">alert("Lo sentimos!\nNo se puede modificar la actividad ya que hay socios inscritos.")</script>} 
+         else if (ViewData["message"].Equals("FNV"))
+         { <script type="text/javascript">alert("Lo sentimos!\nLas fechas no son válidas. Deberá elegir un rango correcto\nIntente nuevamente")</script> }
+         else if (ViewData["message"].Equals("Reservado"))
+         { <script type="text/javascript">alert("Lo sentimos!\nEl ambiente seleccionado está reservado en este período.\nIntente en un período diferente o seleccione otro ambiente\nGracias.")</script> }
+        
         </form>   
     }
        
@@ -113,7 +122,7 @@
         columns.Bound(p => p.vacantesTotales).Sortable(true).Width(50);
         columns.Bound(p => p.fechaInicio).Format("{0:dd/MM/yyyy}").Sortable(true).Width(100);
         columns.Bound(p => p.fechaFin).Format("{0:dd/MM/yyyy}").Sortable(true).Width(100);
-        columns.Command(c => { c.Custom("Editar").Click("onChange"); c.Destroy().Text("Eliminar"); }).Width(175);
+        columns.Command(c => { c.Custom("Editar").Text("<span class='k-icon k-edit'></span>").Click("onChange"); c.Custom("Eliminar").Text("<span class='k-icon k-delete'></span>").Click("elimina"); });
     })
         .Editable(editable => { editable.Mode(GridEditMode.InLine); editable.DisplayDeleteConfirmation("El regitro será eliminado ¿Desea continuar?"); })
         .Pageable()
@@ -139,7 +148,6 @@
         .Events(events => events.Error("ErrorMessage"))
         .Model(model => model.Id(p => p.id))
         .Read(read => read.Action("leerActividad", "GestionarActividad"))
-                .Destroy(update => update.Action("eliminarActividad", "GestionarActividad"))
         )
     )
 </div>
@@ -165,7 +173,7 @@ ignore: "",
                 maxlength:50
                 },
 			descripcion:{
-                required: true,
+                required: false,
                 maxlength:150
                 },
 			precio: {
@@ -273,6 +281,19 @@ ignore: "",
         location = "@Url.Action("modificarActividad")"+ "?id=" + id;
     };
     
+    function elimina(e){
+    e.preventDefault();
+    var grid = $('#Grid').data('kendoGrid');
+    var row = grid.select();
+    var dataItem = grid.dataItem(row);
+    var id = dataItem.id;
+    var result = confirm("El regitro será eliminado ¿Desea continuar?");
+        if (result == true) {
+            location = "@Url.Action("eliminarActividad")" + "?id=" + id;
+            }
+    };
+
+
     var star=$("#start").kendoDatePicker({
         change:startChange
     }).data("kendoDatePicker");

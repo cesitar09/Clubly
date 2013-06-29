@@ -1,0 +1,115 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+    <head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+        <meta charset="utf-8" />
+        <title>@ViewBag.Title - Mi aplicación ASP.NET MVC</title>
+        <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+        <meta name="viewport" content="width=device-width" />
+        @Scripts.Render("~/bundles/jquery")
+        @Scripts.Render("~/bundles/jqueryval")
+        @Scripts.Render("~/bundles/modernizr")
+        @Scripts.Render("~/bundles/kendo")
+        @Styles.Render("~/Content/kendo")
+        @Styles.Render("~/Content/css")
+    </head>
+    <body>
+    <div id="wrapper">
+        <div id="header">
+            <div id="logo">
+	            <img src="~/Content/img/logo.png" alt="Designa Studio"/>
+            </div>
+        </div><div id="menubar">
+            <ul>
+                <li class="main">
+                    <a href="~/">Página principal</a>
+                </li><li class="logout">
+                    <a href="~/">Cerrar sesión</a>
+                </li>
+            </ul>
+        </div>
+        @(Html.Kendo().Menu()
+            .Name("Menu")
+            .Items(items =>
+            {
+                items.Add().Text("Página personal").Enabled(false);
+                items.Add().Text("Reservas").Enabled(false);
+                items.Add().Text("Eventos").Enabled(false);
+                items.Add().Text("Actividades")
+                    .Items(children =>
+                    {
+                        children.Add().Text("Inscribirse en actividad")
+                            .Url("~/Actividad/InscribirseEnActividad");
+                    });
+                items.Add().Text("Adm. del sist.")
+                    .Items(children =>
+                    {
+                        children.Add().Text("Mantener conceptos de pago")
+                            .Url("~/Administracion/TiposPago");
+                        children.Add().Text("Mantener usuarios").Enabled(false);
+                        children.Add().Text("Mantener perfiles")
+                            .Url("~/Usuario/Perfil");
+                        children.Add().Text("Mantener permisos").Enabled(false);
+                    });
+                items.Add().Text("Manej. reservas").Enabled(false);
+                items.Add().Text("Membrecía")
+                    .Items(children =>
+                    {
+                        children.Add().Text("Mantener solicitud de membresía")
+                            .Url("~/SolicitudMembresia/VerSolicitudesDeMembresia");
+                        children.Add().Text("Mantener socio").Enabled(false);
+                        children.Add().Text("Registrar socio no titular").Enabled(false);
+                    });
+                items.Add().Text("Manej. eventos").Enabled(false);
+                items.Add().Text("Manej. actividades")
+                    .Items(children =>
+                    {
+                        children.Add().Text("Mantener inscripción").Enabled(false);
+                    });
+                items.Add().Text("Finanzas").Enabled(false);
+                items.Add().Text("Ventas")
+                    .Items(children =>
+                        {
+                            children.Add().Text("Mantener puntos de venta")
+                                .Url("~/Venta/MantenerPuntoDeVenta");
+                        });
+                items.Add().Text("RR. HH.")
+                    .Items(children =>
+                        {
+                            children.Add().Text("Mantener Empleados")
+                                .Url("~/RRHH/MantenerEmpleado");
+                        });
+                items.Add().Text("Logística")
+                    .Items(children =>
+                    {
+                        children.Add().Text("Mantener sede")
+                            .Url("~/Logistica/MantenerSede");
+                        children.Add().Text("Mantener ambiente")
+                            .Url("~/Logistica/MantenerAmbiente");
+                        children.Add().Text("Mantener proveedor")
+                            .Url("~/Logistica/MantenerProveedor");
+                        children.Add().Text("Mantener productos")
+                            .Url("~/Administracion/MantenimientoProducto");
+                        children.Add().Text("Mantener concesionario")
+                            .Url("~/Logistica/MantenerConcesionario");
+                    });
+                items.Add().Text("Reportes").Enabled(false);
+            })
+            )
+        <div id="page">
+            @RenderSection("featured", required: false)
+            @RenderBody()
+        </div>
+        <div id="footer">
+            <hr />
+            <ul>
+                <li class="footer-left">
+                    © Clubly 2013
+                </li><li class="footer-right">
+                    Atención al cliente: 555-5555
+                </li>
+            </ul>
+        </div>
+    </div>
+    </body>
+</html>

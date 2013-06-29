@@ -1,0 +1,143 @@
+﻿@model Web.Models.Proveedor
+@using Web.Models
+@{
+    ViewBag.Title = "Proveedor";
+}
+
+<h3>@ViewBag.MantenerProveedor</h3>
+
+<fieldset>
+ <legend>Datos del Formulario</legend>
+    <form id ="form" method ="post">
+    <ul>
+             <li>
+            
+             @if (Model.ruc != null)
+             {
+                    @Html.LabelFor(p => p.ruc)
+                    
+                    @Html.TextBoxFor(p => p.ruc, new { @readonly = "readonly" })
+             }
+             else
+             { 
+                 @Html.LabelFor(p => p.ruc)   
+                 @Html.TextBoxFor(p => p.ruc)
+               
+             }
+
+             </li><li>
+
+             @if (Model.nombre != null)
+                  {
+                    @Html.LabelFor(p => p.nombre)
+                    @Html.TextBoxFor(p => p.nombre, new { @readonly = "readonly" })
+                  }
+                else
+                {
+                    @Html.LabelFor(p => p.nombre)
+                    @Html.TextBoxFor(p => p.nombre)
+                }   
+                   
+        </li><li>
+            
+            @if (Model.direccion != null)
+            {
+                @Html.LabelFor(p => p.direccion)    
+                @Html.TextBoxFor(p => p.direccion)
+            }
+            else
+            { 
+                 @Html.LabelFor(p => p.direccion)   
+                 @Html.TextBoxFor(p => p.direccion)
+            }
+        </li>
+    </ul>
+  <input type="button" value= "Cancelar"  id="cancel" onclick="location.href = '@(Url.Action("MantenerSede", "Logistica"))'" class="button fright"/>
+  <input type="button" value= "Guardar" onclick="location.href = '@(Url.Action("agregarSede", "Logistica", Model))'" class="button fright"/>
+
+  </form> 
+  </fieldset>
+
+@(Html.Kendo().Grid<Web.Models.Proveedor>()
+    .Name("Grid")
+    .Columns(columns =>
+    {
+        columns.Bound(p => p.ruc).Sortable(true)
+            .Filterable(filterable => filterable.UI("rucFiltro")).Title("Ruc");
+        columns.Bound(p => p.nombre).Sortable(true)
+            .Filterable(filterable => filterable.UI("nombreFiltro")).Title("Nombre");
+        columns.Bound(p => p.direccion).Sortable(true)
+            .Filterable(filterable => filterable.UI("direccionFiltro")).Title("Direccion");
+       
+        columns.Command(command => { command.Edit().Text("Editar"); command.Destroy().Text("Eliminar"); }).Width(190);
+        
+    })
+     .Pageable()
+     .Sortable()
+     .Scrollable()
+    .Filterable(filterable => filterable
+        .Extra(false)
+        .Operators(operators => operators
+            .ForString(str => str.Clear()
+                .StartsWith("Comienza con")
+                .IsEqualTo("Es igual a")
+                .IsNotEqualTo("No es igual a")
+            ))
+        )
+    .DataSource(datasource => datasource
+                                .Ajax()
+                                    .Events(events => events.Error("error_handler"))
+                                    .Model(model => model.Id(p => p.id))
+                                    .Read(read => read.Action("getProveedor", "Logistica"))
+                                    .Update(update => update.Action("modificarProveedor", "Logistica"))
+                                    .Destroy(update => update.Action("eliminarProveedor", "Logistica")))
+                )
+
+
+<script type="text/javascript">
+    function error_handler(e) {
+        if (e.errors) {
+            var message = "Errors:\n";
+            $.each(e.errors, function (key, value) {
+                if ('errors' in value) {
+                    $.each(value.errors, function () {
+                        message += this + "\n";
+                    });
+                }
+            });
+            alert(message);
+        }
+    }
+</script>
+
+<script type="text/javascript">
+    function nombreFiltro(element) {
+        element.kendoAutoComplete({
+            dataSource: {
+                transport: {
+                    read: "@Url.Action("/FilterMenuCustomization_NombreProveedor")"
+                }
+            }
+        });
+    }
+
+    function rucFiltro(element) {
+        element.kendoAutoComplete({
+            dataSource: {
+                transport: {
+                    read: "@Url.Action("/FilterMenuCustomization_RucProveedor")"
+                }
+            }
+        });
+    }
+
+    function direccionFiltro(element) {
+        element.kendoAutoComplete({
+            dataSource: {
+                transport: {
+                    read: "@Url.Action("/FilterMenuCustomization_DireccionProveedor")"
+                }
+            }
+        });
+    }
+</script>

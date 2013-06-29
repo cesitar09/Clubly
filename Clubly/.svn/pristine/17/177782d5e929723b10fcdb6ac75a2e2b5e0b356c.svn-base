@@ -1,0 +1,66 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+using Newtonsoft.Json;
+using Kendo.Mvc.UI;
+using Web.Controllers;
+using Web.Models;
+using System.Data.Linq;
+using Kendo.Mvc.Extensions;
+
+namespace Web.Controllers
+{
+    public class SolicitudMembresiaController : Controller
+    {
+        //
+        // GET: /SolicitudMembresia/
+
+        
+
+        public ActionResult VerSolicitudesDeMembresia()
+        {
+            return View();
+        }
+
+        public ActionResult getSolicitudesDeMembresia([DataSourceRequest] DataSourceRequest request)
+        {
+            IEnumerable<Models.SolicitudMembresia> ListaSolicitudesDeMembresia = Models.SolicitudMembresia.SeleccionarTodo();
+
+            DataSourceResult result = ListaSolicitudesDeMembresia.ToDataSourceResult(request);
+            return Json(result);
+        }
+
+        public ActionResult FilterMenuCustomization_dni()
+        {
+            return Json(Models.SolicitudMembresia.SeleccionarTodo().Select(e => e.dni).Distinct(), JsonRequestBehavior.AllowGet);
+        }
+
+       /* public ActionResult FilterMenuCustomization_nombre()
+        {
+            return Json(Models.SolicitudMembresia.SeleccionarTodo().Select(e => e.nombre).Distinct(), JsonRequestBehavior.AllowGet);
+        }
+        public ActionResult FilterMenuCustomization_ApPaterno()
+        {
+            return Json(Models.SolicitudMembresia.SeleccionarTodo().Select(e => e.apPaterno).Distinct(), JsonRequestBehavior.AllowGet);
+        }
+        public ActionResult FilterMenuCustomization_ApMaterno()
+        {
+            return Json(Models.SolicitudMembresia.SeleccionarTodo().Select(e => e.apMaterno).Distinct(), JsonRequestBehavior.AllowGet);
+        }
+        public ActionResult FilterMenuCustomization_Correo()
+        {
+            return Json(Models.SolicitudMembresia.SeleccionarTodo().Select(e => e.correo).Distinct(), JsonRequestBehavior.AllowGet);
+        }
+        public ActionResult FilterMenuCustomization_FechaRegistro()
+        {
+            return Json(Models.SolicitudMembresia.SeleccionarTodo().Select(e => e.fechaRegistro).Distinct(), JsonRequestBehavior.AllowGet);
+        }
+        public ActionResult FilterMenuCustomization_estado()
+        {
+            return Json(Models.SolicitudMembresia.SeleccionarTodo().Select(e => e.estado).Distinct(), JsonRequestBehavior.AllowGet);
+        }*/
+
+    }
+}

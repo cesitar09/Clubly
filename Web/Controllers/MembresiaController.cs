@@ -18,7 +18,8 @@ namespace Web.Controllers
         //
         // GET: /Membresia/
 
-        //Registrar No titular
+
+//------------Registrar No titular
         [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
         public ActionResult RegistrarNoTitular(Web.Models.Socio socio)
         {
@@ -55,7 +56,7 @@ namespace Web.Controllers
                 DataSourceResult result = ListaSocio.ToDataSourceResult(request);
                 return Json(result);
             }
-            catch (EntityException e)
+            catch (EntityException)
             {
                 return View("RegistrarNoTitular");
             }
@@ -64,8 +65,8 @@ namespace Web.Controllers
         public ActionResult BuscarId(String id)
         {
             short sid = short.Parse(id.Trim(new Char[] { '\\', '\"' }));
-            IEnumerable<Socio> socio = Socio.SeleccionarTodo().Where(p => p.familia.id == sid);
-            Persona persona = socio.Single(p => p.estado).persona;
+            IEnumerable<Socio> socio = Socio.BuscarIdFamilia(sid) ;
+            Persona persona = socio.First(p => p.estado).persona;
             return Json(persona); 
 
         }
@@ -75,10 +76,18 @@ namespace Web.Controllers
             Datos.InvitadoXFamilia invxFam = new Datos.InvitadoXFamilia();
             invxFam.estado = registro.estado;
             invxFam.Familia = Negocio.Familia.buscarId(registro.familia.id);
-            invxFam.idFamilia = registro.familia.id;
-            invxFam.Invitado = Negocio.Invitado.SeleccionarTodo().Single(p => p.dni == registro.invitado.dni);
-            invxFam.idInvitado = Invitado.SeleccionarTodo().Single(p => p.dni == registro.invitado.dni).id;
-            invxFam.horaIngreso = DateTime.Now;
+            invxFam.Invitado = Negocio.Invitado.SeleccionarTodo().SingleOrDefault(p => p.dni == registro.invitado.dni);
+            if(invxFam.Invitado == null){
+                Datos.Invitado invitado = new Datos.Invitado();
+                invitado.apMaterno = registro.invitado.apMaterno;
+                invitado.apPaterno = registro.invitado.apPaterno;
+                invitado.dni = registro.invitado.dni;
+                invitado.estado = 1;
+                invitado.nombre = registro.invitado.nombre;
+                invxFam.Invitado = invitado;
+                Negocio.Invitado.Insertar(invitado);
+            }
+            invxFam.fechaIngreso = DateTime.Now;
             Negocio.InvitadoXFamilia.insertar(invxFam);
             return View("RegistrarIngresoInvitados");
         }
@@ -107,7 +116,7 @@ namespace Web.Controllers
                 return View("RegistrarNoTitular", socio);
 
             }
-            catch (ConstraintException e)
+            catch (ConstraintException)
             {
                 return View("RegistrarNoTitular", socio);
             }
@@ -119,8 +128,8 @@ namespace Web.Controllers
             return Json(ListaFamilia, JsonRequestBehavior.AllowGet);
         }
 
-        //Mantener
-        public ActionResult Leer_Socio1([DataSourceRequest] DataSourceRequest request)
+//---------------------Mantener
+        public ActionResult Leer_Socio_Empleado([DataSourceRequest] DataSourceRequest request)
         {
             try
             {
@@ -128,12 +137,31 @@ namespace Web.Controllers
                 DataSourceResult result = ListaSocio.ToDataSourceResult(request);
                 return Json(result);
             }
-            catch (EntityException e)
+            catch (EntityException)
             {
                 return View("MantenerSocio");
             }
         }
-        public ActionResult Modificar(Web.Models.Socio socio)
+
+        public ActionResult Leer_Socio_Personal([DataSourceRequest] DataSourceRequest request)
+        {
+            try
+            {
+               short idUsuario = Convert.ToInt16(Session["IdUsuario"]);
+               short idFamilia = Familia.buscarIdUsuario(idUsuario).id; 
+              //  short idFamilia = 10001;
+                IEnumerable<Models.Socio> ListaSocio  = Models.Socio.BuscarIdFamilia(idFamilia);
+             //   IEnumerable<Models.Socio> ListaSocio = Models.Socio.SeleccionarTodo();
+                DataSourceResult result = ListaSocio.ToDataSourceResult(request);
+                return Json(result);
+            }
+            catch (EntityException)
+            {
+                return View("MantenerSocioFamilia");
+            }
+        }
+        [AcceptVerbs(HttpVerbs.Post)]
+        public ActionResult ModificarSocio(Web.Models.Socio socio)
         {
             try
             {
@@ -142,20 +170,51 @@ namespace Web.Controllers
                     Socio.Modificar(socio);
                 }
 
-                return View("MantenerSocio");
+                return View("MantenerSocio", null);
 
             }
-            catch (ConstraintException e)
+            catch (ConstraintException)
             {
                 return View("MantenerSocio", socio);
             }
         }
+
+         [AcceptVerbs(HttpVerbs.Post)]
+        public ActionResult ModificarSocioPersonal(Web.Models.Socio socio)
+        {
+            try
+            {
+                if (socio != null)
+                {
+                    Socio.Modificar(socio);
+                }
+
+                return View("MantenerSocioFamilia");
+
+            }
+            catch (ConstraintException)
+            {
+                return View("MantenerSocioFamilia", socio);
+            }
+        }
+
+
         [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
         public ActionResult MantenerSocio(Web.Models.Socio socio)
         {
 
             ViewBag.indexFamilia = -1;
             return View((IView)null);
+        }
+
+         [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
+        public ActionResult MantenerSocioFamilia(Web.Models.Socio socio)
+        {
+
+
+            ViewBag.indexFamilia = -1;
+            return View((IView)null);
+
         }
 
         [AcceptVerbs(HttpVerbs.Post)]
@@ -178,6 +237,15 @@ namespace Web.Controllers
                 socio = Socio.BuscarId(socio.persona.id);
             }
             return View("MantenerSocio", socio);
+        }
+
+        public ActionResult EditarSocioPersonal(Web.Models.Socio socio)
+        {
+            if (socio != null)
+            {
+                socio = Socio.BuscarId(socio.persona.id);
+            }
+            return View("MantenerSocioFamilia", socio);
         }
 
         public ActionResult EditarSocio(short id)
@@ -204,9 +272,16 @@ namespace Web.Controllers
             return Json(result);
         }
 
+        public ActionResult leerSociosTitulares([DataSourceRequest] DataSourceRequest request)
+        {
+            IEnumerable<Models.Socio> listaSocios = Models.Socio.BuscarTitulares();
+            DataSourceResult result = listaSocios.ToDataSourceResult(request);
+            return Json(result);
+        }
+
         public ActionResult LeerIngresoDia([DataSourceRequest] DataSourceRequest request)
         {
-            IEnumerable<Models.InvitadoXFamilia> ListaInvitados = Models.InvitadoXFamilia.SeleccionarTodo().Where(p => p.horaIngreso.Date == DateTime.Now.Date);
+            IEnumerable<Models.InvitadoXFamilia> ListaInvitados = Models.InvitadoXFamilia.SeleccionarTodo().Where(p => p.fechaIngreso.Date == DateTime.Now.Date);
             return Json(ListaInvitados.ToDataSourceResult(request));
         }
 

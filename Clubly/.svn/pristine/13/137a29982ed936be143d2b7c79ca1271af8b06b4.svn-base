@@ -1,0 +1,20 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+
+
+namespace Negocio.Util
+{
+    public class logito
+    {
+        public static void ElLogeador(string evento, string nombre)
+        {
+            DateTime fecha2 = DateTime.Now;
+            string lines = "\n " +evento+ "     "  + nombre + "       " + fecha2.ToString();
+            System.IO.StreamWriter file = new System.IO.StreamWriter("C:/Users/James/Desktop/LOOOG.txt", true);
+            file.WriteLine(lines);
+            file.Close();
+        }
+    }
+}

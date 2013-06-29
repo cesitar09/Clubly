@@ -16,13 +16,22 @@ namespace Web.Controllers
 {
     public class GestionarActividadController : Controller
     {
-        //LEER TIPO DE ACTIVIDADES
-        public ActionResult leerTipoActividades()
+        //LEER SEDES
+        public ActionResult leerSedes()
         {
-            IEnumerable<Models.TipoActividad> Lista = Models.TipoActividad.SeleccionarTodo();
+            IEnumerable<Models.Sede> Lista = Models.Sede.SeleccionarTodo();
 
             return Json(Lista, JsonRequestBehavior.AllowGet);
         }
+
+        //LEER AMBIENTE
+        public ActionResult leerAmbientes(string idSede)
+        {
+            short idsede = Convert.ToInt16(idSede);
+            IEnumerable<Models.Ambiente> listaAmbientes = null;// Models.Ambiente.buscarPorSede(idsede);
+            return Json(listaAmbientes, JsonRequestBehavior.AllowGet);
+        }
+
         // MANTENER ACTIVIDAD ************************
 
         [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
@@ -52,41 +61,82 @@ namespace Web.Controllers
             return View("MantenerActividad", actividad);
         }
 
+        public bool ValidarFechas(Models.Actividad actividad)
+        {
+            if (actividad.fechaFin > actividad.fechaInicio) return true;
+            return false;
+        }
+
         [HttpPost]
         public ActionResult insertarActividad(Web.Models.Actividad actividad)
         {
-
-            if (actividad != null)
+                
+            if (ValidarFechas(actividad))
             {
-                if (actividad.id == 0)
+                if (actividad != null)
                 {
-                    if (Actividad.insertarAR(actividad) == 1)
+                    if (actividad.id == 0)
                     {
-                        ViewData["message"] = "E";
+                        if (Ambiente.AmbienteReservado(actividad.fechaInicio, actividad.fechaFin, actividad.reserva.ambiente.id) == false)
+                        {
+                            if (Actividad.insertarAR(actividad) == 1)
+                            {
+                                string nombre = (string)Session["Nombre"];
+                                Negocio.Util.logito.ElLogeador("Insertó Actividad", nombre);
+                                ViewData["message"] = "E";
+                            }
+                            else { ViewData["message"] = "F"; }
+                        }
+                        else { ViewData["message"] = "Reservado";}
                     }
-                    else { ViewData["message"] = "F"; }
-                }
-                else
-                {
-                    if (Actividad.modificarAR(actividad) == 1)
+                    else
                     {
-                        ViewData["message"] = "E";
+                        //if (Actividad.HayInscritos(actividad) == false)
+                        //{
+                            if (Actividad.modificarAR(actividad) == 1)
+                            {
+                                string nombre = (string)Session["Nombre"];
+                                Negocio.Util.logito.ElLogeador("Modificó Actividad",nombre);
+                                ViewData["message"] = "E";
+                            }
+                            else { ViewData["message"] = "F"; }
+
+                        //}
+                        //else ViewData["message"] = "M";
                     }
-                    else { ViewData["message"] = "F"; }
                 }
             }
-            return View("MantenerActividad", actividad);
+            else
+            {
+                string nombre = (string)Session["Nombre"];
+                Negocio.Util.logito.ElLogeador("Fecha no válida para insertar/modificar actividad", nombre);
+                ViewData["message"] = "FNV";
+            }
+            return View("MantenerActividad",actividad);
         }
 
 
         public ActionResult eliminarActividad(Web.Models.Actividad actividad)
         {
-            if (actividad != null)
+            if (Actividad.HayInscritos(actividad) == false)
             {
-                Actividad.eliminar(actividad);
+                if (actividad != null)
+                {
+                    Actividad.eliminar(actividad);
+                    string nombre = (string)Session["Nombre"];
+                    Negocio.Util.logito.ElLogeador("Eliminó Actividad", nombre);
+                }
             }
-            return View("MantenerActividad", actividad);
+            else
+            {
+                string nombre = (string)Session["Nombre"];
+                Negocio.Util.logito.ElLogeador("No pudo eliminar actividad", nombre);
+                ViewData["message"] = "ELIMINA";
+            }
+
+            return View("MantenerActividad");
         }
+
         public ActionResult cancelarActividad()
         {
             return RedirectToAction("MantenerActividad", "GestionarActividad");
@@ -159,7 +209,7 @@ namespace Web.Controllers
         {
             try
             {
-                IEnumerable<Models.Actividad> ListaActividades = Models.Actividad.SeleccionarTodo();
+                IEnumerable<Models.Actividad> ListaActividades = Models.Actividad.SeleccionarActividadesDisponibles();
                 DataSourceResult result = ListaActividades.ToDataSourceResult(request);
                 return Json(result);
             }

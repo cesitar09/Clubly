@@ -24,8 +24,9 @@ namespace Web.Models
         //[Display(Name = "Id Pago")]
         //public short idPago { get; set; }
 
-        [Display(Name = "Hora Ingreso")]
-        public string horaIngreso { get; set; }
+        //Atributo Eliminado
+        /*[Display(Name = "Hora Ingreso")]
+        public TimeSpan? horaIngreso{ get; set; }*/
 
         [Display(Name = "Estado")]
         public short estado { get; set; }
@@ -47,9 +48,9 @@ namespace Web.Models
                 idSocio = socioXActividad.idSocio;
                 idActividad = socioXActividad.idActividad;
                 //idPago = socioXActividad.Pago.id;
-                horaIngreso = socioXActividad.horaIngreso.ToString();
+                //horaIngreso = socioXActividad.horaIngreso;
                 estado = socioXActividad.estado;
-                //Socio = Socio.Convertir(socioXActividad.Socio, false); TIENE UN ERROR
+                Socio = Socio.Convertir(socioXActividad.Socio);
                 Actividad = Actividad.Convertir(socioXActividad.Actividad);
             }
             catch (Exception e)
@@ -92,8 +93,6 @@ namespace Web.Models
             socioXActividad.idSocio = sxa.idSocio;
             socioXActividad.idActividad = sxa.idActividad;
             //socioXActividad.Pago.id = sxa.idPago;
-            if(sxa.horaIngreso!=null)
-                socioXActividad.horaIngreso =  TimeSpan.Parse(sxa.horaIngreso);
             socioXActividad.estado = sxa.estado;
             socioXActividad.Actividad = Negocio.Actividad.BuscarId(sxa.idActividad);
             socioXActividad.Socio = Negocio.Socio.BuscarId(sxa.idSocio);
@@ -114,11 +113,11 @@ namespace Web.Models
             return ConvertirLista(Negocio.SocioXActividad.BuscarIdActividadIdFamilia(idActividad,idFamilia));
         }
 
-        //Busca todas las actvidades de un socio especifico
-        public static IEnumerable<Models.SocioXActividad> BuscarActividadIdFamilia(short idFamilia)
+        //Metodo movido a Models.Actividad
+        /*public static IEnumerable<Models.SocioXActividad> BuscarActividadIdFamilia(short idFamilia)
         {
             return ConvertirLista(Negocio.SocioXActividad.BuscarActividadIdFamilia(idFamilia));
-        }
+        }*/
         internal static IEnumerable<SocioXActividad> BuscarIdActividad(short idActividad)
         {
             return ConvertirLista(Negocio.SocioXActividad.BuscarIdActividad(idActividad));

@@ -7,13 +7,14 @@
 <h1>Mantener Socio</h1>
 @if (Model != null)
 {
+
 <fieldset>
  <legend>Datos del Formulario</legend>
- 
-    <form id = form action="Modificar" method= post>
+ @using (Html.BeginForm("ModificarSocio", "Membresia", FormMethod.Post, new { @id = "Form" }))
+ {
+    <form>
      <ul>
      <li>
-                 
                 <div class="editor-label">@Html.LabelFor(p => p.persona.id)</div>
                 @Html.TextBoxFor(p => p.persona.id, new { @readonly = "readonly" })
             </li><li>
@@ -68,8 +69,8 @@
         @Html.TextBoxFor(p => p.persona.estado, "", new { style = "display:none;" })
     </ul>
     <div id="botones">
-  <input type="button" value= "Limpiar"  id="limpiar" onclick="location.href = '@(Url.Action("MantenerSocio", "Membresia"))'" class="button fright"/>
-  <input type="submit" value= "Modificar" onclick="location.href = '@(Url.Action("Modificar", "Membresia"))'" class="button fright"/>
+  <input type="button" value= "Limpiar"  id="limpiar" onclick="location.href = '@(Url.Action("ModificarSocio", "Membresia"))'" class="button fright"/>
+  <input type="submit" value= "Modificar"  class="button fright"/>
   
     </div>
     @if (ViewData["message"] == null)
@@ -79,7 +80,7 @@
     else if (ViewData["message"].Equals("E"))
     { <script type= "text/javascript">          alert("La operación se realizó con éxito!")</script>}  
   </form>
-  
+ }
   </fieldset>
 }  
    <div id="kendotable">
@@ -87,19 +88,19 @@
     .Name("Grid")
     .Columns(columns =>
     {
-        columns.Bound(p => p.familia.id).Title("Fam.").Width(60).Sortable(true);  
-        columns.Bound(p => p.persona.dni).Width(85).Sortable(true);
-        columns.Bound(p => p.persona.nombre).Width(85).Sortable(true);
-        columns.Bound(p => p.persona.apPaterno).Title("Ap. Paterno").Width(110).Sortable(true);
-        columns.Bound(p => p.persona.apMaterno).Title("Ap. Materno").Width(110).Sortable(true);
-        columns.Bound(p => p.persona.estadoCivil).Title("Est. Civil").Width(90).Sortable(true);
-        columns.Command(command => { command.Custom("Editar").Click("Edit"); command.Destroy().Text("Eliminar"); }).Width(190);
+        columns.Bound(p => p.familia.id).Title("Fam.").Sortable(true);  
+        columns.Bound(p => p.persona.dni).Sortable(true);
+        columns.Bound(p => p.persona.nombre).Sortable(true);
+        columns.Bound(p => p.persona.apPaterno).Title("Ap. Paterno").Sortable(true);
+        columns.Bound(p => p.persona.apMaterno).Title("Ap. Materno").Sortable(true);
+        columns.Bound(p => p.persona.estadoCivil).Title("Est. Civil").Sortable(true);
+        columns.Command(command => { command.Custom("Editar").Text("<span class='k-icon k-edit'></span>").Click("Edit"); });
 
     })  .Selectable()
                .Groupable()
                .Pageable()
                .Sortable()
-               .Scrollable()
+               //.Scrollable()
                .Filterable(filterable => filterable
                                               .Extra(false)
                                               .Operators(operators => operators
@@ -117,12 +118,13 @@
                                 )
     .DataSource(datasource => datasource
                                 .Ajax()
-                                    .Read(read => read.Action("Leer_Socio1", "Membresia"))
+                                    .PageSize(6)
+                                    .Read(read => read.Action("Leer_Socio_Empleado", "Membresia"))
                                                         .Batch(false)
                                                                .ServerOperation(false)
                                                                .Events(events => events.Error("error_handler"))
                                                                .Model( model => model.Id(p => p.persona.id))
-                                                               .Destroy(update => update.Action("Eliminar", "Membresia"))
+                                                           
 
 
 
@@ -135,27 +137,27 @@
 <script type="text/javascript">
 
 
-$(document).ready(function() {
+    $(document).ready(function () {
         var combobox = $("#estadoComboBox").data("kendoComboBox");
-        combobox.bind("change",function(e){
+        combobox.bind("change", function (e) {
             $("#persona_estadoCivil").val(combobox.value());
-           //  alert("idSede: "+combobox.value()); 
+            //  alert("idSede: "+combobox.value()); 
         });
     });
 
-function error_handler(e) {
-            if (e.errors) {
-                var message = "Errors:\n";
-                $.each(e.errors, function (key, value) {
-                    if ('errors' in value) {
-                        $.each(value.errors, function () {
-                            message += this + "\n";
-                        });
-                    }
-                });
-                alert(message);
-            }
-      }
+    function error_handler(e) {
+        if (e.errors) {
+            var message = "Errors:\n";
+            $.each(e.errors, function (key, value) {
+                if ('errors' in value) {
+                    $.each(value.errors, function () {
+                        message += this + "\n";
+                    });
+                }
+            });
+            alert(message);
+        }
+    }
      
   </script>
   <script type="text/javascript">
@@ -172,70 +174,67 @@ function error_handler(e) {
 
 <script type="text/javascript">
 
-$("#form").validate({
-    ignore: "",
-		rules: {
-            "persona.estadoCivil":  {
-                required : true      
-                },
-            
-            "familia.id":  {
-                required : true
-                },
-			"persona.nombre" : {    
-                required : true,
-                maxlength : 50
-                },
-            "persona.apPaterno" :{
-                required : true,
-                maxlength : 50
-                },
-            "persona.apMaterno" : {
-                required : true,
-                maxlength : 50
-                },
-            
-            "persona.direccion" : {
-                required : true,
-                maxlength : 150
-                            
-		},
-        "persona.dni" : {required: true, 
-                        digits: true, 
-                        minlength: 8, 
-                        maxlength: 8}
-        },
-		messages: {
-      "persona.estadoCivil":  {
-                required :""
-               
-                },
-             "familia.id":  {
-                required :""
-                },
-       		"persona.nombre" : {
-                required: "*Campo obligatorio",
-                maxlength : "Tamaño máx. 50 caracteres"
-                },
-             "persona.apPaterno" : {
-                required: "*Campo obligatorio",
-                maxlength : "Tamaño máx. 50 caracteres"
-                },
-            "persona.apMaterno" : {
-                required: "*Campo obligatorio",
-                maxlength : "Tamaño máx. 50 caracteres"
-                },
-            "persona.direccion" : {
-                required: "*Campo obligatorio",
-                maxlength : "Tamaño máx. 150 caracteres"
-                },
-            "persona.dni" : {required: "*Campo obligatorio", digits: "Ingrese solo dígitos", minlength: "Ingrese 8 dígitos", maxlength: "Ingrese 8 dígitos"
-            
-			}
+    $("#Form").validate({
+        rules: {
+            "persona.nombre": {
+                required: true,
+                maxlength: 50
             },
-            submitHandler: function ConfirmationBox(form){
-            var result = confirm ("¿Está seguro de realizar los cambios?");
-            if (result == true){
+            "persona.apPaterno": {
+                required: true,
+                maxlength: 50
+            },
+            "persona.apMaterno": {
+                required: true,
+                maxlength: 50
+            },
+            "persona.dni": { required: true,
+                digits: true,
+                minlength: 8,
+                maxlength: 8
+            },
+            "persona.direccion": {
+                required: true,
+                maxlength: 150
+
+            },
+            "persona.estadoCivil": {
+                required: true
+            }
+        },
+        messages: {
+
+            "persona.nombre": {
+                required: "*Campo obligatorio",
+                maxlength: "Tamaño máx. 50 caracteres"
+            },
+            "persona.apPaterno": {
+                required: "*Campo obligatorio",
+                maxlength: "Tamaño máx. 50 caracteres"
+            },
+            "persona.apMaterno": {
+                required: "*Campo obligatorio",
+                maxlength: "Tamaño máx. 50 caracteres"
+            },
+            "persona.dni": { required: "*Campo obligatorio",
+                digits: "Ingrese solo dígitos",
+                minlength: "Ingrese 8 dígitos",
+                maxlength: "Ingrese 8 dígitos"
+
+            },
+            "persona.direccion": {
+                required: "*Campo obligatorio",
+                maxlength: "Tamaño máx. 150 caracteres"
+            },
+
+            "persona.estadoCivil": {
+                required: ""
+
+            }
+        },
+        submitHandler: function ConfirmationBox(form) {
+            var result = confirm("¿Está seguro de realizar los cambios?");
+            if (result == true) {
                 form.submit();
                 return true;
             }
@@ -243,5 +242,5 @@ $("#form").validate({
                 return false;
             }
         }
-});
+    });
    </script>

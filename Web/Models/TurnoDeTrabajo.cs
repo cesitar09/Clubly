@@ -13,7 +13,7 @@ namespace Web.Models
     {
         //atributos
         public short id { get; set; }
-        [DisplayName("Turno de trabajo")]
+        [DisplayName("*Turno de trabajo")]
         public string nombre { get; set; }
         public string descripcion { get; set; }
         public short estado { get; set; }

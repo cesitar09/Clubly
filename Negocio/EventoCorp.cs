@@ -19,10 +19,7 @@ namespace Negocio
         {
             try
             {
-                evento.Evento.estado = 1;
-                context().AddToEvento(evento.Evento);
-                context().AddToEventoCorporativo(evento);       
-
+                context().AddToEventoCorporativo(evento);  
                 context().SaveChanges();
             }
             catch (Exception ex)
@@ -36,8 +33,6 @@ namespace Negocio
         {
             try
             {
-                //context().Evento.Attach(context().Evento.Single(p => p.id == evento.id));
-                Negocio.Evento.modificar(evento.Evento);
                 context().EventoCorporativo.ApplyCurrentValues(evento);
                 context().SaveChanges();
             }
@@ -48,11 +43,10 @@ namespace Negocio
             return null;
         }
         //eliminar
-        public static Exception eliminarCorp(Datos.EventoCorporativo evento)//falta probar, podria no funcionar correctamente
+        public static Exception eliminarCorp(Datos.EventoCorporativo evento)
         {
             try
-            {
-                //context().Evento.SingleOrDefault(e => e.id == evento.id).estado = 0;
+            {                
                 evento.Evento.estado = 0;
                 context().Evento.ApplyCurrentValues(evento.Evento);
                 context().SaveChanges();

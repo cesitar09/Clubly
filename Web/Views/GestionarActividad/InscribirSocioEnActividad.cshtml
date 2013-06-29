@@ -11,40 +11,40 @@
     .Name("tablaActividades") 
     .Columns(columns =>
     {
-        columns.Bound(p => p.nombre).Sortable(true);
-        columns.Bound(p => p.descripcion).Sortable(true);
-        columns.Bound(p => p.fechaInicio).Width(70).Format("{0:dd/MM/yyyy}");
-        columns.Bound(p => p.fechaFin).Width(70).Format("{0:dd/MM/yyyy}");
-        columns.Bound(p => p.vacantesDisponibles).Title("Vacantes");
-        //if(Model.precio != 0)
-          //      {
-            //        columns.Bound(p=>p.precio);
-             //   }
-        columns.Command(c => c.Custom("Inscribir").Click("Registrar"));
+        columns.Bound(p => p.nombre).Width(50);
+        columns.Bound(p => p.descripcion).Width(60);
+        columns.Bound(p => p.fechaInicio).Width(60).Format("{0:dd/MM/yyyy}").Title("Fecha Inicio");
+        columns.Bound(p => p.fechaFin).Width(55).Format("{0:dd/MM/yyyy}").Title("Fecha Fin");
+        columns.Template(p => p.vacantesDisponibles).ClientTemplate("#=vacantesDisponibles#/#=vacantesTotales#").Title("Vacantes").Width(45);
+        columns.Bound(p => p.precio).Title("Precio").Width(37);
+        columns.Command(c => c.Custom("Inscribir").Click("Registrar")).Width(45);
                  
     })
+    .Scrollable()
     .Selectable()
+    .Sortable()
+    .Pageable()
     .Filterable(filterable => filterable
-                              .Extra(false)
-                              .Operators(operators => operators
-                                                      .ForString(str => str.Clear()
-                                                                           .StartsWith("Empezar con")
-                                                                           .IsEqualTo("Es igual a")
-                                                                           .IsNotEqualTo("Diferente a"))
-                                                      .ForNumber(number => number.Clear()
-                                                                                 .IsGreaterThan("Es mayor a")
-                                                                                 .IsLessThan("Es menor a")
-                                                                                 .IsEqualTo("Es igual a")
-                                                                                 .IsNotEqualTo("Es diferente a"))
-                                                      )
-                )
-                .DataSource(datasource => datasource
-                                          .Ajax()
-                                              .Events(events => events.Error("MensajeError"))
-                                                  .Read(read => read.Action("LeerActividadesDisponible", "GestionarActividad"))
-                           )
-                           
+        .Extra(false)
+        .Operators(operators => operators
+            .ForString(str => str.Clear()
+                .StartsWith("Empezar con")
+                .IsEqualTo("Es igual a")
+                .IsNotEqualTo("Diferente a"))
+            .ForNumber(number => number.Clear()
+                .IsGreaterThan("Es mayor a")
+                .IsLessThan("Es menor a")
+                .IsEqualTo("Es igual a")
+                .IsNotEqualTo("Es diferente a"))
+            )
     )
+    .DataSource(datasource => datasource
+        .Ajax()
+        .Events(events => events.Error("MensajeError"))
+        .Read(read => read.Action("LeerActividadesDisponible", "GestionarActividad"))
+        .PageSize(10)                                                  
+    )                           
+)
  </div>
 
 

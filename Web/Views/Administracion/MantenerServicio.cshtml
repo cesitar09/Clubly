@@ -1,8 +1,7 @@
-﻿
-@model Web.Models.Servicio
+﻿@*@model Web.Models.Servicio
 @using Web.Models
 @{
-    ViewBag.Title = "Mantener Servicio";
+    ViewBag.Title = "Mantener Servicios";
 }
 
 <h1>@ViewBag.Title</h1>
@@ -20,15 +19,15 @@
                 @Html.TextBoxFor(p => p.nombre)
              
             </li><li>
-                <div class="editor-label">@Html.LabelFor(p => p.precio)</div>
-                @Html.TextBoxFor(p => p.precio)
-             
-            </li><li>
                 <div class="editor-label">@Html.LabelFor(p => p.descripcion)</div>
                 @Html.TextBoxFor(p => p.descripcion)
+             
+            </li><li>
+                <div class="editor-label">@Html.LabelFor(p => p.precio)</div>
+                @Html.TextBoxFor(p => p.precio)
            
             </li><li class="long">
-               <div class="editor-label">@Html.LabelFor(p => p.sedes)</div>
+                <div class="editor-label">@Html.LabelFor(p => p.sedes)</div>
                 @(Html.Kendo().MultiSelectFor(p => p.sedesAux)
                     .DataTextField("nombre")
                     .DataValueField("id")
@@ -60,10 +59,10 @@
         .Columns(columns =>
         {
             columns.Bound(p => p.id);
-            columns.Bound(p => p.nombre);
+            columns.Bound(p => p.nombre);         
             columns.Bound(p => p.precio);
             columns.Bound(p => p.descripcion);
-            columns.Command(c => { c.Custom("Editar").Click("EditarServicio"); c.Destroy().Text("Eliminar"); }).Width(181);
+            columns.Command(c => { c.Custom("Editar").Click("EditarServicio"); c.Destroy().Text("Eliminar"); });
         }
         )
         .Editable(editable => { editable.Mode(GridEditMode.InLine); editable.DisplayDeleteConfirmation("El regitro será eliminado ¿Desea continuar?"); })
@@ -92,12 +91,59 @@
             .Selectable()
     )
 </div>
+
 <script type="text/javascript">
-function ErrorMessage(e) {
+
+    $("#form").validate({
+        rules: {
+            nombre: {
+                    required: true,
+                    maxlength: 50
+                },
+            Descripcion: {
+                    required: true,
+                    maxlength: 150
+                },
+            precio: {
+                    required: true,
+                    minlength: 1,
+                    maxlength: 4,
+                    digits: true
+                }
+        },
+        messages: {
+			nombre: {
+                required: "*Campo obligatorio",
+                maxlength: "Tamaño máx. 50 caracteres"
+                },
+			descripcion: {
+                required: "*Campo obligatorio",
+                maxlength: "Tamaño máx. 150 caracteres"
+                },
+			precio: {
+				required: "*Campo obligatorio",
+                digits: "Ingrese solo dígitos",
+                maxlength:"Ingrese 4 dígitos como máximo",
+                minlength:"Ingrese 1 dígitos como mínimo"
+			}
+        },
+        submitHandler: function ConfirmationBox(form) {
+        var result = confirm("¿Está seguro de realizar los cambios?");
+        if (result == true) {
+            form.submit();
+            return true;
+        }
+        else {
+            return false;
+            }
+        }
+    });
+
+    function ErrorMessage(e) {
         alert("A ocurrido un error en el servidor!\nVuelva a intentar la operación en unos minutos...");
     }
 
-    function EditarServicio(e) {
+    function EditarConcesionario(e) {
         e.preventDefault();
         var grid = $('#Grid').data('kendoGrid');
         var row = grid.select();
@@ -106,4 +152,4 @@ function ErrorMessage(e) {
         location = "@Url.Action("EditarServicio")" + "?id=" + id;
     }
 
-</script>
+</script>*@

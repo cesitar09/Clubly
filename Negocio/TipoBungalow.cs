@@ -17,6 +17,15 @@ namespace Negocio
             return Context.context();
         }
 
+        //Metodo para verificar que no haya bungalows con ese tipo de bungalow
+
+        public static bool HayBungalows(short id) {
+            IEnumerable<Datos.Bungalow> listabungalows = buscarId(id).Bungalow;
+            if (listabungalows.Count() > 0) return true;
+            else
+                return false;
+        }
+
         public static Exception insertar(Datos.TipoBungalow tipobungalow)
         {
             try

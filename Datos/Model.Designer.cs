@@ -29,14 +29,12 @@ using System.Runtime.Serialization;
 [assembly: EdmRelationshipAttribute("Model", "FK_Asistencia_Empleado", "Empleado", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Datos.Empleado), "Asistencia", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.Asistencia))]
 [assembly: EdmRelationshipAttribute("Model", "FK_Bungalow_Sede", "Sede", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Datos.Sede), "Bungalow", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.Bungalow))]
 [assembly: EdmRelationshipAttribute("Model", "FK_Bungalow_TipoBungalow", "TipoBungalow", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Datos.TipoBungalow), "Bungalow", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.Bungalow))]
-[assembly: EdmRelationshipAttribute("Model", "FK_BungalowXReservaBungalow_Bungalow", "Bungalow", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Datos.Bungalow), "BungalowXReservaBungalow", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.BungalowXReservaBungalow), true)]
-[assembly: EdmRelationshipAttribute("Model", "FK_BungalowXReservaBungalow_ReservaBungalow", "ReservaBungalow", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Datos.ReservaBungalow), "BungalowXReservaBungalow", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.BungalowXReservaBungalow), true)]
-[assembly: EdmRelationshipAttribute("Model", "FK_ServicioAdicionalXBungalowXReserva_BungalowXReservaBungalow", "BungalowXReservaBungalow", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Datos.BungalowXReservaBungalow), "ServicioAdicionalXBungalowXReserva", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.ServicioAdicionalXBungalowXReserva), true)]
+[assembly: EdmRelationshipAttribute("Model", "FK_ReservaBungalow_Bungalow", "Bungalow", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Datos.Bungalow), "ReservaBungalow", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.ReservaBungalow))]
 [assembly: EdmRelationshipAttribute("Model", "FK_Cancha_Sede", "Sede", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Datos.Sede), "Cancha", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.Cancha))]
 [assembly: EdmRelationshipAttribute("Model", "FK_Cancha_TipoCancha", "TipoCancha", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Datos.TipoCancha), "Cancha", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.Cancha))]
 [assembly: EdmRelationshipAttribute("Model", "FK_ReservaCancha_Cancha", "Cancha", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Datos.Cancha), "ReservaCancha", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.ReservaCancha))]
 [assembly: EdmRelationshipAttribute("Model", "FK_Pago_ComprobanteDePago", "ComprobanteDePago", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(Datos.ComprobanteDePago), "Pago", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.Pago))]
-[assembly: EdmRelationshipAttribute("Model", "FK_Pago_ConceptoDePago", "ConceptoDePago", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Datos.ConceptoDePago), "Pago", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.Pago))]
+[assembly: EdmRelationshipAttribute("Model", "FK_Pago_ConceptoDePago", "ConceptoDePago", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(Datos.ConceptoDePago), "Pago", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.Pago))]
 [assembly: EdmRelationshipAttribute("Model", "FK_Promocion_ConceptoDePago", "ConceptoDePago", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Datos.ConceptoDePago), "Promocion", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.Promocion))]
 [assembly: EdmRelationshipAttribute("Model", "FK_Empleado_Persona", "Persona", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Datos.Persona), "Empleado", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(Datos.Empleado), true)]
 [assembly: EdmRelationshipAttribute("Model", "FK_Empleado_Sede", "Sede", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Datos.Sede), "Empleado", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.Empleado))]
@@ -52,15 +50,15 @@ using System.Runtime.Serialization;
 [assembly: EdmRelationshipAttribute("Model", "FK_EventoCorporativo_Evento", "Evento", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Datos.Evento), "EventoCorporativo", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(Datos.EventoCorporativo), true)]
 [assembly: EdmRelationshipAttribute("Model", "FK_EventoPrivado_Evento", "Evento", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Datos.Evento), "EventoPrivado", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(Datos.EventoPrivado), true)]
 [assembly: EdmRelationshipAttribute("Model", "FK_EventoPublico_Evento", "Evento", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Datos.Evento), "EventoPublico", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(Datos.EventoPublico), true)]
-[assembly: EdmRelationshipAttribute("Model", "FK_ReservaAmbiente_Evento", "Evento", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(Datos.Evento), "ReservaAmbiente", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.ReservaAmbiente))]
+[assembly: EdmRelationshipAttribute("Model", "FK_ReservaAmbiente_Evento", "Evento", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(Datos.Evento), "ReservaAmbiente", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Datos.ReservaAmbiente))]
 [assembly: EdmRelationshipAttribute("Model", "FK_ReservaBungalow_Evento", "Evento", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(Datos.Evento), "ReservaBungalow", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.ReservaBungalow))]
 [assembly: EdmRelationshipAttribute("Model", "FK_SocioXEvento_Evento", "Evento", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Datos.Evento), "SocioXEvento", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.SocioXEvento), true)]
 [assembly: EdmRelationshipAttribute("Model", "FK_InvitadoXSocioXEvento_Evento", "EventoPrivado", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Datos.EventoPrivado), "InvitadoXFamiliaXEventoPrivado", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.InvitadoXFamiliaXEventoPrivado), true)]
 [assembly: EdmRelationshipAttribute("Model", "FK_InvitadoXEventoPublico_EventoPublico", "EventoPublico", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Datos.EventoPublico), "InvitadoXEventoPublico", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.InvitadoXEventoPublico), true)]
 [assembly: EdmRelationshipAttribute("Model", "FK_Familia_SolicitudMembresia", "SolicitudMembresia", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Datos.SolicitudMembresia), "Familia", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.Familia))]
-[assembly: EdmRelationshipAttribute("Model", "FK_Familia_Usuario", "Usuario", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(Datos.Usuario), "Familia", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(Datos.Familia))]
+[assembly: EdmRelationshipAttribute("Model", "FK_Familia_Usuario", "Usuario", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Datos.Usuario), "Familia", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(Datos.Familia))]
 [assembly: EdmRelationshipAttribute("Model", "FK_FamiliaXPromocion_Familia", "Familia", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Datos.Familia), "FamiliaXPromocion", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.FamiliaXPromocion), true)]
-[assembly: EdmRelationshipAttribute("Model", "FK_InvitadoXFamilia_Familia", "Familia", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Datos.Familia), "InvitadoXFamilia", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.InvitadoXFamilia), true)]
+[assembly: EdmRelationshipAttribute("Model", "FK_InvitadoXFamilia_Familia", "Familia", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Datos.Familia), "InvitadoXFamilia", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.InvitadoXFamilia))]
 [assembly: EdmRelationshipAttribute("Model", "FK_InvitadoXSocioXEvento_Socio", "Familia", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Datos.Familia), "InvitadoXFamiliaXEventoPrivado", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.InvitadoXFamiliaXEventoPrivado), true)]
 [assembly: EdmRelationshipAttribute("Model", "FK_Pago_Familia", "Familia", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Datos.Familia), "Pago", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.Pago))]
 [assembly: EdmRelationshipAttribute("Model", "FK_Recomendacion_Familia", "Familia", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Datos.Familia), "Recomendacion", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.Recomendacion), true)]
@@ -69,11 +67,13 @@ using System.Runtime.Serialization;
 [assembly: EdmRelationshipAttribute("Model", "FK_ReservaCamping_Familia", "Familia", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Datos.Familia), "ReservaCamping", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.ReservaCamping))]
 [assembly: EdmRelationshipAttribute("Model", "FK_ReservaCancha_Familia", "Familia", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(Datos.Familia), "ReservaCancha", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.ReservaCancha))]
 [assembly: EdmRelationshipAttribute("Model", "FK_Socio_Familia", "Familia", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Datos.Familia), "Socio", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.Socio))]
+[assembly: EdmRelationshipAttribute("Model", "FK_SolicitudMembresia_Familia", "Familia", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(Datos.Familia), "SolicitudMembresia", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.SolicitudMembresia))]
 [assembly: EdmRelationshipAttribute("Model", "FK_FamiliaXPromocion_Promocion", "Promocion", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Datos.Promocion), "FamiliaXPromocion", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.FamiliaXPromocion), true)]
 [assembly: EdmRelationshipAttribute("Model", "FK_InvitadoXEvento_InvitadoXEvento", "Invitado", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Datos.Invitado), "InvitadoXEventoPublico", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.InvitadoXEventoPublico), true)]
-[assembly: EdmRelationshipAttribute("Model", "FK_InvitadoXFamilia_Invitado", "Invitado", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Datos.Invitado), "InvitadoXFamilia", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.InvitadoXFamilia), true)]
+[assembly: EdmRelationshipAttribute("Model", "FK_InvitadoXFamilia_Invitado", "Invitado", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Datos.Invitado), "InvitadoXFamilia", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.InvitadoXFamilia))]
 [assembly: EdmRelationshipAttribute("Model", "FK_InvitadoXSocioXEvento_Invitado", "Invitado", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Datos.Invitado), "InvitadoXFamiliaXEventoPrivado", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.InvitadoXFamiliaXEventoPrivado), true)]
 [assembly: EdmRelationshipAttribute("Model", "FK_InvitadoXEventoPublico_Pago", "Pago", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Datos.Pago), "InvitadoXEventoPublico", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.InvitadoXEventoPublico))]
+[assembly: EdmRelationshipAttribute("Model", "FK_InvitadoXFamilia_Pago", "Pago", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(Datos.Pago), "InvitadoXFamilia", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.InvitadoXFamilia))]
 [assembly: EdmRelationshipAttribute("Model", "FK_InvitadoXFamiliaXEventoPrivado_Pago", "Pago", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(Datos.Pago), "InvitadoXFamiliaXEventoPrivado", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.InvitadoXFamiliaXEventoPrivado))]
 [assembly: EdmRelationshipAttribute("Model", "FK_LineaOrdenDeCompra_OrdenDeCompra", "OrdenDeCompra", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Datos.OrdenDeCompra), "LineaOrdenDeCompra", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.LineaOrdenDeCompra), true)]
 [assembly: EdmRelationshipAttribute("Model", "FK_LineaOrdenDeCompra_Producto", "Producto", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Datos.Producto), "LineaOrdenDeCompra", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.LineaOrdenDeCompra), true)]
@@ -83,7 +83,7 @@ using System.Runtime.Serialization;
 [assembly: EdmRelationshipAttribute("Model", "FK_ReservaBungalow_Pago", "Pago", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(Datos.Pago), "ReservaBungalow", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.ReservaBungalow))]
 [assembly: EdmRelationshipAttribute("Model", "FK_ReservaBungalowSorteo_Pago", "Pago", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Datos.Pago), "ReservaBungalowSorteo", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.ReservaBungalowSorteo))]
 [assembly: EdmRelationshipAttribute("Model", "FK_ReservaCamping_Pago", "Pago", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Datos.Pago), "ReservaCamping", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.ReservaCamping))]
-[assembly: EdmRelationshipAttribute("Model", "FK_ServiciosAdicionales_Pago", "Pago", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(Datos.Pago), "ServicioAdicionalXBungalowXReserva", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.ServicioAdicionalXBungalowXReserva))]
+[assembly: EdmRelationshipAttribute("Model", "FK_ServiciosAdicionales_Pago", "Pago", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(Datos.Pago), "ServicioAdicionalXReserva", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.ServicioAdicionalXReserva))]
 [assembly: EdmRelationshipAttribute("Model", "FK_SocioXActividad_Pago", "Pago", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(Datos.Pago), "SocioXActividad", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.SocioXActividad))]
 [assembly: EdmRelationshipAttribute("Model", "FK_SocioXEvento_Pago", "Pago", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(Datos.Pago), "SocioXEvento", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.SocioXEvento))]
 [assembly: EdmRelationshipAttribute("Model", "FK_Usuario_Perfil", "Perfil", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Datos.Perfil), "Usuario", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.Usuario))]
@@ -95,9 +95,12 @@ using System.Runtime.Serialization;
 [assembly: EdmRelationshipAttribute("Model", "FK_Punto_de_Venta_Sede", "Sede", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Datos.Sede), "PuntoDeVenta", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(Datos.PuntoDeVenta), true)]
 [assembly: EdmRelationshipAttribute("Model", "FK_Venta_PuntoDeVenta", "PuntoDeVenta", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Datos.PuntoDeVenta), "Venta", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.Venta))]
 [assembly: EdmRelationshipAttribute("Model", "FK_Recomendacion_SolicitudMembresia", "SolicitudMembresia", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Datos.SolicitudMembresia), "Recomendacion", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.Recomendacion), true)]
+[assembly: EdmRelationshipAttribute("Model", "FK_ServicioAdicionalXBungalowXReserva_ReservaBungalow", "ReservaBungalow", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Datos.ReservaBungalow), "ServicioAdicionalXReserva", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.ServicioAdicionalXReserva), true)]
+[assembly: EdmRelationshipAttribute("Model", "FK_ReservaBungalowSorteo_Sede", "Sede", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Datos.Sede), "ReservaBungalowSorteo", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.ReservaBungalowSorteo))]
 [assembly: EdmRelationshipAttribute("Model", "FK_ReservaBungalowSorteo_TipoBungalow", "TipoBungalow", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Datos.TipoBungalow), "ReservaBungalowSorteo", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.ReservaBungalowSorteo))]
+[assembly: EdmRelationshipAttribute("Model", "FK_Sorteo_Sede", "Sede", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Datos.Sede), "Sorteo", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.Sorteo), true)]
 [assembly: EdmRelationshipAttribute("Model", "FK_ZonaDeCamping_Sede", "Sede", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Datos.Sede), "ZonaDeCamping", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.ZonaDeCamping))]
-[assembly: EdmRelationshipAttribute("Model", "FK_ServicioAdicionalXBungalowXReserva_ServicioAdicional", "ServicioAdicional", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Datos.ServicioAdicional), "ServicioAdicionalXBungalowXReserva", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.ServicioAdicionalXBungalowXReserva), true)]
+[assembly: EdmRelationshipAttribute("Model", "FK_ServicioAdicionalXBungalowXReserva_ServicioAdicional", "ServicioAdicional", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Datos.ServicioAdicional), "ServicioAdicionalXReserva", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.ServicioAdicionalXReserva), true)]
 [assembly: EdmRelationshipAttribute("Model", "FK_SocioXActividad_Socio", "Socio", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Datos.Socio), "SocioXActividad", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.SocioXActividad), true)]
 [assembly: EdmRelationshipAttribute("Model", "FK_SocioXEvento_Socio", "Socio", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Datos.Socio), "SocioXEvento", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.SocioXEvento), true)]
 [assembly: EdmRelationshipAttribute("Model", "FK_Sorteo_TemporadaAlta", "TemporadaAlta", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Datos.TemporadaAlta), "Sorteo", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.Sorteo), true)]
@@ -107,7 +110,6 @@ using System.Runtime.Serialization;
 [assembly: EdmRelationshipAttribute("Model", "PermisoXUsuario", "Permiso", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.Permiso), "Usuario", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.Usuario))]
 [assembly: EdmRelationshipAttribute("Model", "ServicioXSede", "Sede", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.Sede), "Servicio", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.Servicio))]
 [assembly: EdmRelationshipAttribute("Model", "ZonaDeCampingXReservaCamping", "ReservaCamping", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.ReservaCamping), "ZonaDeCamping", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.ZonaDeCamping))]
-[assembly: EdmRelationshipAttribute("Model", "FK_InvitadoXFamilia_Pago", "Pago", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(Datos.Pago), "InvitadoXFamilia", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Datos.InvitadoXFamilia))]
 
 #endregion
 
@@ -238,22 +240,6 @@ namespace Datos
             }
         }
         private ObjectSet<Bungalow> _Bungalow;
-    
-        /// <summary>
-        /// No hay documentación de metadatos disponible.
-        /// </summary>
-        public ObjectSet<BungalowXReservaBungalow> BungalowXReservaBungalow
-        {
-            get
-            {
-                if ((_BungalowXReservaBungalow == null))
-                {
-                    _BungalowXReservaBungalow = base.CreateObjectSet<BungalowXReservaBungalow>("BungalowXReservaBungalow");
-                }
-                return _BungalowXReservaBungalow;
-            }
-        }
-        private ObjectSet<BungalowXReservaBungalow> _BungalowXReservaBungalow;
     
         /// <summary>
         /// No hay documentación de metadatos disponible.
@@ -594,6 +580,22 @@ namespace Datos
         /// <summary>
         /// No hay documentación de metadatos disponible.
         /// </summary>
+        public ObjectSet<Parametros> Parametros
+        {
+            get
+            {
+                if ((_Parametros == null))
+                {
+                    _Parametros = base.CreateObjectSet<Parametros>("Parametros");
+                }
+                return _Parametros;
+            }
+        }
+        private ObjectSet<Parametros> _Parametros;
+    
+        /// <summary>
+        /// No hay documentación de metadatos disponible.
+        /// </summary>
         public ObjectSet<Perfil> Perfil
         {
             get
@@ -914,18 +916,18 @@ namespace Datos
         /// <summary>
         /// No hay documentación de metadatos disponible.
         /// </summary>
-        public ObjectSet<ServicioAdicionalXBungalowXReserva> ServicioAdicionalXBungalowXReserva
+        public ObjectSet<ServicioAdicionalXReserva> ServicioAdicionalXReserva
         {
             get
             {
-                if ((_ServicioAdicionalXBungalowXReserva == null))
+                if ((_ServicioAdicionalXReserva == null))
                 {
-                    _ServicioAdicionalXBungalowXReserva = base.CreateObjectSet<ServicioAdicionalXBungalowXReserva>("ServicioAdicionalXBungalowXReserva");
+                    _ServicioAdicionalXReserva = base.CreateObjectSet<ServicioAdicionalXReserva>("ServicioAdicionalXReserva");
                 }
-                return _ServicioAdicionalXBungalowXReserva;
+                return _ServicioAdicionalXReserva;
             }
         }
-        private ObjectSet<ServicioAdicionalXBungalowXReserva> _ServicioAdicionalXBungalowXReserva;
+        private ObjectSet<ServicioAdicionalXReserva> _ServicioAdicionalXReserva;
     
         /// <summary>
         /// No hay documentación de metadatos disponible.
@@ -1166,22 +1168,6 @@ namespace Datos
             }
         }
         private ObjectSet<ZonaDeCamping> _ZonaDeCamping;
-    
-        /// <summary>
-        /// No hay documentación de metadatos disponible.
-        /// </summary>
-        public ObjectSet<Parametros> Parametros
-        {
-            get
-            {
-                if ((_Parametros == null))
-                {
-                    _Parametros = base.CreateObjectSet<Parametros>("Parametros");
-                }
-                return _Parametros;
-            }
-        }
-        private ObjectSet<Parametros> _Parametros;
 
         #endregion
         #region Métodos AddTo
@@ -1224,14 +1210,6 @@ namespace Datos
         public void AddToBungalow(Bungalow bungalow)
         {
             base.AddObject("Bungalow", bungalow);
-        }
-    
-        /// <summary>
-        /// Método desusado para agregar un nuevo objeto al EntitySet BungalowXReservaBungalow. Considere la posibilidad de usar el método .Add de la propiedad ObjectSet&lt;T&gt; asociada.
-        /// </summary>
-        public void AddToBungalowXReservaBungalow(BungalowXReservaBungalow bungalowXReservaBungalow)
-        {
-            base.AddObject("BungalowXReservaBungalow", bungalowXReservaBungalow);
         }
     
         /// <summary>
@@ -1403,6 +1381,14 @@ namespace Datos
         }
     
         /// <summary>
+        /// Método desusado para agregar un nuevo objeto al EntitySet Parametros. Considere la posibilidad de usar el método .Add de la propiedad ObjectSet&lt;T&gt; asociada.
+        /// </summary>
+        public void AddToParametros(Parametros parametros)
+        {
+            base.AddObject("Parametros", parametros);
+        }
+    
+        /// <summary>
         /// Método desusado para agregar un nuevo objeto al EntitySet Perfil. Considere la posibilidad de usar el método .Add de la propiedad ObjectSet&lt;T&gt; asociada.
         /// </summary>
         public void AddToPerfil(Perfil perfil)
@@ -1563,11 +1549,11 @@ namespace Datos
         }
     
         /// <summary>
-        /// Método desusado para agregar un nuevo objeto al EntitySet ServicioAdicionalXBungalowXReserva. Considere la posibilidad de usar el método .Add de la propiedad ObjectSet&lt;T&gt; asociada.
+        /// Método desusado para agregar un nuevo objeto al EntitySet ServicioAdicionalXReserva. Considere la posibilidad de usar el método .Add de la propiedad ObjectSet&lt;T&gt; asociada.
         /// </summary>
-        public void AddToServicioAdicionalXBungalowXReserva(ServicioAdicionalXBungalowXReserva servicioAdicionalXBungalowXReserva)
+        public void AddToServicioAdicionalXReserva(ServicioAdicionalXReserva servicioAdicionalXReserva)
         {
-            base.AddObject("ServicioAdicionalXBungalowXReserva", servicioAdicionalXBungalowXReserva);
+            base.AddObject("ServicioAdicionalXReserva", servicioAdicionalXReserva);
         }
     
         /// <summary>
@@ -1689,14 +1675,6 @@ namespace Datos
         {
             base.AddObject("ZonaDeCamping", zonaDeCamping);
         }
-    
-        /// <summary>
-        /// Método desusado para agregar un nuevo objeto al EntitySet Parametros. Considere la posibilidad de usar el método .Add de la propiedad ObjectSet&lt;T&gt; asociada.
-        /// </summary>
-        public void AddToParametros(Parametros parametros)
-        {
-            base.AddObject("Parametros", parametros);
-        }
 
         #endregion
     }
@@ -1721,19 +1699,17 @@ namespace Datos
         /// </summary>
         /// <param name="id">Valor inicial de la propiedad id.</param>
         /// <param name="nombre">Valor inicial de la propiedad nombre.</param>
-        /// <param name="descripcion">Valor inicial de la propiedad descripcion.</param>
         /// <param name="precio">Valor inicial de la propiedad precio.</param>
         /// <param name="fechaInicio">Valor inicial de la propiedad fechaInicio.</param>
         /// <param name="fechaFin">Valor inicial de la propiedad fechaFin.</param>
         /// <param name="vacantesDisponibles">Valor inicial de la propiedad vacantesDisponibles.</param>
         /// <param name="vacantesTotales">Valor inicial de la propiedad vacantesTotales.</param>
         /// <param name="estado">Valor inicial de la propiedad estado.</param>
-        public static Actividad CreateActividad(global::System.Int16 id, global::System.String nombre, global::System.String descripcion, global::System.Double precio, global::System.DateTime fechaInicio, global::System.DateTime fechaFin, global::System.Int16 vacantesDisponibles, global::System.Int16 vacantesTotales, global::System.Int16 estado)
+        public static Actividad CreateActividad(global::System.Int16 id, global::System.String nombre, global::System.Double precio, global::System.DateTime fechaInicio, global::System.DateTime fechaFin, global::System.Int16 vacantesDisponibles, global::System.Int16 vacantesTotales, global::System.Int16 estado)
         {
             Actividad actividad = new Actividad();
             actividad.id = id;
             actividad.nombre = nombre;
-            actividad.descripcion = descripcion;
             actividad.precio = precio;
             actividad.fechaInicio = fechaInicio;
             actividad.fechaFin = fechaFin;
@@ -1800,7 +1776,7 @@ namespace Datos
         /// <summary>
         /// No hay documentación de metadatos disponible.
         /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
         [DataMemberAttribute()]
         public global::System.String descripcion
         {
@@ -1812,7 +1788,7 @@ namespace Datos
             {
                 OndescripcionChanging(value);
                 ReportPropertyChanging("descripcion");
-                _descripcion = StructuralObject.SetValidValue(value, false);
+                _descripcion = StructuralObject.SetValidValue(value, true);
                 ReportPropertyChanged("descripcion");
                 OndescripcionChanged();
             }
@@ -2676,11 +2652,13 @@ namespace Datos
         /// Crear un nuevo objeto Bungalow.
         /// </summary>
         /// <param name="id">Valor inicial de la propiedad id.</param>
+        /// <param name="numero">Valor inicial de la propiedad numero.</param>
         /// <param name="estado">Valor inicial de la propiedad estado.</param>
-        public static Bungalow CreateBungalow(global::System.Int16 id, global::System.Int16 estado)
+        public static Bungalow CreateBungalow(global::System.Int16 id, global::System.Int16 numero, global::System.Int16 estado)
         {
             Bungalow bungalow = new Bungalow();
             bungalow.id = id;
+            bungalow.numero = numero;
             bungalow.estado = estado;
             return bungalow;
         }
@@ -2720,6 +2698,78 @@ namespace Datos
         /// </summary>
         [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
         [DataMemberAttribute()]
+        public global::System.Int16 numero
+        {
+            get
+            {
+                return _numero;
+            }
+            set
+            {
+                OnnumeroChanging(value);
+                ReportPropertyChanging("numero");
+                _numero = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("numero");
+                OnnumeroChanged();
+            }
+        }
+        private global::System.Int16 _numero;
+        partial void OnnumeroChanging(global::System.Int16 value);
+        partial void OnnumeroChanged();
+    
+        /// <summary>
+        /// No hay documentación de metadatos disponible.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public Nullable<global::System.Int16> posX
+        {
+            get
+            {
+                return _posX;
+            }
+            set
+            {
+                OnposXChanging(value);
+                ReportPropertyChanging("posX");
+                _posX = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("posX");
+                OnposXChanged();
+            }
+        }
+        private Nullable<global::System.Int16> _posX;
+        partial void OnposXChanging(Nullable<global::System.Int16> value);
+        partial void OnposXChanged();
+    
+        /// <summary>
+        /// No hay documentación de metadatos disponible.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public Nullable<global::System.Int16> posY
+        {
+            get
+            {
+                return _posY;
+            }
+            set
+            {
+                OnposYChanging(value);
+                ReportPropertyChanging("posY");
+                _posY = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("posY");
+                OnposYChanged();
+            }
+        }
+        private Nullable<global::System.Int16> _posY;
+        partial void OnposYChanging(Nullable<global::System.Int16> value);
+        partial void OnposYChanged();
+    
+        /// <summary>
+        /// No hay documentación de metadatos disponible.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
+        [DataMemberAttribute()]
         public global::System.Int16 estado
         {
             get
@@ -2738,54 +2788,6 @@ namespace Datos
         private global::System.Int16 _estado;
         partial void OnestadoChanging(global::System.Int16 value);
         partial void OnestadoChanged();
-    
-        /// <summary>
-        /// No hay documentación de metadatos disponible.
-        /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
-        [DataMemberAttribute()]
-        public Nullable<global::System.Double> posX
-        {
-            get
-            {
-                return _posX;
-            }
-            set
-            {
-                OnposXChanging(value);
-                ReportPropertyChanging("posX");
-                _posX = StructuralObject.SetValidValue(value);
-                ReportPropertyChanged("posX");
-                OnposXChanged();
-            }
-        }
-        private Nullable<global::System.Double> _posX;
-        partial void OnposXChanging(Nullable<global::System.Double> value);
-        partial void OnposXChanged();
-    
-        /// <summary>
-        /// No hay documentación de metadatos disponible.
-        /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
-        [DataMemberAttribute()]
-        public Nullable<global::System.Double> posY
-        {
-            get
-            {
-                return _posY;
-            }
-            set
-            {
-                OnposYChanging(value);
-                ReportPropertyChanging("posY");
-                _posY = StructuralObject.SetValidValue(value);
-                ReportPropertyChanged("posY");
-                OnposYChanged();
-            }
-        }
-        private Nullable<global::System.Double> _posY;
-        partial void OnposYChanging(Nullable<global::System.Double> value);
-        partial void OnposYChanged();
 
         #endregion
     
@@ -2873,203 +2875,18 @@ namespace Datos
         [XmlIgnoreAttribute()]
         [SoapIgnoreAttribute()]
         [DataMemberAttribute()]
-        [EdmRelationshipNavigationPropertyAttribute("Model", "FK_BungalowXReservaBungalow_Bungalow", "BungalowXReservaBungalow")]
-        public EntityCollection<BungalowXReservaBungalow> BungalowXReservaBungalow
+        [EdmRelationshipNavigationPropertyAttribute("Model", "FK_ReservaBungalow_Bungalow", "ReservaBungalow")]
+        public EntityCollection<ReservaBungalow> ReservaBungalow
         {
             get
             {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedCollection<BungalowXReservaBungalow>("Model.FK_BungalowXReservaBungalow_Bungalow", "BungalowXReservaBungalow");
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedCollection<ReservaBungalow>("Model.FK_ReservaBungalow_Bungalow", "ReservaBungalow");
             }
             set
             {
                 if ((value != null))
                 {
-                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<BungalowXReservaBungalow>("Model.FK_BungalowXReservaBungalow_Bungalow", "BungalowXReservaBungalow", value);
-                }
-            }
-        }
-
-        #endregion
-    }
-    
-    /// <summary>
-    /// No hay documentación de metadatos disponible.
-    /// </summary>
-    [EdmEntityTypeAttribute(NamespaceName="Model", Name="BungalowXReservaBungalow")]
-    [Serializable()]
-    [DataContractAttribute(IsReference=true)]
-    public partial class BungalowXReservaBungalow : EntityObject
-    {
-        #region Método de generador
-    
-        /// <summary>
-        /// Crear un nuevo objeto BungalowXReservaBungalow.
-        /// </summary>
-        /// <param name="idBungalow">Valor inicial de la propiedad idBungalow.</param>
-        /// <param name="idReservaBungalow">Valor inicial de la propiedad idReservaBungalow.</param>
-        public static BungalowXReservaBungalow CreateBungalowXReservaBungalow(global::System.Int16 idBungalow, global::System.Int16 idReservaBungalow)
-        {
-            BungalowXReservaBungalow bungalowXReservaBungalow = new BungalowXReservaBungalow();
-            bungalowXReservaBungalow.idBungalow = idBungalow;
-            bungalowXReservaBungalow.idReservaBungalow = idReservaBungalow;
-            return bungalowXReservaBungalow;
-        }
-
-        #endregion
-        #region Propiedades primitivas
-    
-        /// <summary>
-        /// No hay documentación de metadatos disponible.
-        /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=true, IsNullable=false)]
-        [DataMemberAttribute()]
-        public global::System.Int16 idBungalow
-        {
-            get
-            {
-                return _idBungalow;
-            }
-            set
-            {
-                if (_idBungalow != value)
-                {
-                    OnidBungalowChanging(value);
-                    ReportPropertyChanging("idBungalow");
-                    _idBungalow = StructuralObject.SetValidValue(value);
-                    ReportPropertyChanged("idBungalow");
-                    OnidBungalowChanged();
-                }
-            }
-        }
-        private global::System.Int16 _idBungalow;
-        partial void OnidBungalowChanging(global::System.Int16 value);
-        partial void OnidBungalowChanged();
-    
-        /// <summary>
-        /// No hay documentación de metadatos disponible.
-        /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=true, IsNullable=false)]
-        [DataMemberAttribute()]
-        public global::System.Int16 idReservaBungalow
-        {
-            get
-            {
-                return _idReservaBungalow;
-            }
-            set
-            {
-                if (_idReservaBungalow != value)
-                {
-                    OnidReservaBungalowChanging(value);
-                    ReportPropertyChanging("idReservaBungalow");
-                    _idReservaBungalow = StructuralObject.SetValidValue(value);
-                    ReportPropertyChanged("idReservaBungalow");
-                    OnidReservaBungalowChanged();
-                }
-            }
-        }
-        private global::System.Int16 _idReservaBungalow;
-        partial void OnidReservaBungalowChanging(global::System.Int16 value);
-        partial void OnidReservaBungalowChanged();
-
-        #endregion
-    
-        #region Propiedades de navegación
-    
-        /// <summary>
-        /// No hay documentación de metadatos disponible.
-        /// </summary>
-        [XmlIgnoreAttribute()]
-        [SoapIgnoreAttribute()]
-        [DataMemberAttribute()]
-        [EdmRelationshipNavigationPropertyAttribute("Model", "FK_BungalowXReservaBungalow_Bungalow", "Bungalow")]
-        public Bungalow Bungalow
-        {
-            get
-            {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<Bungalow>("Model.FK_BungalowXReservaBungalow_Bungalow", "Bungalow").Value;
-            }
-            set
-            {
-                ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<Bungalow>("Model.FK_BungalowXReservaBungalow_Bungalow", "Bungalow").Value = value;
-            }
-        }
-        /// <summary>
-        /// No hay documentación de metadatos disponible.
-        /// </summary>
-        [BrowsableAttribute(false)]
-        [DataMemberAttribute()]
-        public EntityReference<Bungalow> BungalowReference
-        {
-            get
-            {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<Bungalow>("Model.FK_BungalowXReservaBungalow_Bungalow", "Bungalow");
-            }
-            set
-            {
-                if ((value != null))
-                {
-                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedReference<Bungalow>("Model.FK_BungalowXReservaBungalow_Bungalow", "Bungalow", value);
-                }
-            }
-        }
-    
-        /// <summary>
-        /// No hay documentación de metadatos disponible.
-        /// </summary>
-        [XmlIgnoreAttribute()]
-        [SoapIgnoreAttribute()]
-        [DataMemberAttribute()]
-        [EdmRelationshipNavigationPropertyAttribute("Model", "FK_BungalowXReservaBungalow_ReservaBungalow", "ReservaBungalow")]
-        public ReservaBungalow ReservaBungalow
-        {
-            get
-            {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<ReservaBungalow>("Model.FK_BungalowXReservaBungalow_ReservaBungalow", "ReservaBungalow").Value;
-            }
-            set
-            {
-                ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<ReservaBungalow>("Model.FK_BungalowXReservaBungalow_ReservaBungalow", "ReservaBungalow").Value = value;
-            }
-        }
-        /// <summary>
-        /// No hay documentación de metadatos disponible.
-        /// </summary>
-        [BrowsableAttribute(false)]
-        [DataMemberAttribute()]
-        public EntityReference<ReservaBungalow> ReservaBungalowReference
-        {
-            get
-            {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<ReservaBungalow>("Model.FK_BungalowXReservaBungalow_ReservaBungalow", "ReservaBungalow");
-            }
-            set
-            {
-                if ((value != null))
-                {
-                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedReference<ReservaBungalow>("Model.FK_BungalowXReservaBungalow_ReservaBungalow", "ReservaBungalow", value);
-                }
-            }
-        }
-    
-        /// <summary>
-        /// No hay documentación de metadatos disponible.
-        /// </summary>
-        [XmlIgnoreAttribute()]
-        [SoapIgnoreAttribute()]
-        [DataMemberAttribute()]
-        [EdmRelationshipNavigationPropertyAttribute("Model", "FK_ServicioAdicionalXBungalowXReserva_BungalowXReservaBungalow", "ServicioAdicionalXBungalowXReserva")]
-        public EntityCollection<ServicioAdicionalXBungalowXReserva> ServicioAdicionalXBungalowXReserva
-        {
-            get
-            {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedCollection<ServicioAdicionalXBungalowXReserva>("Model.FK_ServicioAdicionalXBungalowXReserva_BungalowXReservaBungalow", "ServicioAdicionalXBungalowXReserva");
-            }
-            set
-            {
-                if ((value != null))
-                {
-                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<ServicioAdicionalXBungalowXReserva>("Model.FK_ServicioAdicionalXBungalowXReserva_BungalowXReservaBungalow", "ServicioAdicionalXBungalowXReserva", value);
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<ReservaBungalow>("Model.FK_ReservaBungalow_Bungalow", "ReservaBungalow", value);
                 }
             }
         }
@@ -3091,11 +2908,13 @@ namespace Datos
         /// Crear un nuevo objeto Cancha.
         /// </summary>
         /// <param name="id">Valor inicial de la propiedad id.</param>
+        /// <param name="numero">Valor inicial de la propiedad numero.</param>
         /// <param name="estado">Valor inicial de la propiedad estado.</param>
-        public static Cancha CreateCancha(global::System.Int16 id, global::System.Int16 estado)
+        public static Cancha CreateCancha(global::System.Int16 id, global::System.Int16 numero, global::System.Int16 estado)
         {
             Cancha cancha = new Cancha();
             cancha.id = id;
+            cancha.numero = numero;
             cancha.estado = estado;
             return cancha;
         }
@@ -3129,6 +2948,30 @@ namespace Datos
         private global::System.Int16 _id;
         partial void OnidChanging(global::System.Int16 value);
         partial void OnidChanged();
+    
+        /// <summary>
+        /// No hay documentación de metadatos disponible.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
+        [DataMemberAttribute()]
+        public global::System.Int16 numero
+        {
+            get
+            {
+                return _numero;
+            }
+            set
+            {
+                OnnumeroChanging(value);
+                ReportPropertyChanging("numero");
+                _numero = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("numero");
+                OnnumeroChanged();
+            }
+        }
+        private global::System.Int16 _numero;
+        partial void OnnumeroChanging(global::System.Int16 value);
+        partial void OnnumeroChanged();
     
         /// <summary>
         /// No hay documentación de metadatos disponible.
@@ -3177,30 +3020,6 @@ namespace Datos
         private global::System.Int16 _estado;
         partial void OnestadoChanging(global::System.Int16 value);
         partial void OnestadoChanged();
-    
-        /// <summary>
-        /// No hay documentación de metadatos disponible.
-        /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
-        [DataMemberAttribute()]
-        public Nullable<global::System.Int16> numero
-        {
-            get
-            {
-                return _numero;
-            }
-            set
-            {
-                OnnumeroChanging(value);
-                ReportPropertyChanging("numero");
-                _numero = StructuralObject.SetValidValue(value);
-                ReportPropertyChanged("numero");
-                OnnumeroChanged();
-            }
-        }
-        private Nullable<global::System.Int16> _numero;
-        partial void OnnumeroChanging(Nullable<global::System.Int16> value);
-        partial void OnnumeroChanged();
 
         #endregion
     
@@ -3324,13 +3143,17 @@ namespace Datos
         /// <param name="fecha">Valor inicial de la propiedad fecha.</param>
         /// <param name="montoTotal">Valor inicial de la propiedad montoTotal.</param>
         /// <param name="estado">Valor inicial de la propiedad estado.</param>
-        public static ComprobanteDePago CreateComprobanteDePago(global::System.Int16 id, global::System.DateTime fecha, global::System.Double montoTotal, global::System.Int16 estado)
+        /// <param name="descuento">Valor inicial de la propiedad descuento.</param>
+        /// <param name="montoAPagar">Valor inicial de la propiedad montoAPagar.</param>
+        public static ComprobanteDePago CreateComprobanteDePago(global::System.Int16 id, global::System.DateTime fecha, global::System.Double montoTotal, global::System.Int16 estado, global::System.Double descuento, global::System.Double montoAPagar)
         {
             ComprobanteDePago comprobanteDePago = new ComprobanteDePago();
             comprobanteDePago.id = id;
             comprobanteDePago.fecha = fecha;
             comprobanteDePago.montoTotal = montoTotal;
             comprobanteDePago.estado = estado;
+            comprobanteDePago.descuento = descuento;
+            comprobanteDePago.montoAPagar = montoAPagar;
             return comprobanteDePago;
         }
 
@@ -3435,6 +3258,54 @@ namespace Datos
         private global::System.Int16 _estado;
         partial void OnestadoChanging(global::System.Int16 value);
         partial void OnestadoChanged();
+    
+        /// <summary>
+        /// No hay documentación de metadatos disponible.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
+        [DataMemberAttribute()]
+        public global::System.Double descuento
+        {
+            get
+            {
+                return _descuento;
+            }
+            set
+            {
+                OndescuentoChanging(value);
+                ReportPropertyChanging("descuento");
+                _descuento = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("descuento");
+                OndescuentoChanged();
+            }
+        }
+        private global::System.Double _descuento;
+        partial void OndescuentoChanging(global::System.Double value);
+        partial void OndescuentoChanged();
+    
+        /// <summary>
+        /// No hay documentación de metadatos disponible.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
+        [DataMemberAttribute()]
+        public global::System.Double montoAPagar
+        {
+            get
+            {
+                return _montoAPagar;
+            }
+            set
+            {
+                OnmontoAPagarChanging(value);
+                ReportPropertyChanging("montoAPagar");
+                _montoAPagar = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("montoAPagar");
+                OnmontoAPagarChanged();
+            }
+        }
+        private global::System.Double _montoAPagar;
+        partial void OnmontoAPagarChanging(global::System.Double value);
+        partial void OnmontoAPagarChanged();
 
         #endregion
     
@@ -4660,24 +4531,16 @@ namespace Datos
         /// </summary>
         /// <param name="id">Valor inicial de la propiedad id.</param>
         /// <param name="nombre">Valor inicial de la propiedad nombre.</param>
-        /// <param name="descripcion">Valor inicial de la propiedad descripcion.</param>
         /// <param name="fechaInicio">Valor inicial de la propiedad fechaInicio.</param>
         /// <param name="fechaFin">Valor inicial de la propiedad fechaFin.</param>
-        /// <param name="precioSocio">Valor inicial de la propiedad precioSocio.</param>
-        /// <param name="vacantesSocio">Valor inicial de la propiedad vacantesSocio.</param>
-        /// <param name="vacantesInvitado">Valor inicial de la propiedad vacantesInvitado.</param>
         /// <param name="estado">Valor inicial de la propiedad estado.</param>
-        public static Evento CreateEvento(global::System.Int16 id, global::System.String nombre, global::System.String descripcion, global::System.DateTime fechaInicio, global::System.DateTime fechaFin, global::System.Double precioSocio, global::System.Int16 vacantesSocio, global::System.Int16 vacantesInvitado, global::System.Int16 estado)
+        public static Evento CreateEvento(global::System.Int16 id, global::System.String nombre, global::System.DateTime fechaInicio, global::System.DateTime fechaFin, global::System.Int16 estado)
         {
             Evento evento = new Evento();
             evento.id = id;
             evento.nombre = nombre;
-            evento.descripcion = descripcion;
             evento.fechaInicio = fechaInicio;
             evento.fechaFin = fechaFin;
-            evento.precioSocio = precioSocio;
-            evento.vacantesSocio = vacantesSocio;
-            evento.vacantesInvitado = vacantesInvitado;
             evento.estado = estado;
             return evento;
         }
@@ -4739,7 +4602,7 @@ namespace Datos
         /// <summary>
         /// No hay documentación de metadatos disponible.
         /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
         [DataMemberAttribute()]
         public global::System.String descripcion
         {
@@ -4751,7 +4614,7 @@ namespace Datos
             {
                 OndescripcionChanging(value);
                 ReportPropertyChanging("descripcion");
-                _descripcion = StructuralObject.SetValidValue(value, false);
+                _descripcion = StructuralObject.SetValidValue(value, true);
                 ReportPropertyChanged("descripcion");
                 OndescripcionChanged();
             }
@@ -4811,9 +4674,9 @@ namespace Datos
         /// <summary>
         /// No hay documentación de metadatos disponible.
         /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
         [DataMemberAttribute()]
-        public global::System.Double precioSocio
+        public Nullable<global::System.Double> precioSocio
         {
             get
             {
@@ -4828,8 +4691,8 @@ namespace Datos
                 OnprecioSocioChanged();
             }
         }
-        private global::System.Double _precioSocio;
-        partial void OnprecioSocioChanging(global::System.Double value);
+        private Nullable<global::System.Double> _precioSocio;
+        partial void OnprecioSocioChanging(Nullable<global::System.Double> value);
         partial void OnprecioSocioChanged();
     
         /// <summary>
@@ -4859,9 +4722,9 @@ namespace Datos
         /// <summary>
         /// No hay documentación de metadatos disponible.
         /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
         [DataMemberAttribute()]
-        public global::System.Int16 vacantesSocio
+        public Nullable<global::System.Int16> vacantesSocio
         {
             get
             {
@@ -4876,16 +4739,16 @@ namespace Datos
                 OnvacantesSocioChanged();
             }
         }
-        private global::System.Int16 _vacantesSocio;
-        partial void OnvacantesSocioChanging(global::System.Int16 value);
+        private Nullable<global::System.Int16> _vacantesSocio;
+        partial void OnvacantesSocioChanging(Nullable<global::System.Int16> value);
         partial void OnvacantesSocioChanged();
     
         /// <summary>
         /// No hay documentación de metadatos disponible.
         /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
         [DataMemberAttribute()]
-        public global::System.Int16 vacantesInvitado
+        public Nullable<global::System.Int16> vacantesInvitado
         {
             get
             {
@@ -4900,8 +4763,8 @@ namespace Datos
                 OnvacantesInvitadoChanged();
             }
         }
-        private global::System.Int16 _vacantesInvitado;
-        partial void OnvacantesInvitadoChanging(global::System.Int16 value);
+        private Nullable<global::System.Int16> _vacantesInvitado;
+        partial void OnvacantesInvitadoChanging(Nullable<global::System.Int16> value);
         partial void OnvacantesInvitadoChanged();
     
         /// <summary>
@@ -5091,17 +4954,33 @@ namespace Datos
         [SoapIgnoreAttribute()]
         [DataMemberAttribute()]
         [EdmRelationshipNavigationPropertyAttribute("Model", "FK_ReservaAmbiente_Evento", "ReservaAmbiente")]
-        public EntityCollection<ReservaAmbiente> ReservaAmbiente
+        public ReservaAmbiente ReservaAmbiente
         {
             get
             {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedCollection<ReservaAmbiente>("Model.FK_ReservaAmbiente_Evento", "ReservaAmbiente");
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<ReservaAmbiente>("Model.FK_ReservaAmbiente_Evento", "ReservaAmbiente").Value;
+            }
+            set
+            {
+                ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<ReservaAmbiente>("Model.FK_ReservaAmbiente_Evento", "ReservaAmbiente").Value = value;
+            }
+        }
+        /// <summary>
+        /// No hay documentación de metadatos disponible.
+        /// </summary>
+        [BrowsableAttribute(false)]
+        [DataMemberAttribute()]
+        public EntityReference<ReservaAmbiente> ReservaAmbienteReference
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<ReservaAmbiente>("Model.FK_ReservaAmbiente_Evento", "ReservaAmbiente");
             }
             set
             {
                 if ((value != null))
                 {
-                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<ReservaAmbiente>("Model.FK_ReservaAmbiente_Evento", "ReservaAmbiente", value);
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedReference<ReservaAmbiente>("Model.FK_ReservaAmbiente_Evento", "ReservaAmbiente", value);
                 }
             }
         }
@@ -6065,6 +5944,28 @@ namespace Datos
                 }
             }
         }
+    
+        /// <summary>
+        /// No hay documentación de metadatos disponible.
+        /// </summary>
+        [XmlIgnoreAttribute()]
+        [SoapIgnoreAttribute()]
+        [DataMemberAttribute()]
+        [EdmRelationshipNavigationPropertyAttribute("Model", "FK_SolicitudMembresia_Familia", "SolicitudMembresia")]
+        public EntityCollection<SolicitudMembresia> SolicitudMembresia1
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedCollection<SolicitudMembresia>("Model.FK_SolicitudMembresia_Familia", "SolicitudMembresia");
+            }
+            set
+            {
+                if ((value != null))
+                {
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<SolicitudMembresia>("Model.FK_SolicitudMembresia_Familia", "SolicitudMembresia", value);
+                }
+            }
+        }
 
         #endregion
     }
@@ -6776,15 +6677,13 @@ namespace Datos
         /// <summary>
         /// Crear un nuevo objeto InvitadoXFamilia.
         /// </summary>
-        /// <param name="idInvitado">Valor inicial de la propiedad idInvitado.</param>
-        /// <param name="idFamilia">Valor inicial de la propiedad idFamilia.</param>
+        /// <param name="id">Valor inicial de la propiedad id.</param>
         /// <param name="fechaIngreso">Valor inicial de la propiedad fechaIngreso.</param>
         /// <param name="estado">Valor inicial de la propiedad estado.</param>
-        public static InvitadoXFamilia CreateInvitadoXFamilia(global::System.Int16 idInvitado, global::System.Int16 idFamilia, global::System.DateTime fechaIngreso, global::System.Int16 estado)
+        public static InvitadoXFamilia CreateInvitadoXFamilia(global::System.Int16 id, global::System.DateTime fechaIngreso, global::System.Int16 estado)
         {
             InvitadoXFamilia invitadoXFamilia = new InvitadoXFamilia();
-            invitadoXFamilia.idInvitado = idInvitado;
-            invitadoXFamilia.idFamilia = idFamilia;
+            invitadoXFamilia.id = id;
             invitadoXFamilia.fechaIngreso = fechaIngreso;
             invitadoXFamilia.estado = estado;
             return invitadoXFamilia;
@@ -6798,59 +6697,32 @@ namespace Datos
         /// </summary>
         [EdmScalarPropertyAttribute(EntityKeyProperty=true, IsNullable=false)]
         [DataMemberAttribute()]
-        public global::System.Int16 idInvitado
+        public global::System.Int16 id
         {
             get
             {
-                return _idInvitado;
+                return _id;
             }
             set
             {
-                if (_idInvitado != value)
+                if (_id != value)
                 {
-                    OnidInvitadoChanging(value);
-                    ReportPropertyChanging("idInvitado");
-                    _idInvitado = StructuralObject.SetValidValue(value);
-                    ReportPropertyChanged("idInvitado");
-                    OnidInvitadoChanged();
+                    OnidChanging(value);
+                    ReportPropertyChanging("id");
+                    _id = StructuralObject.SetValidValue(value);
+                    ReportPropertyChanged("id");
+                    OnidChanged();
                 }
             }
         }
-        private global::System.Int16 _idInvitado;
-        partial void OnidInvitadoChanging(global::System.Int16 value);
-        partial void OnidInvitadoChanged();
+        private global::System.Int16 _id;
+        partial void OnidChanging(global::System.Int16 value);
+        partial void OnidChanged();
     
         /// <summary>
         /// No hay documentación de metadatos disponible.
         /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=true, IsNullable=false)]
-        [DataMemberAttribute()]
-        public global::System.Int16 idFamilia
-        {
-            get
-            {
-                return _idFamilia;
-            }
-            set
-            {
-                if (_idFamilia != value)
-                {
-                    OnidFamiliaChanging(value);
-                    ReportPropertyChanging("idFamilia");
-                    _idFamilia = StructuralObject.SetValidValue(value);
-                    ReportPropertyChanged("idFamilia");
-                    OnidFamiliaChanged();
-                }
-            }
-        }
-        private global::System.Int16 _idFamilia;
-        partial void OnidFamiliaChanging(global::System.Int16 value);
-        partial void OnidFamiliaChanged();
-    
-        /// <summary>
-        /// No hay documentación de metadatos disponible.
-        /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=true, IsNullable=false)]
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
         [DataMemberAttribute()]
         public global::System.DateTime fechaIngreso
         {
@@ -6860,43 +6732,16 @@ namespace Datos
             }
             set
             {
-                if (_fechaIngreso != value)
-                {
-                    OnfechaIngresoChanging(value);
-                    ReportPropertyChanging("fechaIngreso");
-                    _fechaIngreso = StructuralObject.SetValidValue(value);
-                    ReportPropertyChanged("fechaIngreso");
-                    OnfechaIngresoChanged();
-                }
+                OnfechaIngresoChanging(value);
+                ReportPropertyChanging("fechaIngreso");
+                _fechaIngreso = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("fechaIngreso");
+                OnfechaIngresoChanged();
             }
         }
         private global::System.DateTime _fechaIngreso;
         partial void OnfechaIngresoChanging(global::System.DateTime value);
         partial void OnfechaIngresoChanged();
-    
-        /// <summary>
-        /// No hay documentación de metadatos disponible.
-        /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
-        [DataMemberAttribute()]
-        public Nullable<global::System.DateTime> horaIngreso
-        {
-            get
-            {
-                return _horaIngreso;
-            }
-            set
-            {
-                OnhoraIngresoChanging(value);
-                ReportPropertyChanging("horaIngreso");
-                _horaIngreso = StructuralObject.SetValidValue(value);
-                ReportPropertyChanged("horaIngreso");
-                OnhoraIngresoChanged();
-            }
-        }
-        private Nullable<global::System.DateTime> _horaIngreso;
-        partial void OnhoraIngresoChanging(Nullable<global::System.DateTime> value);
-        partial void OnhoraIngresoChanged();
     
         /// <summary>
         /// No hay documentación de metadatos disponible.
@@ -8051,18 +7896,22 @@ namespace Datos
         /// Crear un nuevo objeto Pago.
         /// </summary>
         /// <param name="id">Valor inicial de la propiedad id.</param>
+        /// <param name="descripcion">Valor inicial de la propiedad descripcion.</param>
         /// <param name="fechaRegistro">Valor inicial de la propiedad fechaRegistro.</param>
         /// <param name="fechaLimite">Valor inicial de la propiedad fechaLimite.</param>
         /// <param name="monto">Valor inicial de la propiedad monto.</param>
         /// <param name="estado">Valor inicial de la propiedad estado.</param>
-        public static Pago CreatePago(global::System.Int16 id, global::System.DateTime fechaRegistro, global::System.DateTime fechaLimite, global::System.Double monto, global::System.Int16 estado)
+        /// <param name="montoDevolver">Valor inicial de la propiedad montoDevolver.</param>
+        public static Pago CreatePago(global::System.Int16 id, global::System.String descripcion, global::System.DateTime fechaRegistro, global::System.DateTime fechaLimite, global::System.Double monto, global::System.Int16 estado, global::System.Double montoDevolver)
         {
             Pago pago = new Pago();
             pago.id = id;
+            pago.descripcion = descripcion;
             pago.fechaRegistro = fechaRegistro;
             pago.fechaLimite = fechaLimite;
             pago.monto = monto;
             pago.estado = estado;
+            pago.montoDevolver = montoDevolver;
             return pago;
         }
 
@@ -8095,6 +7944,30 @@ namespace Datos
         private global::System.Int16 _id;
         partial void OnidChanging(global::System.Int16 value);
         partial void OnidChanged();
+    
+        /// <summary>
+        /// No hay documentación de metadatos disponible.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
+        [DataMemberAttribute()]
+        public global::System.String descripcion
+        {
+            get
+            {
+                return _descripcion;
+            }
+            set
+            {
+                OndescripcionChanging(value);
+                ReportPropertyChanging("descripcion");
+                _descripcion = StructuralObject.SetValidValue(value, false);
+                ReportPropertyChanged("descripcion");
+                OndescripcionChanged();
+            }
+        }
+        private global::System.String _descripcion;
+        partial void OndescripcionChanging(global::System.String value);
+        partial void OndescripcionChanged();
     
         /// <summary>
         /// No hay documentación de metadatos disponible.
@@ -8191,6 +8064,30 @@ namespace Datos
         private global::System.Int16 _estado;
         partial void OnestadoChanging(global::System.Int16 value);
         partial void OnestadoChanged();
+    
+        /// <summary>
+        /// No hay documentación de metadatos disponible.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
+        [DataMemberAttribute()]
+        public global::System.Double montoDevolver
+        {
+            get
+            {
+                return _montoDevolver;
+            }
+            set
+            {
+                OnmontoDevolverChanging(value);
+                ReportPropertyChanging("montoDevolver");
+                _montoDevolver = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("montoDevolver");
+                OnmontoDevolverChanged();
+            }
+        }
+        private global::System.Double _montoDevolver;
+        partial void OnmontoDevolverChanging(global::System.Double value);
+        partial void OnmontoDevolverChanged();
 
         #endregion
     
@@ -8338,6 +8235,28 @@ namespace Datos
         [XmlIgnoreAttribute()]
         [SoapIgnoreAttribute()]
         [DataMemberAttribute()]
+        [EdmRelationshipNavigationPropertyAttribute("Model", "FK_InvitadoXFamilia_Pago", "InvitadoXFamilia")]
+        public EntityCollection<InvitadoXFamilia> InvitadoXFamilia
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedCollection<InvitadoXFamilia>("Model.FK_InvitadoXFamilia_Pago", "InvitadoXFamilia");
+            }
+            set
+            {
+                if ((value != null))
+                {
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<InvitadoXFamilia>("Model.FK_InvitadoXFamilia_Pago", "InvitadoXFamilia", value);
+                }
+            }
+        }
+    
+        /// <summary>
+        /// No hay documentación de metadatos disponible.
+        /// </summary>
+        [XmlIgnoreAttribute()]
+        [SoapIgnoreAttribute()]
+        [DataMemberAttribute()]
         [EdmRelationshipNavigationPropertyAttribute("Model", "FK_InvitadoXFamiliaXEventoPrivado_Pago", "InvitadoXFamiliaXEventoPrivado")]
         public EntityCollection<InvitadoXFamiliaXEventoPrivado> InvitadoXFamiliaXEventoPrivado
         {
@@ -8426,18 +8345,18 @@ namespace Datos
         [XmlIgnoreAttribute()]
         [SoapIgnoreAttribute()]
         [DataMemberAttribute()]
-        [EdmRelationshipNavigationPropertyAttribute("Model", "FK_ServiciosAdicionales_Pago", "ServicioAdicionalXBungalowXReserva")]
-        public EntityCollection<ServicioAdicionalXBungalowXReserva> ServicioAdicionalXBungalowXReserva
+        [EdmRelationshipNavigationPropertyAttribute("Model", "FK_ServiciosAdicionales_Pago", "ServicioAdicionalXReserva")]
+        public EntityCollection<ServicioAdicionalXReserva> ServicioAdicionalXReserva
         {
             get
             {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedCollection<ServicioAdicionalXBungalowXReserva>("Model.FK_ServiciosAdicionales_Pago", "ServicioAdicionalXBungalowXReserva");
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedCollection<ServicioAdicionalXReserva>("Model.FK_ServiciosAdicionales_Pago", "ServicioAdicionalXReserva");
             }
             set
             {
                 if ((value != null))
                 {
-                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<ServicioAdicionalXBungalowXReserva>("Model.FK_ServiciosAdicionales_Pago", "ServicioAdicionalXBungalowXReserva", value);
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<ServicioAdicionalXReserva>("Model.FK_ServiciosAdicionales_Pago", "ServicioAdicionalXReserva", value);
                 }
             }
         }
@@ -8485,28 +8404,6 @@ namespace Datos
                 }
             }
         }
-    
-        /// <summary>
-        /// No hay documentación de metadatos disponible.
-        /// </summary>
-        [XmlIgnoreAttribute()]
-        [SoapIgnoreAttribute()]
-        [DataMemberAttribute()]
-        [EdmRelationshipNavigationPropertyAttribute("Model", "FK_InvitadoXFamilia_Pago", "InvitadoXFamilia")]
-        public EntityCollection<InvitadoXFamilia> InvitadoXFamilia
-        {
-            get
-            {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedCollection<InvitadoXFamilia>("Model.FK_InvitadoXFamilia_Pago", "InvitadoXFamilia");
-            }
-            set
-            {
-                if ((value != null))
-                {
-                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<InvitadoXFamilia>("Model.FK_InvitadoXFamilia_Pago", "InvitadoXFamilia", value);
-                }
-            }
-        }
 
         #endregion
     }
@@ -8529,9 +8426,12 @@ namespace Datos
         /// <param name="numInvitadosFamilia">Valor inicial de la propiedad numInvitadosFamilia.</param>
         /// <param name="tiempoMaximoCancha">Valor inicial de la propiedad tiempoMaximoCancha.</param>
         /// <param name="costoMembresia">Valor inicial de la propiedad costoMembresia.</param>
+        /// <param name="diasLimitePago">Valor inicial de la propiedad diasLimitePago.</param>
+        /// <param name="multa">Valor inicial de la propiedad multa.</param>
+        /// <param name="pagoInvitado">Valor inicial de la propiedad pagoInvitado.</param>
+        /// <param name="maxReservasCancha">Valor inicial de la propiedad maxReservasCancha.</param>
         /// <param name="estado">Valor inicial de la propiedad estado.</param>
-        /// <param name="costoInvitados">Valor inicial de la propiedad costoInvitados.</param>
-        public static Parametros CreateParametros(global::System.Int16 id, global::System.DateTime fechaInicial, global::System.Int16 numInvitadosFamilia, global::System.Int16 tiempoMaximoCancha, global::System.Double costoMembresia, global::System.Int16 estado, global::System.Double costoInvitados)
+        public static Parametros CreateParametros(global::System.Int16 id, global::System.DateTime fechaInicial, global::System.Int16 numInvitadosFamilia, global::System.Int16 tiempoMaximoCancha, global::System.Double costoMembresia, global::System.Int16 diasLimitePago, global::System.Double multa, global::System.Double pagoInvitado, global::System.Int16 maxReservasCancha, global::System.Int16 estado)
         {
             Parametros parametros = new Parametros();
             parametros.id = id;
@@ -8539,8 +8439,11 @@ namespace Datos
             parametros.numInvitadosFamilia = numInvitadosFamilia;
             parametros.tiempoMaximoCancha = tiempoMaximoCancha;
             parametros.costoMembresia = costoMembresia;
+            parametros.diasLimitePago = diasLimitePago;
+            parametros.multa = multa;
+            parametros.pagoInvitado = pagoInvitado;
+            parametros.maxReservasCancha = maxReservasCancha;
             parametros.estado = estado;
-            parametros.costoInvitados = costoInvitados;
             return parametros;
         }
 
@@ -8699,6 +8602,102 @@ namespace Datos
         /// </summary>
         [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
         [DataMemberAttribute()]
+        public global::System.Int16 diasLimitePago
+        {
+            get
+            {
+                return _diasLimitePago;
+            }
+            set
+            {
+                OndiasLimitePagoChanging(value);
+                ReportPropertyChanging("diasLimitePago");
+                _diasLimitePago = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("diasLimitePago");
+                OndiasLimitePagoChanged();
+            }
+        }
+        private global::System.Int16 _diasLimitePago;
+        partial void OndiasLimitePagoChanging(global::System.Int16 value);
+        partial void OndiasLimitePagoChanged();
+    
+        /// <summary>
+        /// No hay documentación de metadatos disponible.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
+        [DataMemberAttribute()]
+        public global::System.Double multa
+        {
+            get
+            {
+                return _multa;
+            }
+            set
+            {
+                OnmultaChanging(value);
+                ReportPropertyChanging("multa");
+                _multa = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("multa");
+                OnmultaChanged();
+            }
+        }
+        private global::System.Double _multa;
+        partial void OnmultaChanging(global::System.Double value);
+        partial void OnmultaChanged();
+    
+        /// <summary>
+        /// No hay documentación de metadatos disponible.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
+        [DataMemberAttribute()]
+        public global::System.Double pagoInvitado
+        {
+            get
+            {
+                return _pagoInvitado;
+            }
+            set
+            {
+                OnpagoInvitadoChanging(value);
+                ReportPropertyChanging("pagoInvitado");
+                _pagoInvitado = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("pagoInvitado");
+                OnpagoInvitadoChanged();
+            }
+        }
+        private global::System.Double _pagoInvitado;
+        partial void OnpagoInvitadoChanging(global::System.Double value);
+        partial void OnpagoInvitadoChanged();
+    
+        /// <summary>
+        /// No hay documentación de metadatos disponible.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
+        [DataMemberAttribute()]
+        public global::System.Int16 maxReservasCancha
+        {
+            get
+            {
+                return _maxReservasCancha;
+            }
+            set
+            {
+                OnmaxReservasCanchaChanging(value);
+                ReportPropertyChanging("maxReservasCancha");
+                _maxReservasCancha = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("maxReservasCancha");
+                OnmaxReservasCanchaChanged();
+            }
+        }
+        private global::System.Int16 _maxReservasCancha;
+        partial void OnmaxReservasCanchaChanging(global::System.Int16 value);
+        partial void OnmaxReservasCanchaChanged();
+    
+        /// <summary>
+        /// No hay documentación de metadatos disponible.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
+        [DataMemberAttribute()]
         public global::System.Int16 estado
         {
             get
@@ -8717,30 +8716,6 @@ namespace Datos
         private global::System.Int16 _estado;
         partial void OnestadoChanging(global::System.Int16 value);
         partial void OnestadoChanged();
-    
-        /// <summary>
-        /// No hay documentación de metadatos disponible.
-        /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
-        [DataMemberAttribute()]
-        public global::System.Double costoInvitados
-        {
-            get
-            {
-                return _costoInvitados;
-            }
-            set
-            {
-                OncostoInvitadosChanging(value);
-                ReportPropertyChanging("costoInvitados");
-                _costoInvitados = StructuralObject.SetValidValue(value);
-                ReportPropertyChanged("costoInvitados");
-                OncostoInvitadosChanged();
-            }
-        }
-        private global::System.Double _costoInvitados;
-        partial void OncostoInvitadosChanging(global::System.Double value);
-        partial void OncostoInvitadosChanged();
 
         #endregion
     
@@ -9072,10 +9047,9 @@ namespace Datos
         /// <param name="nombre">Valor inicial de la propiedad nombre.</param>
         /// <param name="apPaterno">Valor inicial de la propiedad apPaterno.</param>
         /// <param name="apMaterno">Valor inicial de la propiedad apMaterno.</param>
-        /// <param name="direccion">Valor inicial de la propiedad direccion.</param>
         /// <param name="estadoCivil">Valor inicial de la propiedad estadoCivil.</param>
         /// <param name="estado">Valor inicial de la propiedad estado.</param>
-        public static Persona CreatePersona(global::System.Int16 id, global::System.Int32 dni, global::System.String nombre, global::System.String apPaterno, global::System.String apMaterno, global::System.String direccion, global::System.Int16 estadoCivil, global::System.Int16 estado)
+        public static Persona CreatePersona(global::System.Int16 id, global::System.Int32 dni, global::System.String nombre, global::System.String apPaterno, global::System.String apMaterno, global::System.Int16 estadoCivil, global::System.Int16 estado)
         {
             Persona persona = new Persona();
             persona.id = id;
@@ -9083,7 +9057,6 @@ namespace Datos
             persona.nombre = nombre;
             persona.apPaterno = apPaterno;
             persona.apMaterno = apMaterno;
-            persona.direccion = direccion;
             persona.estadoCivil = estadoCivil;
             persona.estado = estado;
             return persona;
@@ -9218,7 +9191,7 @@ namespace Datos
         /// <summary>
         /// No hay documentación de metadatos disponible.
         /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
         [DataMemberAttribute()]
         public global::System.String direccion
         {
@@ -9230,7 +9203,7 @@ namespace Datos
             {
                 OndireccionChanging(value);
                 ReportPropertyChanging("direccion");
-                _direccion = StructuralObject.SetValidValue(value, false);
+                _direccion = StructuralObject.SetValidValue(value, true);
                 ReportPropertyChanged("direccion");
                 OndireccionChanged();
             }
@@ -11676,18 +11649,34 @@ namespace Datos
         [XmlIgnoreAttribute()]
         [SoapIgnoreAttribute()]
         [DataMemberAttribute()]
-        [EdmRelationshipNavigationPropertyAttribute("Model", "FK_BungalowXReservaBungalow_ReservaBungalow", "BungalowXReservaBungalow")]
-        public EntityCollection<BungalowXReservaBungalow> BungalowXReservaBungalow
+        [EdmRelationshipNavigationPropertyAttribute("Model", "FK_ReservaBungalow_Bungalow", "Bungalow")]
+        public Bungalow Bungalow
         {
             get
             {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedCollection<BungalowXReservaBungalow>("Model.FK_BungalowXReservaBungalow_ReservaBungalow", "BungalowXReservaBungalow");
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<Bungalow>("Model.FK_ReservaBungalow_Bungalow", "Bungalow").Value;
+            }
+            set
+            {
+                ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<Bungalow>("Model.FK_ReservaBungalow_Bungalow", "Bungalow").Value = value;
+            }
+        }
+        /// <summary>
+        /// No hay documentación de metadatos disponible.
+        /// </summary>
+        [BrowsableAttribute(false)]
+        [DataMemberAttribute()]
+        public EntityReference<Bungalow> BungalowReference
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<Bungalow>("Model.FK_ReservaBungalow_Bungalow", "Bungalow");
             }
             set
             {
                 if ((value != null))
                 {
-                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<BungalowXReservaBungalow>("Model.FK_BungalowXReservaBungalow_ReservaBungalow", "BungalowXReservaBungalow", value);
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedReference<Bungalow>("Model.FK_ReservaBungalow_Bungalow", "Bungalow", value);
                 }
             }
         }
@@ -11802,6 +11791,28 @@ namespace Datos
                 if ((value != null))
                 {
                     ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedReference<Pago>("Model.FK_ReservaBungalow_Pago", "Pago", value);
+                }
+            }
+        }
+    
+        /// <summary>
+        /// No hay documentación de metadatos disponible.
+        /// </summary>
+        [XmlIgnoreAttribute()]
+        [SoapIgnoreAttribute()]
+        [DataMemberAttribute()]
+        [EdmRelationshipNavigationPropertyAttribute("Model", "FK_ServicioAdicionalXBungalowXReserva_ReservaBungalow", "ServicioAdicionalXReserva")]
+        public EntityCollection<ServicioAdicionalXReserva> ServicioAdicionalXReserva
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedCollection<ServicioAdicionalXReserva>("Model.FK_ServicioAdicionalXBungalowXReserva_ReservaBungalow", "ServicioAdicionalXReserva");
+            }
+            set
+            {
+                if ((value != null))
+                {
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<ServicioAdicionalXReserva>("Model.FK_ServicioAdicionalXBungalowXReserva_ReservaBungalow", "ServicioAdicionalXReserva", value);
                 }
             }
         }
@@ -12062,6 +12073,44 @@ namespace Datos
                 if ((value != null))
                 {
                     ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedReference<Pago>("Model.FK_ReservaBungalowSorteo_Pago", "Pago", value);
+                }
+            }
+        }
+    
+        /// <summary>
+        /// No hay documentación de metadatos disponible.
+        /// </summary>
+        [XmlIgnoreAttribute()]
+        [SoapIgnoreAttribute()]
+        [DataMemberAttribute()]
+        [EdmRelationshipNavigationPropertyAttribute("Model", "FK_ReservaBungalowSorteo_Sede", "Sede")]
+        public Sede Sede
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<Sede>("Model.FK_ReservaBungalowSorteo_Sede", "Sede").Value;
+            }
+            set
+            {
+                ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<Sede>("Model.FK_ReservaBungalowSorteo_Sede", "Sede").Value = value;
+            }
+        }
+        /// <summary>
+        /// No hay documentación de metadatos disponible.
+        /// </summary>
+        [BrowsableAttribute(false)]
+        [DataMemberAttribute()]
+        public EntityReference<Sede> SedeReference
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<Sede>("Model.FK_ReservaBungalowSorteo_Sede", "Sede");
+            }
+            set
+            {
+                if ((value != null))
+                {
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedReference<Sede>("Model.FK_ReservaBungalowSorteo_Sede", "Sede", value);
                 }
             }
         }
@@ -12924,6 +12973,50 @@ namespace Datos
         [XmlIgnoreAttribute()]
         [SoapIgnoreAttribute()]
         [DataMemberAttribute()]
+        [EdmRelationshipNavigationPropertyAttribute("Model", "FK_ReservaBungalowSorteo_Sede", "ReservaBungalowSorteo")]
+        public EntityCollection<ReservaBungalowSorteo> ReservaBungalowSorteo
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedCollection<ReservaBungalowSorteo>("Model.FK_ReservaBungalowSorteo_Sede", "ReservaBungalowSorteo");
+            }
+            set
+            {
+                if ((value != null))
+                {
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<ReservaBungalowSorteo>("Model.FK_ReservaBungalowSorteo_Sede", "ReservaBungalowSorteo", value);
+                }
+            }
+        }
+    
+        /// <summary>
+        /// No hay documentación de metadatos disponible.
+        /// </summary>
+        [XmlIgnoreAttribute()]
+        [SoapIgnoreAttribute()]
+        [DataMemberAttribute()]
+        [EdmRelationshipNavigationPropertyAttribute("Model", "FK_Sorteo_Sede", "Sorteo")]
+        public EntityCollection<Sorteo> Sorteo
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedCollection<Sorteo>("Model.FK_Sorteo_Sede", "Sorteo");
+            }
+            set
+            {
+                if ((value != null))
+                {
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<Sorteo>("Model.FK_Sorteo_Sede", "Sorteo", value);
+                }
+            }
+        }
+    
+        /// <summary>
+        /// No hay documentación de metadatos disponible.
+        /// </summary>
+        [XmlIgnoreAttribute()]
+        [SoapIgnoreAttribute()]
+        [DataMemberAttribute()]
         [EdmRelationshipNavigationPropertyAttribute("Model", "FK_ZonaDeCamping_Sede", "ZonaDeCamping")]
         public EntityCollection<ZonaDeCamping> ZonaDeCamping
         {
@@ -13334,18 +13427,18 @@ namespace Datos
         [XmlIgnoreAttribute()]
         [SoapIgnoreAttribute()]
         [DataMemberAttribute()]
-        [EdmRelationshipNavigationPropertyAttribute("Model", "FK_ServicioAdicionalXBungalowXReserva_ServicioAdicional", "ServicioAdicionalXBungalowXReserva")]
-        public EntityCollection<ServicioAdicionalXBungalowXReserva> ServicioAdicionalXBungalowXReserva
+        [EdmRelationshipNavigationPropertyAttribute("Model", "FK_ServicioAdicionalXBungalowXReserva_ServicioAdicional", "ServicioAdicionalXReserva")]
+        public EntityCollection<ServicioAdicionalXReserva> ServicioAdicionalXReserva
         {
             get
             {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedCollection<ServicioAdicionalXBungalowXReserva>("Model.FK_ServicioAdicionalXBungalowXReserva_ServicioAdicional", "ServicioAdicionalXBungalowXReserva");
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedCollection<ServicioAdicionalXReserva>("Model.FK_ServicioAdicionalXBungalowXReserva_ServicioAdicional", "ServicioAdicionalXReserva");
             }
             set
             {
                 if ((value != null))
                 {
-                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<ServicioAdicionalXBungalowXReserva>("Model.FK_ServicioAdicionalXBungalowXReserva_ServicioAdicional", "ServicioAdicionalXBungalowXReserva", value);
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<ServicioAdicionalXReserva>("Model.FK_ServicioAdicionalXBungalowXReserva_ServicioAdicional", "ServicioAdicionalXReserva", value);
                 }
             }
         }
@@ -13356,32 +13449,30 @@ namespace Datos
     /// <summary>
     /// No hay documentación de metadatos disponible.
     /// </summary>
-    [EdmEntityTypeAttribute(NamespaceName="Model", Name="ServicioAdicionalXBungalowXReserva")]
+    [EdmEntityTypeAttribute(NamespaceName="Model", Name="ServicioAdicionalXReserva")]
     [Serializable()]
     [DataContractAttribute(IsReference=true)]
-    public partial class ServicioAdicionalXBungalowXReserva : EntityObject
+    public partial class ServicioAdicionalXReserva : EntityObject
     {
         #region Método de generador
     
         /// <summary>
-        /// Crear un nuevo objeto ServicioAdicionalXBungalowXReserva.
+        /// Crear un nuevo objeto ServicioAdicionalXReserva.
         /// </summary>
         /// <param name="idServicioAdicional">Valor inicial de la propiedad idServicioAdicional.</param>
-        /// <param name="idBungalow">Valor inicial de la propiedad idBungalow.</param>
         /// <param name="idReservaBungalow">Valor inicial de la propiedad idReservaBungalow.</param>
         /// <param name="cantidad">Valor inicial de la propiedad cantidad.</param>
         /// <param name="precio">Valor inicial de la propiedad precio.</param>
         /// <param name="estado">Valor inicial de la propiedad estado.</param>
-        public static ServicioAdicionalXBungalowXReserva CreateServicioAdicionalXBungalowXReserva(global::System.Int16 idServicioAdicional, global::System.Int16 idBungalow, global::System.Int16 idReservaBungalow, global::System.Int16 cantidad, global::System.Double precio, global::System.Int16 estado)
+        public static ServicioAdicionalXReserva CreateServicioAdicionalXReserva(global::System.Int16 idServicioAdicional, global::System.Int16 idReservaBungalow, global::System.Int16 cantidad, global::System.Double precio, global::System.Int16 estado)
         {
-            ServicioAdicionalXBungalowXReserva servicioAdicionalXBungalowXReserva = new ServicioAdicionalXBungalowXReserva();
-            servicioAdicionalXBungalowXReserva.idServicioAdicional = idServicioAdicional;
-            servicioAdicionalXBungalowXReserva.idBungalow = idBungalow;
-            servicioAdicionalXBungalowXReserva.idReservaBungalow = idReservaBungalow;
-            servicioAdicionalXBungalowXReserva.cantidad = cantidad;
-            servicioAdicionalXBungalowXReserva.precio = precio;
-            servicioAdicionalXBungalowXReserva.estado = estado;
-            return servicioAdicionalXBungalowXReserva;
+            ServicioAdicionalXReserva servicioAdicionalXReserva = new ServicioAdicionalXReserva();
+            servicioAdicionalXReserva.idServicioAdicional = idServicioAdicional;
+            servicioAdicionalXReserva.idReservaBungalow = idReservaBungalow;
+            servicioAdicionalXReserva.cantidad = cantidad;
+            servicioAdicionalXReserva.precio = precio;
+            servicioAdicionalXReserva.estado = estado;
+            return servicioAdicionalXReserva;
         }
 
         #endregion
@@ -13413,33 +13504,6 @@ namespace Datos
         private global::System.Int16 _idServicioAdicional;
         partial void OnidServicioAdicionalChanging(global::System.Int16 value);
         partial void OnidServicioAdicionalChanged();
-    
-        /// <summary>
-        /// No hay documentación de metadatos disponible.
-        /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=true, IsNullable=false)]
-        [DataMemberAttribute()]
-        public global::System.Int16 idBungalow
-        {
-            get
-            {
-                return _idBungalow;
-            }
-            set
-            {
-                if (_idBungalow != value)
-                {
-                    OnidBungalowChanging(value);
-                    ReportPropertyChanging("idBungalow");
-                    _idBungalow = StructuralObject.SetValidValue(value);
-                    ReportPropertyChanged("idBungalow");
-                    OnidBungalowChanged();
-                }
-            }
-        }
-        private global::System.Int16 _idBungalow;
-        partial void OnidBungalowChanging(global::System.Int16 value);
-        partial void OnidBungalowChanged();
     
         /// <summary>
         /// No hay documentación de metadatos disponible.
@@ -13550,44 +13614,6 @@ namespace Datos
         [XmlIgnoreAttribute()]
         [SoapIgnoreAttribute()]
         [DataMemberAttribute()]
-        [EdmRelationshipNavigationPropertyAttribute("Model", "FK_ServicioAdicionalXBungalowXReserva_BungalowXReservaBungalow", "BungalowXReservaBungalow")]
-        public BungalowXReservaBungalow BungalowXReservaBungalow
-        {
-            get
-            {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<BungalowXReservaBungalow>("Model.FK_ServicioAdicionalXBungalowXReserva_BungalowXReservaBungalow", "BungalowXReservaBungalow").Value;
-            }
-            set
-            {
-                ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<BungalowXReservaBungalow>("Model.FK_ServicioAdicionalXBungalowXReserva_BungalowXReservaBungalow", "BungalowXReservaBungalow").Value = value;
-            }
-        }
-        /// <summary>
-        /// No hay documentación de metadatos disponible.
-        /// </summary>
-        [BrowsableAttribute(false)]
-        [DataMemberAttribute()]
-        public EntityReference<BungalowXReservaBungalow> BungalowXReservaBungalowReference
-        {
-            get
-            {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<BungalowXReservaBungalow>("Model.FK_ServicioAdicionalXBungalowXReserva_BungalowXReservaBungalow", "BungalowXReservaBungalow");
-            }
-            set
-            {
-                if ((value != null))
-                {
-                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedReference<BungalowXReservaBungalow>("Model.FK_ServicioAdicionalXBungalowXReserva_BungalowXReservaBungalow", "BungalowXReservaBungalow", value);
-                }
-            }
-        }
-    
-        /// <summary>
-        /// No hay documentación de metadatos disponible.
-        /// </summary>
-        [XmlIgnoreAttribute()]
-        [SoapIgnoreAttribute()]
-        [DataMemberAttribute()]
         [EdmRelationshipNavigationPropertyAttribute("Model", "FK_ServiciosAdicionales_Pago", "Pago")]
         public Pago Pago
         {
@@ -13616,6 +13642,44 @@ namespace Datos
                 if ((value != null))
                 {
                     ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedReference<Pago>("Model.FK_ServiciosAdicionales_Pago", "Pago", value);
+                }
+            }
+        }
+    
+        /// <summary>
+        /// No hay documentación de metadatos disponible.
+        /// </summary>
+        [XmlIgnoreAttribute()]
+        [SoapIgnoreAttribute()]
+        [DataMemberAttribute()]
+        [EdmRelationshipNavigationPropertyAttribute("Model", "FK_ServicioAdicionalXBungalowXReserva_ReservaBungalow", "ReservaBungalow")]
+        public ReservaBungalow ReservaBungalow
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<ReservaBungalow>("Model.FK_ServicioAdicionalXBungalowXReserva_ReservaBungalow", "ReservaBungalow").Value;
+            }
+            set
+            {
+                ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<ReservaBungalow>("Model.FK_ServicioAdicionalXBungalowXReserva_ReservaBungalow", "ReservaBungalow").Value = value;
+            }
+        }
+        /// <summary>
+        /// No hay documentación de metadatos disponible.
+        /// </summary>
+        [BrowsableAttribute(false)]
+        [DataMemberAttribute()]
+        public EntityReference<ReservaBungalow> ReservaBungalowReference
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<ReservaBungalow>("Model.FK_ServicioAdicionalXBungalowXReserva_ReservaBungalow", "ReservaBungalow");
+            }
+            set
+            {
+                if ((value != null))
+                {
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedReference<ReservaBungalow>("Model.FK_ServicioAdicionalXBungalowXReserva_ReservaBungalow", "ReservaBungalow", value);
                 }
             }
         }
@@ -13946,30 +14010,6 @@ namespace Datos
         private global::System.Int16 _idActividad;
         partial void OnidActividadChanging(global::System.Int16 value);
         partial void OnidActividadChanged();
-    
-        /// <summary>
-        /// No hay documentación de metadatos disponible.
-        /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
-        [DataMemberAttribute()]
-        public Nullable<global::System.TimeSpan> horaIngreso
-        {
-            get
-            {
-                return _horaIngreso;
-            }
-            set
-            {
-                OnhoraIngresoChanging(value);
-                ReportPropertyChanging("horaIngreso");
-                _horaIngreso = StructuralObject.SetValidValue(value);
-                ReportPropertyChanged("horaIngreso");
-                OnhoraIngresoChanged();
-            }
-        }
-        private Nullable<global::System.TimeSpan> _horaIngreso;
-        partial void OnhoraIngresoChanging(Nullable<global::System.TimeSpan> value);
-        partial void OnhoraIngresoChanged();
     
         /// <summary>
         /// No hay documentación de metadatos disponible.
@@ -14387,8 +14427,9 @@ namespace Datos
         /// <param name="apMaterno">Valor inicial de la propiedad apMaterno.</param>
         /// <param name="correo">Valor inicial de la propiedad correo.</param>
         /// <param name="fechaRegistro">Valor inicial de la propiedad fechaRegistro.</param>
+        /// <param name="estadoCivil">Valor inicial de la propiedad estadoCivil.</param>
         /// <param name="estado">Valor inicial de la propiedad estado.</param>
-        public static SolicitudMembresia CreateSolicitudMembresia(global::System.Int16 id, global::System.Int32 dni, global::System.String nombre, global::System.String apPaterno, global::System.String apMaterno, global::System.String correo, global::System.DateTime fechaRegistro, global::System.Int16 estado)
+        public static SolicitudMembresia CreateSolicitudMembresia(global::System.Int16 id, global::System.Int32 dni, global::System.String nombre, global::System.String apPaterno, global::System.String apMaterno, global::System.String correo, global::System.DateTime fechaRegistro, global::System.Int16 estadoCivil, global::System.Int16 estado)
         {
             SolicitudMembresia solicitudMembresia = new SolicitudMembresia();
             solicitudMembresia.id = id;
@@ -14398,6 +14439,7 @@ namespace Datos
             solicitudMembresia.apMaterno = apMaterno;
             solicitudMembresia.correo = correo;
             solicitudMembresia.fechaRegistro = fechaRegistro;
+            solicitudMembresia.estadoCivil = estadoCivil;
             solicitudMembresia.estado = estado;
             return solicitudMembresia;
         }
@@ -14579,6 +14621,54 @@ namespace Datos
         /// <summary>
         /// No hay documentación de metadatos disponible.
         /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public global::System.String direccion
+        {
+            get
+            {
+                return _direccion;
+            }
+            set
+            {
+                OndireccionChanging(value);
+                ReportPropertyChanging("direccion");
+                _direccion = StructuralObject.SetValidValue(value, true);
+                ReportPropertyChanged("direccion");
+                OndireccionChanged();
+            }
+        }
+        private global::System.String _direccion;
+        partial void OndireccionChanging(global::System.String value);
+        partial void OndireccionChanged();
+    
+        /// <summary>
+        /// No hay documentación de metadatos disponible.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
+        [DataMemberAttribute()]
+        public global::System.Int16 estadoCivil
+        {
+            get
+            {
+                return _estadoCivil;
+            }
+            set
+            {
+                OnestadoCivilChanging(value);
+                ReportPropertyChanging("estadoCivil");
+                _estadoCivil = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("estadoCivil");
+                OnestadoCivilChanged();
+            }
+        }
+        private global::System.Int16 _estadoCivil;
+        partial void OnestadoCivilChanging(global::System.Int16 value);
+        partial void OnestadoCivilChanged();
+    
+        /// <summary>
+        /// No hay documentación de metadatos disponible.
+        /// </summary>
         [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
         [DataMemberAttribute()]
         public global::System.Int16 estado
@@ -14632,6 +14722,44 @@ namespace Datos
         [XmlIgnoreAttribute()]
         [SoapIgnoreAttribute()]
         [DataMemberAttribute()]
+        [EdmRelationshipNavigationPropertyAttribute("Model", "FK_SolicitudMembresia_Familia", "Familia")]
+        public Familia Familia1
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<Familia>("Model.FK_SolicitudMembresia_Familia", "Familia").Value;
+            }
+            set
+            {
+                ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<Familia>("Model.FK_SolicitudMembresia_Familia", "Familia").Value = value;
+            }
+        }
+        /// <summary>
+        /// No hay documentación de metadatos disponible.
+        /// </summary>
+        [BrowsableAttribute(false)]
+        [DataMemberAttribute()]
+        public EntityReference<Familia> Familia1Reference
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<Familia>("Model.FK_SolicitudMembresia_Familia", "Familia");
+            }
+            set
+            {
+                if ((value != null))
+                {
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedReference<Familia>("Model.FK_SolicitudMembresia_Familia", "Familia", value);
+                }
+            }
+        }
+    
+        /// <summary>
+        /// No hay documentación de metadatos disponible.
+        /// </summary>
+        [XmlIgnoreAttribute()]
+        [SoapIgnoreAttribute()]
+        [DataMemberAttribute()]
         [EdmRelationshipNavigationPropertyAttribute("Model", "FK_Recomendacion_SolicitudMembresia", "Recomendacion")]
         public EntityCollection<Recomendacion> Recomendacion
         {
@@ -14669,7 +14797,8 @@ namespace Datos
         /// <param name="fechaSorteo">Valor inicial de la propiedad fechaSorteo.</param>
         /// <param name="numGanadores">Valor inicial de la propiedad numGanadores.</param>
         /// <param name="estado">Valor inicial de la propiedad estado.</param>
-        public static Sorteo CreateSorteo(global::System.Int16 idTemporadaAlta, global::System.Int16 idTipoBungalow, global::System.DateTime fechaSorteo, global::System.Int16 numGanadores, global::System.Int16 estado)
+        /// <param name="idSede">Valor inicial de la propiedad idSede.</param>
+        public static Sorteo CreateSorteo(global::System.Int16 idTemporadaAlta, global::System.Int16 idTipoBungalow, global::System.DateTime fechaSorteo, global::System.Int16 numGanadores, global::System.Int16 estado, global::System.Int16 idSede)
         {
             Sorteo sorteo = new Sorteo();
             sorteo.idTemporadaAlta = idTemporadaAlta;
@@ -14677,6 +14806,7 @@ namespace Datos
             sorteo.fechaSorteo = fechaSorteo;
             sorteo.numGanadores = numGanadores;
             sorteo.estado = estado;
+            sorteo.idSede = idSede;
             return sorteo;
         }
 
@@ -14832,10 +14962,75 @@ namespace Datos
         private global::System.Int16 _estado;
         partial void OnestadoChanging(global::System.Int16 value);
         partial void OnestadoChanged();
+    
+        /// <summary>
+        /// No hay documentación de metadatos disponible.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=true, IsNullable=false)]
+        [DataMemberAttribute()]
+        public global::System.Int16 idSede
+        {
+            get
+            {
+                return _idSede;
+            }
+            set
+            {
+                if (_idSede != value)
+                {
+                    OnidSedeChanging(value);
+                    ReportPropertyChanging("idSede");
+                    _idSede = StructuralObject.SetValidValue(value);
+                    ReportPropertyChanged("idSede");
+                    OnidSedeChanged();
+                }
+            }
+        }
+        private global::System.Int16 _idSede;
+        partial void OnidSedeChanging(global::System.Int16 value);
+        partial void OnidSedeChanged();
 
         #endregion
     
         #region Propiedades de navegación
+    
+        /// <summary>
+        /// No hay documentación de metadatos disponible.
+        /// </summary>
+        [XmlIgnoreAttribute()]
+        [SoapIgnoreAttribute()]
+        [DataMemberAttribute()]
+        [EdmRelationshipNavigationPropertyAttribute("Model", "FK_Sorteo_Sede", "Sede")]
+        public Sede Sede
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<Sede>("Model.FK_Sorteo_Sede", "Sede").Value;
+            }
+            set
+            {
+                ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<Sede>("Model.FK_Sorteo_Sede", "Sede").Value = value;
+            }
+        }
+        /// <summary>
+        /// No hay documentación de metadatos disponible.
+        /// </summary>
+        [BrowsableAttribute(false)]
+        [DataMemberAttribute()]
+        public EntityReference<Sede> SedeReference
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<Sede>("Model.FK_Sorteo_Sede", "Sede");
+            }
+            set
+            {
+                if ((value != null))
+                {
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedReference<Sede>("Model.FK_Sorteo_Sede", "Sede", value);
+                }
+            }
+        }
     
         /// <summary>
         /// No hay documentación de metadatos disponible.

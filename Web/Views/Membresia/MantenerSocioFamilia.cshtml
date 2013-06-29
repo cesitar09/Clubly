@@ -1,0 +1,244 @@
+﻿@model Web.Models.Socio
+@using Web.Models
+@{
+    ViewBag.Title = "Datos Personales";
+}
+
+<h1>@ViewBag.Title</h1>
+ @if (Model != null)
+ {
+<fieldset>
+ <legend>Datos del Formulario</legend>
+ @using (Html.BeginForm("ModificarSocioPersonal", "Membresia", FormMethod.Post, new { @id = "Form" }))
+ {
+    <form>
+     <ul>
+     <li>
+                <div class="editor-label">@Html.LabelFor(p => p.persona.id)</div>
+                @Html.TextBoxFor(p => p.persona.id, new { @readonly = "readonly" })
+            </li><li>
+                 
+                <div class="editor-label">@Html.LabelFor(p => p.familia.id)</div>
+                @Html.TextBoxFor(p => p.familia.id, new { @readonly = "readonly" })
+            </li>
+            <li>
+                <div class="editor-label">@Html.LabelFor(p => p.persona.nombre)</div>
+                 @Html.TextBoxFor(p => p.persona.nombre)  
+                            
+        </li><li>  
+                 <div class="editor-label">@Html.LabelFor(p => p.persona.apPaterno)</div>  
+                 @Html.TextBoxFor(p => p.persona.apPaterno)  
+                           
+        </li><li>           
+                    <div class="editor-label">@Html.LabelFor(p => p.persona.apMaterno)</div>
+                    @Html.TextBoxFor(p => p.persona.apMaterno) 
+                              
+        </li><li>
+                    <div class="editor-label">@Html.LabelFor(p => p.persona.dni)</div>
+                    @Html.TextBoxFor(p => p.persona.dni)
+                      
+         </li><li>            
+                    <div class="editor-label">@Html.LabelFor(p => p.persona.direccion)</div>
+                    @Html.TextBoxFor(p => p.persona.direccion)
+                                    
+        </li><li>
+            @*------------ESTODOCIVIL--------------*@
+     <div class = "editor-label">    @Html.LabelFor(p => p.persona.estadoCivil)    </div>  
+          @(Html.Kendo().ComboBox()
+           .Name("estadoComboBox")
+          .DataTextField("nombre")
+          .DataValueField("nombre")
+          .Filter("contains")
+          .AutoBind(true)
+          .Placeholder("--Seleccionar--")
+          .MinLength(3)
+                  .Suggest(true)
+          .DataSource(source =>
+          {
+              source.Read(read =>
+              {
+                  read.Action("Leer_Estados", "RRHH");
+              })
+              .ServerFiltering(true);
+          })
+          .Value(Model != null && Model.persona != null ? Model.persona.estadoCivil : null)
+    )  
+    </li>
+        @Html.TextBoxFor(p => p.persona.estadoCivil, new { style = "display: none;" })  
+        @Html.TextBoxFor(p => p.persona.estado, "", new { style = "display:none;" })
+    </ul>
+    <div id="botones">
+  <input type="button" value= "Limpiar"  id="limpiar" onclick="location.href = '@(Url.Action("MantenerSocioFamilia", "Membresia"))'" class="button fright"/>
+  <input type="submit" value= "Modificar"  class="button fright"/>
+  
+    </div>
+    @if (ViewData["message"] == null)
+    { }
+    else if (ViewData["message"].Equals("F"))
+    { <script type= "text/javascript">          alert("Lo sentimos!\n No se pudo realizar la operacion\nVuelva a intentarlo en otro momento. ")</script>}
+    else if (ViewData["message"].Equals("E"))
+    { <script type= "text/javascript">          alert("La operación se realizó con éxito!")</script>}  
+  </form>
+ }
+  </fieldset>
+}  
+   <div id="kendotable">
+    @(Html.Kendo().Grid<Web.Models.Socio>()
+    .Name("Grid")
+    .Columns(columns =>
+    {
+        columns.Bound(p => p.familia.id).Title("Fam.").Width(60).Sortable(true);  
+        columns.Bound(p => p.persona.dni).Width(85).Sortable(true);
+        columns.Bound(p => p.persona.nombre).Width(85).Sortable(true);
+        columns.Bound(p => p.persona.apPaterno).Title("Ap. Paterno").Width(110).Sortable(true);
+        columns.Bound(p => p.persona.apMaterno).Title("Ap. Materno").Width(110).Sortable(true);
+        columns.Bound(p => p.persona.estadoCivil).Title("Est. Civil").Width(90).Sortable(true);
+        columns.Command(command => { command.Custom("Editar").Click("Edit");}).Width(190);
+
+    })  .Selectable()
+               .Groupable()
+               .Pageable()
+               .Sortable()
+               .Scrollable()
+               .Filterable(filterable => filterable
+                                              .Extra(false)
+                                              .Operators(operators => operators
+                                                                      .ForString(str => str.Clear()
+                                                                          .Contains("Contiene")
+                                                                          .StartsWith("Empezar con")
+                                                                                           .IsEqualTo("Es igual a")
+                                                                                           .IsNotEqualTo("Diferente a"))
+                                                                      .ForNumber(number => number.Clear()
+                                                                                                 .IsGreaterThan("Es mayor a")
+                                                                                                 .IsLessThan("Es menor a")
+                                                                                                 .IsEqualTo("Es igual a")
+                                                                                                 .IsNotEqualTo("Es diferente a"))
+                                                                      )
+                                )
+    .DataSource(datasource => datasource
+                                .Ajax()
+                                    .Read(read => read.Action("Leer_Socio_Personal", "Membresia"))
+                                                        .Batch(false)
+                                                               .ServerOperation(false)
+                                                               .Events(events => events.Error("error_handler"))
+                                                               .Model( model => model.Id(p => p.persona.id))
+                                                           
+
+
+
+                )
+)
+</div>
+
+
+
+<script type="text/javascript">
+
+
+    $(document).ready(function () {
+        var combobox = $("#estadoComboBox").data("kendoComboBox");
+        combobox.bind("change", function (e) {
+            $("#persona_estadoCivil").val(combobox.value());
+            //  alert("idSede: "+combobox.value()); 
+        });
+    });
+
+    function error_handler(e) {
+        if (e.errors) {
+            var message = "Errors:\n";
+            $.each(e.errors, function (key, value) {
+                if ('errors' in value) {
+                    $.each(value.errors, function () {
+                        message += this + "\n";
+                    });
+                }
+            });
+            alert(message);
+        }
+    }
+     
+  </script>
+  <script type="text/javascript">
+    function Edit(e){
+        e.preventDefault();
+        var grid = $('#Grid').data('kendoGrid');
+        var row = grid.select();
+        var dataItem = grid.dataItem(row);
+        var id = dataItem.id;
+        location = "@Url.Action("EditarSocioPersonal")"+"?persona.id=" + id ;
+    }
+
+</script>
+
+<script type="text/javascript">
+
+$("#Form").validate({
+        rules: {
+            "persona.nombre": {
+                required: true,
+                maxlength: 50
+            },
+            "persona.apPaterno": {
+                required: true,
+                maxlength: 50
+            },
+            "persona.apMaterno": {
+                required: true,
+                maxlength: 50
+            },
+            "persona.dni": { required: true,
+                digits: true,
+                minlength: 8,
+                maxlength: 8
+            },
+            "persona.direccion": {
+                required: true,
+                maxlength: 150
+
+            },
+            "persona.estadoCivil": {
+                required: true
+            }
+        },
+        messages: {
+
+            "persona.nombre": {
+                required: "*Campo obligatorio",
+                maxlength: "Tamaño máx. 50 caracteres"
+            },
+            "persona.apPaterno": {
+                required: "*Campo obligatorio",
+                maxlength: "Tamaño máx. 50 caracteres"
+            },
+            "persona.apMaterno": {
+                required: "*Campo obligatorio",
+                maxlength: "Tamaño máx. 50 caracteres"
+            },
+            "persona.dni": { required: "*Campo obligatorio",
+                digits: "Ingrese solo dígitos",
+                minlength: "Ingrese 8 dígitos",
+                maxlength: "Ingrese 8 dígitos"
+
+            },
+            "persona.direccion": {
+                required: "*Campo obligatorio",
+                maxlength: "Tamaño máx. 150 caracteres"
+            },
+
+             "persona.estadoCivil": {
+                required: ""
+
+            }
+        },
+        submitHandler: function ConfirmationBox(form) {
+            var result = confirm("¿Está seguro de realizar los cambios?");
+            if (result == true) {
+                form.submit();
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+    });
+   </script>

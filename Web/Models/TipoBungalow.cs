@@ -25,7 +25,7 @@ namespace Web.Models
         public short capacidad { get; set; }
 
         [DisplayName("Nro Habitaciones")]
-        public short nrohabitaciones { get; set; }
+        public short? nrohabitaciones { get; set; }
 
          [DisplayName("Precio")]
         public double precio { get; set; }
@@ -41,7 +41,7 @@ namespace Web.Models
             nombre = tipo.nombre;
             descripcion = tipo.descripcion;
             capacidad = tipo.capacidad;
-            //nrohabitaciones = tipo.nrohabitaciones;
+            nrohabitaciones = tipo.nrohabitaciones;
             precio = tipo.precio;
             estado = tipo.estado;
         }
@@ -51,6 +51,10 @@ namespace Web.Models
         //    IEnumerable<Datos.TipoBungalow> listaTipos = Negocio.TipoBungalow.SeleccionarTodo();
         //    return ConvertirLista(listaTipos);
         //}
+
+        public static bool HayBungalow(Models.TipoBungalow tipoB) {
+            return Negocio.TipoBungalow.HayBungalows(tipoB.id);
+        }
 
         public static IEnumerable<TipoBungalow> ConvertirLista(IEnumerable<Datos.TipoBungalow> listaTipos)
         {

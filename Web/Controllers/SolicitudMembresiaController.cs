@@ -37,9 +37,10 @@ namespace Web.Controllers
 
                 if (submit == "Insertar" || submit == "Modificar")
                 {
+                    
                     if (solicitud.id > 0)
                     {
-
+                        
                         if (SolicitudMembresia.Modificar(solicitud) == 1)
                         {
                             ViewData["message"] = "E";
@@ -57,8 +58,17 @@ namespace Web.Controllers
 
                     return View("VerSolicitudesDeMembresia", solicitud);
                 }
-                else if (submit == "Aceptar")
+                else if (submit == "Aprobar")
                 {
+                    if (solicitud.familiatraslado != 0)
+                    {
+                        string resultado = Models.Familia.val_pagos_reservas(solicitud.familiatraslado);
+                        if (resultado.Equals("2") || resultado.Equals("1"))
+                        {
+                            ViewData["message"] = "FF";
+                            return View("VerSolicitudesDeMembresia");
+                        }
+                    }
                     if (SolicitudMembresia.Modificar(solicitud) == 1)
                     {
                         ViewData["message"] = "E";
@@ -68,7 +78,7 @@ namespace Web.Controllers
                     SolicitudMembresia.Aceptar(solicitud);
                     return View("VerSolicitudesDeMembresia");
                 }
-                else if (submit == "rechazar")
+                else if (submit == "Rechazar")
                 {
                     if (SolicitudMembresia.Modificar(solicitud) == 1)
                     {
@@ -131,6 +141,13 @@ namespace Web.Controllers
         public ActionResult FilterMenuCustomization_dni()
         {
             return Json(Models.SolicitudMembresia.SeleccionarTodo().Select(e => e.dni).Distinct(), JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public JsonResult Validarpendientes(string data) {
+            short num = Convert.ToInt16(data);
+            string em = Models.Familia.val_pagos_reservas(num);
+            return Json(new {me = em});
         }
 
     }

@@ -6,15 +6,17 @@
 
 <div id="kendotable">
 @(Html.Kendo().Grid<Web.Models.Pago>()
-    .Name("tablaPagos") 
+    .Name("tablaPagos")
+    
     .Columns(columns =>
     {
-        columns.Bound(p => p.monto).Sortable(true);
-        columns.Bound(p => p.fechaRegistro).Width(70).Format("{0:dd/MM/yyyy}");
-        columns.Bound(p => p.fechaLimite).Width(70).Format("{0:dd/MM/yyyy}");
-        columns.Bound(p => p.idfamilia).Sortable(true);
-        columns.Bound(p => p.conceptoDePago.descripcion);
-        columns.Bound(p => p.estado).Sortable(true);
+        columns.Bound(p => p.id).Width(69).Sortable(true).Title("Id Pago");
+        columns.Bound(p => p.descripcion).Width(270).Title("Descripción");
+        //columns.Bound(p => p.conceptoDePago.descripcion);
+        columns.Bound(p => p.fechaRegistro).Width(110).Format("{0:dd/MM/yyyy}").Title("Fecha Registro");
+        columns.Bound(p => p.fechaLimite).Width(100).Format("{0:dd/MM/yyyy}").Title("Fecha Limite");
+        columns.Bound(p => p.monto).Width(70).Sortable(true);
+        columns.Bound(p => p.estado).Width(80).Sortable(true);
         //if(Model.precio != 0)
           //      {
             //        columns.Bound(p=>p.precio);
@@ -27,6 +29,7 @@
     })
     .Selectable()
     .Pageable()
+    .Scrollable()
     .Filterable(filterable => filterable
                               .Extra(false)
                               .Operators(operators => operators

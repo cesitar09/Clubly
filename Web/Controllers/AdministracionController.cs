@@ -191,32 +191,33 @@ namespace Web.Controllers
             return View((IView)null);
         }
 
-        /*[AcceptVerbs(HttpVerbs.Post)]
+        [AcceptVerbs(HttpVerbs.Post)]
         public ActionResult InsertarServicio(Web.Models.Servicio servicio)
         {
             try
             {
-                if (servicio != null)
+                if (servicio.sedesAux != null)
                 {
-                    if (servicio.id == 0)
+                    List<Sede> lista = new List<Sede>(servicio.sedesAux.Count());
+                    foreach (short codigo in servicio.sedesAux)
                     {
-                        servicio.estado = 1;
-                        if (Servicio.insertar(servicio) == 1)
-                        {
-                            ViewData["message"] = "E";
-                        }
-                        else { ViewData["message"] = "F"; }
+                        lista.Add(Sede.buscarId(codigo));
                     }
-                    else
-                    {
-                        if (Servicio.modificar(servicio) == 1)
-                        {
-                            ViewData["message"] = "E";
-                        }
-                        else { ViewData["message"] = "F"; }
-                    }
+                    servicio.sedes = lista.AsEnumerable();
                 }
-                return View("MantenerServicio", servicio);
+
+                if (servicio.id > 0)
+                {
+                    Servicio.modificar(servicio);
+                    return View("MantenerServicio", servicio);
+                }
+                else
+                {
+                    servicio.estado = ListaEstados.ESTADO_ACTIVO;
+                    Servicio.insertar(servicio);
+                    return View("MantenerServicio", servicio);
+                }
+
             }
             catch (ConstraintException)
             {
@@ -258,73 +259,10 @@ namespace Web.Controllers
         public IEnumerable<String> EnlistarSedes()
         {
             return Servicio.listaSedes();
-        }*/
+        }
 
 
-        // Mantener Promociones
-        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
-         public ActionResult MantenerPromociones(Web.Models.Promocion promocion)
-         {
-
-             ViewData["message"] = null;
-             return View((IView)null);
-         }
-
-         /*[AcceptVerbs(HttpVerbs.Post)]
-         public ActionResult InsertarPromocion(Web.Models.Promocion promocion)
-         {
-             try
-             {
-                 if (promocion != null)
-                 {
-                     if (promocion.id == 0)
-                     {
-                         promocion.estado = 1;
-                         if (Promocion.insertar(promocion) == 1)
-                         {
-                             ViewData["message"] = "E";
-                         }
-                         else { ViewData["message"] = "F"; }
-                     }
-                     
-                 }
-                 return View("MantenerPromocion", promocion);
-             }
-             catch (ConstraintException)
-             {
-                 return View("MantenerPromocion", promocion);
-             }
-             catch (UpdateException)
-             {
-                 return View("MantenerPromocion", promocion);
-             }
-             catch (SqlException)
-             {
-                 return View("MantenerPromocion", promocion);
-             }
-             catch (ValidationException)
-             {
-                 return View("MantenerPromocion", promocion);
-             }
-         }
-
-         public ActionResult LeerPromocion([DataSourceRequest] DataSourceRequest request)
-         {
-             IEnumerable<Models.Promocion> lista = Promocion.SeleccionarTodo();
-             DataSourceResult result = lista.ToDataSourceResult(request);
-             return Json(result);
-         }
-
-         public ActionResult EliminarPromocion(Web.Models.Promocion promocion)
-         {
-             Promocion.eliminar(promocion);
-             return View("MantenerPromocion", promocion);
-         }
-
-         public IEnumerable<String> EnlistarFamilias()
-         {
-             return Promocion.listaFamilias();
-         }*/
+        
 
 
         /****************TEMPORADA ALTA*******/
@@ -346,10 +284,13 @@ namespace Web.Controllers
 
         public ActionResult eliminarTemporadaAlta([DataSourceRequest] DataSourceRequest request, Web.Models.TemporadaAlta tempA)
         {
-            if (tempA != null)
-            {
-                TemporadaAlta.eliminarTemporadaAlta(tempA);
-            }
+            //if (Models.TemporadaAlta.HaySorteos(tempA) == false){
+                if (tempA != null)
+                {
+                    TemporadaAlta.eliminarTemporadaAlta(tempA);
+                }
+            //}
+            else ViewData["message"] = "SORTEOS";
             return Json(ModelState.ToDataSourceResult());
         }
 
@@ -362,33 +303,151 @@ namespace Web.Controllers
 
         }
 
+        public bool ValidarFechas(Models.TemporadaAlta tempA) {
+            if (tempA.fechaFin > tempA.fechaInicio) return true;
+             return false;
+        }
+
+
         [HttpPost]
         public ActionResult agregarTemporadaAlta(Web.Models.TemporadaAlta tempA)
         {
-            if (tempA != null)
-            {
-                if (tempA.id == 0)
-                {
-                    tempA.estado = ListaEstados.ESTADO_ACTIVO;
-                    if (TemporadaAlta.insertarTemporadaAlta(tempA) == 1)
-                    {
-                        ViewData["message"] = "E";
-                    }
-                    else { ViewData["message"] = "F"; }
-                }
-                else
-                {
-                    if (TemporadaAlta.modificarTemporadaAlta(tempA) == 1)
-                    {
-                        ViewData["message"] = "E";
-                    }
-                    else { ViewData["message"] = "F"; }
-                }
-            }
 
+            if (ValidarFechas(tempA))
+            {
+
+
+                if (tempA != null)
+                {
+                    if (tempA.id == 0)
+                    {
+                        tempA.estado = ListaEstados.ESTADO_ACTIVO;
+                        if (TemporadaAlta.insertarTemporadaAlta(tempA) == 1)
+                        {
+                            ViewData["message"] = "E";
+                        }
+                        else { ViewData["message"] = "F"; }
+                    }
+                    else
+                    {
+                        if (TemporadaAlta.modificarTemporadaAlta(tempA) == 1)
+                        {
+                            ViewData["message"] = "E";
+                        }
+                        else { ViewData["message"] = "F"; }
+                    }
+                }
+
+            }
+            else {
+                ViewData["message"] = "FNV";
+            }
             return View("MantenerTemporadaAlta", tempA);
         }
 
+        //----------------------------Mantener Parametros: Dorita ------------------------//
+        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
+        public ActionResult MantenerParametros(Web.Models.Parametros parametro)
+        {
+
+            ViewData["message"] = null;
+            return View((IView)null);
+        }
+
+        [AcceptVerbs(HttpVerbs.Post)]
+        public ActionResult InsertarParametros(Web.Models.Parametros parametro)
+        {
+            try
+            {
+                    Parametros.insertarParametros(parametro);
+                    return View("MantenerParametros", parametro);
+            }
+            catch (ConstraintException)
+            {
+                return View("MantenerParametros", parametro);
+            }
+            catch (UpdateException)
+            {
+                return View("MantenerParametros", parametro);
+            }
+            catch (SqlException)
+            {
+                return View("MantenerParametros", parametro);
+            }
+            catch (ValidationException)
+            {
+                return View("MantenerParametros", parametro);
+            }
+        }
+
+       public ActionResult LeerParametros([DataSourceRequest] DataSourceRequest request)
+        {
+            IEnumerable<Models.Parametros> lista = Parametros.SeleccionarTodo();
+            DataSourceResult result = lista.ToDataSourceResult(request);
+            return Json(result);
+        }
+
+//-----------------------------------Agregar Cuotas--------------------------------------------
+       [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
+       public ActionResult AgregarCuotas(Web.Models.Pago cuota)
+       {
+
+           ViewData["message"] = null;
+           return View((IView)null);
+       }
+
+       [AcceptVerbs(HttpVerbs.Post)]
+       public ActionResult InsertarCuotas(Web.Models.Pago cuota)
+       {
+           try
+           {
+               
+               Pago.InsertarCuota(cuota);
+               return View("AgregarCuotas");
+           }
+           catch (ConstraintException)
+           {
+               return View("AgregarCuotas", cuota);
+           }
+           catch (UpdateException)
+           {
+               return View("AgregarCuotas", cuota);
+           }
+           catch (SqlException)
+           {
+               return View("AgregarCuotas", cuota);
+           }
+           catch (ValidationException)
+           {
+               return View("AgregarCuotas", cuota);
+           }
+       }
+
+       public ActionResult LeerCuotas([DataSourceRequest] DataSourceRequest request)
+       {
+           IEnumerable<Models.Pago> lista = Pago.SeleccionarCuotas();
+           DataSourceResult result = lista.ToDataSourceResult(request);
+           return Json(result);
+       }
+
+       public ActionResult EliminarCuotas([DataSourceRequest] DataSourceRequest request, Web.Models.Pago cuota)
+       {
+           if (cuota != null)
+           {
+               Pago.Cancelar(cuota);
+           }
+           return Json(ModelState.ToDataSourceResult());
+       }
+
+        [HttpGet]
+       public ActionResult GenerarPagosMembresia([DataSourceRequest] DataSourceRequest request)
+       {
+
+           Pago.GenerarPagosMembresia();
+           return View("AgregarCuotas");
+           //return Json(ModelState.ToDataSourceResult());
+       }
+               
     }
 
 }

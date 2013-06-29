@@ -1,0 +1,116 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.Data.Objects.DataClasses;
+using Negocio.Util;
+namespace Web.Models
+{
+    public class Sorteo
+    {
+        public TemporadaAlta temporadaAlta { set; get;}
+
+        public TipoBungalow tipoBungalow { set; get; }
+
+        public DateTime FechaSorteo { set; get; }
+
+        public short numGanadores { set; get; }
+
+        public String comentarios { set; get; }
+
+        public String estado { set; get; }
+
+        public Sede sede { set; get; }
+
+        public static ListaEstados listaestados { set; get; }
+
+        static Sorteo()
+        {
+            listaestados = new ListaEstados();
+
+            listaestados.AgregarEstado(1, "Pendiente");
+            listaestados.AgregarEstado(2, "Realizado");
+            listaestados.AgregarEstado(3, "Cancelado");
+        }
+
+        public Sorteo(Datos.Sorteo sorteo)
+        {
+            temporadaAlta = Models.TemporadaAlta.Convertir(sorteo.TemporadaAlta);
+            tipoBungalow = Models.TipoBungalow.Convertir(sorteo.TipoBungalow);
+            FechaSorteo = sorteo.fechaSorteo;
+            numGanadores = sorteo.numGanadores;
+            comentarios = sorteo.comentarios;
+            estado = listaestados.TextoEstado(sorteo.estado);
+            sede = Models.Sede.Convertir(sorteo.Sede);
+        }
+
+        public Sorteo(TemporadaAlta temp, TipoBungalow tipoBung, Sede sed)
+        {
+            temporadaAlta = temp;
+            tipoBungalow = tipoBung;
+            sede = sed;
+            FechaSorteo = temp.fechaInicio.AddDays(-7);
+            numGanadores = 0;
+            comentarios = "";
+            estado = "Pendiente";
+        }
+
+
+        public static Sorteo Convertir(Datos.Sorteo sorteo)
+        {
+            return new Sorteo(sorteo);
+        }
+
+        public static IEnumerable<Sorteo> ConvertirLista(IEnumerable<Datos.Sorteo> ListaSorteo)
+        {
+            return ListaSorteo.Select(sorteo=> Convertir(sorteo));
+
+        }
+
+        public static Datos.Sorteo Invertir(Models.Sorteo sorteo)
+        {
+            Datos.Sorteo datosSorteo = new Datos.Sorteo();
+
+            datosSorteo.TemporadaAlta = Models.TemporadaAlta.Invertir(sorteo.temporadaAlta);
+            datosSorteo.TipoBungalow = Models.TipoBungalow.Invertir(sorteo.tipoBungalow);
+            datosSorteo.fechaSorteo = sorteo.FechaSorteo;
+            datosSorteo.numGanadores = sorteo.numGanadores;
+            datosSorteo.comentarios = sorteo.comentarios;
+            datosSorteo.estado = listaestados.EstadoTexto(sorteo.estado);
+            datosSorteo.Sede = Models.Sede.Invertir(sorteo.sede);
+           
+            return datosSorteo;
+        }
+
+        public static EntityCollection<Datos.Sorteo> InvertirLista(IEnumerable<Models.Sorteo> ListaSorteo)
+        {
+            EntityCollection<Datos.Sorteo> DatosListaSorteo= new EntityCollection<Datos.Sorteo>();
+
+            foreach (var sol in ListaSorteo)
+            {
+                DatosListaSorteo.Add(Invertir(sol));
+            }
+
+            return DatosListaSorteo;
+        }
+
+
+        public static void insertarSorteos(TemporadaAlta temporadaAlta)
+        {
+            IEnumerable<Models.Sede> listaSedes= Sede.SeleccionarTodo();
+             IEnumerable<Models.TipoBungalow> listaTipos= TipoBungalow.SeleccionarTodo();
+            for (int i = 0; i < listaSedes.Count();i++ )
+            {
+                for (int j = 0; j < listaTipos.Count(); j++)
+                {
+                    Sorteo sorteo = new Sorteo(temporadaAlta, listaTipos.ElementAt(j), listaSedes.ElementAt(i));
+                    Negocio.Sorteo.Insertar(Invertir(sorteo));     
+                }
+               
+           }
+
+        }
+    }
+}

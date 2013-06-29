@@ -15,20 +15,12 @@ namespace Web.Controllers
 
         public ActionResult Index()
         {
-            //try
-            //{
-            //    Models.Evento Evento=new Models.Evento();
-            //    Models.Evento.modificarPrueba();
-
-            //    return View();
-            //}
-            //catch (OptimisticConcurrencyException )
-            //{
-            //    ModelState.AddModelError("nombre", "Este campo fue modificado");
-            //    ModelState.AddModelError("", "Uno o varios de los valores fue modificado por otro usuario");
-            //    return View("error");
-            //}
-
+            Models.ReservaBungalow reserva = new Models.ReservaBungalow();
+            reserva.fechaInicio = DateTime.Now.AddDays(5);
+            reserva.fechaFin = DateTime.Now.AddDays(6);
+            reserva.bungalow = new Models.Bungalow();
+            reserva.bungalow.id = 18;
+            Models.ReservaBungalow.AgregarReservaBungalow(reserva, 38);
             return View();
         }
 

@@ -8,6 +8,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 using Datos;
+using Negocio.Util;
 //using System.ComponentModel.DataAnnotations;
 
 namespace Web.Models
@@ -20,19 +21,51 @@ namespace Web.Models
 
         
         [DisplayFormat(ConvertEmptyStringToNull = false)]
-        [DisplayName("*Nombre")]
+        [DisplayName("Nombre")]
         public String nombre { get; set; }
 
         [DisplayName("Estado")]
-        public short estado { get; set; }
+        public string estado { get; set; }
 
         
-        [DisplayName("*Área")]
+        [DisplayName("Área")]
         public double? area { get; set; }
 
         //Un ambiente está asignado a una Sede
-        [DisplayName("*Sede")]
+        [DisplayName("Sede")]
         public Models.Sede sede { get; set; }
+
+        [DisplayName("Reserva")]
+        public Models.ReservaAmbiente reserva { get; set; }
+
+        //Validación de Estados para Habilitado e Inhabilitado
+
+        public static ListaEstados listaEstados = new ListaEstados();
+        public static List<Estado_Ambiente> listestadoamb { get; set; }
+
+
+        public class Estado_Ambiente
+        {
+            public short id { get; set; }
+            public string nombre { get; set; }
+
+            public Estado_Ambiente(short i, string n)
+            {
+                id = i;
+                nombre = n;
+            }
+        }
+        
+        static Ambiente() {
+            listaEstados = new ListaEstados();
+            listaEstados.AgregarEstado(1, "Habilitado");
+            listaEstados.AgregarEstado(2, "Inhabilitado");
+            Estado_Ambiente estado1 = new Estado_Ambiente(1, "Habilitado");
+            Estado_Ambiente estado2 = new Estado_Ambiente(2, "Inhabilitado");
+            listestadoamb = new List<Estado_Ambiente>();
+            listestadoamb.Add(estado1);
+            listestadoamb.Add(estado2);
+        }
 
 
         public Ambiente() { }
@@ -41,7 +74,7 @@ namespace Web.Models
         {
             id = amb.id;
             nombre = amb.nombre;
-            estado = amb.estado;
+            estado = listaEstados.TextoEstado(amb.estado);
             area = amb.area;
             sede = Sede.Convertir(amb.Sede);
         }
@@ -57,6 +90,8 @@ namespace Web.Models
 
         }
 
+        //Busca si tiene Reservas
+
         public static Datos.Ambiente Invertir(Models.Ambiente mAmbiente)
         {
             Datos.Ambiente dAmbiente;
@@ -66,10 +101,28 @@ namespace Web.Models
                 dAmbiente = Negocio.Ambiente.buscarId(mAmbiente.id);
             dAmbiente.nombre = mAmbiente.nombre;
             dAmbiente.area = mAmbiente.area;
-            dAmbiente.estado = mAmbiente.estado;
+            dAmbiente.estado = listaEstados.EstadoTexto(mAmbiente.estado);
             dAmbiente.Sede = Negocio.Sede.buscarId(mAmbiente.sede.id);
             return dAmbiente;
+        
         }
+
+        public static bool HayReserva(Models.Ambiente ambiente) {            
+
+            return Negocio.Ambiente.HayReserva(ambiente.id);
+        }
+
+
+        //FUNCIÓN QUE RETORNA TRUE SI ES QUE EL AMBIENTE ESTA DISPONIBLE SINO EMITIRA FALSE
+        public static bool AmbienteReservado(DateTime ini, DateTime fin, short idAmbiente)
+        {
+            if (Negocio.Ambiente.AmbienteLibre(ini, fin, idAmbiente) == true)
+                return false;
+            else
+                return true;
+        }
+        /*********************************************************************************/
+
 
         public static IEnumerable<Datos.Ambiente> ConvertirListaInverso(IEnumerable<Models.Ambiente> mAmbiente)
         {
@@ -81,6 +134,11 @@ namespace Web.Models
             return Convertir(Negocio.Ambiente.buscarId(id));
         }
 
+        public static IEnumerable<Ambiente> buscarPorSede(short idSede)
+        {
+            IEnumerable<Datos.Ambiente> lista = Negocio.Ambiente.buscarPorSede(idSede);
+            return ConvertirLista(lista);
+        }
         public static IEnumerable<Ambiente> SeleccionarTodo()
         {
             IEnumerable<Datos.Ambiente> ambiente = Negocio.Ambiente.seleccionarTodo();
@@ -98,25 +156,19 @@ namespace Web.Models
             return ConvertirLista(lista);
         }
  
-        public static int modificarAmbiente(Models.Ambiente ambiente)
+        public static void modificarAmbiente(Models.Ambiente ambiente)
         {
-            if (Negocio.Ambiente.modificar(Invertir(ambiente)) == null)
-                return 1;
-            else
-                return 0;
+            Negocio.Ambiente.modificar(Invertir(ambiente));
         }
 
-        public static int insertarAmbiente(Models.Ambiente ambiente)
+        public static void insertarAmbiente(Models.Ambiente ambiente)
         {
-            if (Negocio.Ambiente.insertar(Invertir(ambiente)) == null)
-                return 1;
-            else
-                return 0;
+            Negocio.Ambiente.insertar(Invertir(ambiente));
         }
 
-        public static void eliminarAmbiente(Models.Ambiente ambiente)
+        public static void eliminarAmbiente(short id)
         {
-            Negocio.Ambiente.eliminar(Invertir(ambiente));
+            Negocio.Ambiente.eliminar(id);
         }
     }
 }

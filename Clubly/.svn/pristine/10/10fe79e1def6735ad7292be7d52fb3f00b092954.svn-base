@@ -1,0 +1,189 @@
+﻿@model Web.Models.Proveedor
+@using Web.Models
+@{
+    ViewBag.Title = "Mantenimiento del Proveedor";
+}
+
+<h1>@ViewBag.Title</h1>
+
+<fieldset>
+    <legend>Datos del Formulario</legend>
+    @using (Html.BeginForm("insertarProveedor", "Logistica", FormMethod.Post, new { @id = "Form" }))
+    {
+        <form id="myform">
+        <ul>
+            <li>
+                <div class="editor-label">@Html.LabelFor(p => p.id)</div>
+                @Html.TextBoxFor(p => p.id, new { @readonly = "readonly" })
+            </li><li>
+                <div class="editor-label">@Html.LabelFor(p => p.ruc)</div>
+                @Html.TextBoxFor(p => p.ruc)
+                @if (Model != null && Model.ruc == null)
+                {
+                    <div id="validacion">@Html.ValidationMessageFor(p => p.ruc)</div>
+                }
+            </li><li>
+                <div class="editor-label">@Html.LabelFor(p => p.nombre)</div>
+                @Html.TextBoxFor(p => p.nombre)
+                @if (Model != null && Model.nombre == null)
+                {
+                    <div id="validacion">@Html.ValidationMessageFor(p => p.nombre)</div>
+                }
+            </li><li>
+                <div class="editor-label">@Html.LabelFor(p => p.direccion)</div>
+                @Html.TextBoxFor(p => p.direccion)
+                @if (Model != null && Model.direccion == null)
+                {
+                    <div id="validacion">@Html.ValidationMessageFor(p => p.direccion)</div>
+                }
+            </li>
+                @Html.TextBoxFor(p => p.estado, "", new { style = "display:none;" })
+        </ul>
+        <div id="botones">
+            <input type="button" value="Limpiar" id="Limpiar" onclick="location.href = '@(Url.Action("MantenerProveedor", "Logistica"))'" />
+            <input type="submit" value=@(Model == null || Model.id == 0 ? "Insertar" : "Modificar") />
+        </div> 
+        
+         @if (ViewData["message"] == null)
+         { }                                                                                                         
+         else if (ViewData["message"].Equals("F"))
+         {<script type="text/javascript">alert("Lo sentimos!\nNo se pudo realizar la operación.\nVuelva intentarlo en otro momento. ")</script> }
+         else if (ViewData["message"].Equals("E"))
+         { <script type="text/javascript">alert("La operación se realizó con éxito!")</script>} 
+        </form>   
+    }
+       
+</fieldset>
+<div id="kendotable">
+    @(Html.Kendo().Grid<Web.Models.Proveedor>()
+    .Name("Grid")
+    .Columns(columns =>
+    {
+        columns.Bound(p => p.ruc).Sortable(true).Width(100);
+        columns.Bound(p => p.nombre).Sortable(true).Width(200);
+        columns.Bound(p => p.direccion).Sortable(true).Width(200);
+        columns.Command(c => { c.Custom("Editar").Click("onChange"); c.Destroy().Text("Eliminar"); }).Width(200);
+    })
+        .Editable(editable => { editable.Mode(GridEditMode.InLine); editable.DisplayDeleteConfirmation("El regitro será eliminado ¿Desea continuar?"); })
+        .Pageable()
+        .Sortable()
+        .Selectable()
+        .Filterable(filterable => filterable
+        .Extra(false)
+        .Operators(operators => operators
+            .ForString(str => str.Clear()
+                .Contains("Contiene")
+                .StartsWith("Empezar con")
+                .IsEqualTo("Es igual a")
+                .IsNotEqualTo("Diferente a"))
+            .ForNumber(number => number.Clear()
+                .IsGreaterThan("Es mayor a")
+                .IsLessThan("Es menor a")
+                .IsEqualTo("Es igual a")
+                .IsNotEqualTo("Es diferente a"))
+        )
+    )
+    .DataSource(datasource => datasource
+        .Ajax()
+        .Events(events => events.Error("ErrorMessage"))
+        .Model(model => model.Id(p => p.id))
+        .Read(read => read.Action("leerProveedor", "Logistica"))
+        .Destroy(update => update.Action("eliminarProveedor", "Logistica"))
+        )
+    )
+</div>
+
+<script type="text/javascript">
+
+$("#Form").validate({
+		rules: {
+			nombre: {
+                required:true,
+                maxlength:50
+                },
+			direccion:{
+                required: true,
+                maxlength:150
+                },
+			ruc: {
+				required: true,
+                digits: true,
+                maxlength: 11,
+                minlength: 11
+			}
+		},
+		messages: {
+			nombre: {
+                required: "*Campo obligatorio",
+                maxlength: "Tamaño máx. 50 caracteres"
+                },
+			direccion: {
+                required: "*Campo obligatorio",
+                maxlength: "Tamaño máx. 150 caracteres"
+                },
+			ruc: {
+				required: "*Campo obligatorio",
+                digits: "Ingrese solo dígitos",
+                maxlength:"Ingrese 11 dígitos",
+                minlength:"Ingrese 11 dígitos"
+			}
+		},
+        submitHandler: function ConfirmationBox(form) {
+        var result = confirm("¿Está seguro de realizar los cambios?");
+        if (result == true) {
+            form.submit();
+            return true;
+        }
+        else {
+            return false;
+            }
+        }
+});
+
+    function ErrorMessage(e) {
+        alert("A ocurrido un error en el servidor!\nVuelva a intentar la operación en unos minutos...");
+    }
+
+    function onChange(e) {
+
+        e.preventDefault();
+        var grid = $('#Grid').data('kendoGrid');
+        var row = grid.select();
+        var dataItem = grid.dataItem(row);
+        var id = dataItem.id;
+        location = "@Url.Action("modificarProveedor")"+ "?id=" + id;
+    }
+
+//    function nombreFiltro(element) {
+//        element.kendoAutoComplete({
+//            dataSource: {
+//                tr
+//            });
+//            alert(message);
+//        }ansport: {
+//                    read: "@Url.Action("/FilterMenuCustomization_NombreProveedor")"
+//                }
+//            }
+//        });
+//    }
+
+//    function rucFiltro(element) {
+//        element.kendoAutoComplete({
+//            dataSource: {
+//                transport: {
+//                    read: "@Url.Action("/FilterMenuCustomization_RucProveedor")"
+//                }
+//            }
+//        });
+//    }
+
+//    function direccionFiltro(element) {
+//        element.kendoAutoComplete({
+//            dataSource: {
+//                transport: {
+//                    read: "@Url.Action("/FilterMenuCustomization_DireccionProveedor")"
+//                }
+//            }
+//        });
+//    }
+</script>

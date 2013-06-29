@@ -11,7 +11,7 @@
  <legend>Datos del Formulario</legend>  
  @using (Html.BeginForm("InsertarTipoBungalow", "Logistica", FormMethod.Post, new { @id = "Form" }))
  {
-    <form id="myform">
+    <form>
     <ul>
         <li>
             <div class="editor-label">@Html.LabelFor(p => p.id)</div>
@@ -34,8 +34,8 @@
             @Html.TextBoxFor(p => p.nrohabitaciones)
         </li><li>
             @Html.TextBoxFor(p => p.estado, new {@style = "display: none;"})
-
-    </li>
+        </li>
+        
     </ul>
   <div id="botones">
   <input type="button" value= "Limpiar"  id="cancel" onclick="location.href = '@(Url.Action("MantenerTipobungalow", "Logistica"))'" class="button fright"/>
@@ -49,6 +49,8 @@
          {<script type="text/javascript">              alert("Lo sentimos!\nNo se pudo realizar la operación.\nVuelva intentarlo en otro momento. ")</script> }
          else if (ViewData["message"].Equals("E"))
          { <script type="text/javascript">               alert("La operación se realizó con éxito!")</script>} 
+         else if (ViewData["message"].Equals("eliminaTipo"))
+         { <script type="text/javascript">               alert("Lo sentimos!\n No se puede eliminar este Tipo de Bungalows porque ya hay Bungalows asociados a este Tipo")</script>} 
 
   </form> 
  }
@@ -65,7 +67,7 @@
         columns.Bound(p => p.capacidad).Width(150);
             //.Filterable(filterable => filterable.UI("areaFiltro"));
         columns.Bound(p => p.descripcion);
-        columns.Command(command => { command.Custom("Editar").Click("onChange"); command.Destroy().Text("Eliminar"); }).Width(181);
+        columns.Command(command => { command.Custom("Editar").Click("onChange"); command.Custom("Eliminar").Click("elimina"); }).Width(181);
 
     })
      .Editable(editable => { editable.Mode(GridEditMode.InLine); editable.DisplayDeleteConfirmation("El regitro será eliminado ¿Desea continuar?"); })
@@ -100,16 +102,22 @@
 </div>
 
 <script type="text/javascript">
+jQuery.validator.addMethod("accept2", function(value, element, param) {
+  return value.match(new RegExp("^" + param + "$"));
+});
+
 
 $("#Form").validate({
 		rules: {
 			nombre: {
 				required: true,
-                maxlength: 50
+                maxlength: 50,
+                accept2: "[a-zA-ZáéíóúñÑ ]+"
                 },
             descripcion: {
-                requires: true,
-                maxlength: 150
+                required: true,
+                maxlength: 150,
+                accept2: "[a-zA-ZáéíóúñÑ 0-9.,; ]+"
                 },
             capacidad:  {
                 required: true,
@@ -118,7 +126,7 @@ $("#Form").validate({
                 },
             precio: {
                 required: true,
-                digits: true,
+                number: true,
                 range: [0,300]
                 },
             nrohabitaciones: {
@@ -130,11 +138,13 @@ $("#Form").validate({
 		messages: {
 			nombre: {
                 required: "*Campo obligatorio",
-                maxlength: "Tamaño máx. 50 caracteres"
+                maxlength: "Tamaño máx. 50 caracteres",
+                accept2: "Solo se permiten letras"
                 },			
 			descripcion: {
 				required: "*Campo obligatorio",
-                maxlength: "Ingrese 150 caracteres como máximo"     
+                maxlength: "Ingrese 150 caracteres como máximo",
+                accept2: "Esta usando un caracter no permitido"     
 			    },
             capacidad: {
                  required: "*Campo obligatorio",
@@ -143,8 +153,8 @@ $("#Form").validate({
                 },
             precio: {
                  required: "*Campo obligatorio",
-                digits: "Ingrese solo dígitos",
-                range:"Ingrese un numero entre 0 y 300"  
+                 number: "Ingrese solo dígitos",
+                 range:"Ingrese un numero entre 0 y 300"  
                 },
              nrohabitaciones: {
                  required: "*Campo obligatorio",
@@ -168,6 +178,15 @@ $("#Form").validate({
     function ErrorMessage(e) {
             alert("A ocurrido un error en el servidor!\nVuelva a intentar la operación en unos minutos...");
     }
+
+function elimina(e){e.preventDefault();
+    var grid = $('#Grid').data('kendoGrid');
+    var row = grid.select();
+    var dataItem = grid.dataItem(row);
+    var id = dataItem.id;
+    location = "@Url.Action("EliminarTipoBungalow")" + "?id=" + id;}
+
+
 
 
 function onChange(e){

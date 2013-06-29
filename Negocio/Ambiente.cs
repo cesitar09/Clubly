@@ -18,7 +18,7 @@ namespace Negocio
         {
             try
             {
-                ambiente.estado = 1;
+                //ambiente.estado = 1;
                 context().Ambiente.AddObject(ambiente);
                 context().SaveChanges();
             }
@@ -29,9 +29,23 @@ namespace Negocio
             return null;
         }
 
+        //falta fecha
+
+        public static bool HayReserva(short id)
+        {
+            IEnumerable<Datos.ReservaAmbiente> listaReservas = buscarId(id).ReservaAmbiente.Where(p => p.estado == 1);
+            if(listaReservas.Count() > 0) return true; 
+            else
+                return false;
+        }
+
+        
+
+
+
         public static IEnumerable<Datos.Ambiente> seleccionarTodo()
         {
-            IEnumerable<Datos.Ambiente> listaAmbientes = context().Ambiente.Where(p => p.estado == 1);
+            IEnumerable<Datos.Ambiente> listaAmbientes = context().Ambiente.Where(p => p.estado >= 1);
             return listaAmbientes;
         }
 
@@ -43,7 +57,12 @@ namespace Negocio
 
         public static Datos.Ambiente buscarId(short id)
         {
-            return context().Ambiente.Single(p => p.id == id);
+            return context().Ambiente.SingleOrDefault(p => p.id == id && p.estado!=0);
+        }
+        //Ambientes por sede
+        public static IEnumerable<Datos.Ambiente> buscarPorSede(short idSede)
+        {
+            return context().Ambiente.Where(p =>p.Sede.id == idSede );
         }
 
         public static Exception modificar(Datos.Ambiente ambiente)
@@ -68,15 +87,14 @@ namespace Negocio
             return null;
         }
 
-        public static Exception eliminar(Datos.Ambiente ambiente)
+        public static Exception eliminar(short id)
         {
             //Datos.Ambiente amb_eliminado = context().Ambiente.Single(p => p.id == ambiente.id);
             //amb_eliminado.estado = 0;
             //modificar(amb_eliminado);
             try
             {
-                ambiente.estado = 0;
-                context().Ambiente.ApplyCurrentValues(ambiente);
+                buscarId(id).estado = 0;
                 context().SaveChanges();
             }
             catch (Exception ex)
@@ -86,19 +104,29 @@ namespace Negocio
             return null;
         }
 
-        //Cholo aqui esta lo que se me ocurre que se deberia hacer. Habria que llenar datos y probarlo
+        //MÉTODO QUE RETORNA UNA LISTA DE AMBIENTES DISPONIBLES EN UN RANGO DE FECHAS----------
         public static IEnumerable<Datos.Ambiente> SeleccionarDisponibles(DateTime fechaInicial, DateTime fechaFinal)
         {
             IEnumerable<Datos.Ambiente> listaAmbientes = context().Ambiente.Where(a=>a.estado!=0);
             return listaAmbientes.Where(a =>
                 a.ReservaAmbiente.Where(r=>
                     ((r.horaInicio <= fechaInicial && fechaInicial < r.horaFin) ||
-                    (fechaInicial <= r.horaInicio && r.horaInicio < fechaFinal)
-                    )
-                ).ToList().Count!=1);
+                    (fechaInicial <= r.horaInicio && r.horaInicio < fechaFinal)) && r.estado != 0
+                    
+                ).ToList().Count!=0);
         }
+
+        //MÉTODO QUE VERIFICA SI EL AMBIENTE INGRESADO EN EL RANGO DADO ESTA DISPONIBLE O NO---------
+        public static bool AmbienteLibre(DateTime i, DateTime f, short idAmb)
+        {
+            IEnumerable<Datos.Ambiente> listaAmbientesDispobibles = Negocio.Ambiente.SeleccionarDisponibles(i, f);
+            foreach (Datos.Ambiente amb in listaAmbientesDispobibles)
+            {
+                if (amb.id == idAmb)
+                    return false;
+            }
+            return true;
+        }
+
     }
 }
-
-//((r.horaInicio.CompareTo(fechaInicial)>=0) && (r.horaInicio.CompareTo(fechaFinal)<=0))  ||
-//                     ((r.horaFin.CompareTo(fechaInicial)>=0) && (r.horaFin.CompareTo(fechaFinal)<=0)) 

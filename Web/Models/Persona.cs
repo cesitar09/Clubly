@@ -14,28 +14,28 @@ namespace Web.Models
         public short id { get; set; }
 
         [Required(ErrorMessage = " Ingrese un nombre")]
-        [Display(Name = "Nombre")]
+        [Display(Name = "*Nombre")]
         
         public string nombre { get; set; }
 
         [Required(ErrorMessage = " Ingrese un apellido paterno")]
-        [Display(Name = "Ap. Paterno")]
+        [Display(Name = "*Ap. Paterno")]
         public string apPaterno { get; set; }
 
         [Required(ErrorMessage = " Ingrese un apellido materno")]
-        [Display(Name = "Ap. Materno")]
+        [Display(Name = "*Ap. Materno")]
         public string apMaterno { get; set; }
 
         [Required(ErrorMessage = " Ingrese DNI")]
-        [Display(Name = "DNI")]
+        [Display(Name = "*DNI")]
         public Int32 dni { get; set; }
 
         [Required(ErrorMessage = " Ingrese una direccion")]
-        [Display(Name = "Dirección")]
+        [Display(Name = "*Dirección")]
         public string direccion { get; set; }
 
         [Required(ErrorMessage = " Seleccione una opcion")]
-        [Display(Name = "Estado Civil")]
+        [Display(Name = "*Estado Civil")]
         public string estadoCivil { get; set; }
 
         [Required]
@@ -133,11 +133,8 @@ namespace Web.Models
             return ConvertirLista(Negocio.Persona.seleccionarTodo());
         }
 
-        public static int eliminar(Models.Persona persona){
-            if (Negocio.Persona.eliminar(Invertir(persona)) == null)
-                return 1;
-            else
-                return 0;   
+        public static void eliminar(Models.Persona persona){
+            Negocio.Persona.eliminar(Invertir(persona));
             
         }
     }

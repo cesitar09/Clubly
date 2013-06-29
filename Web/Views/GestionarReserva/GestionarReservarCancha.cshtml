@@ -8,14 +8,32 @@
 
 <fieldset>
     <legend>Datos del Usuario</legend>
-    <form id= "Form1">
+    <form id= "Form1" >
         <ul>
             <li>
-                <div id="editor-label">@Html.LabelFor(p => p.familia.id)</div>
-                @Html.TextBoxFor(p => p.familia.id)
+                <div id="editor-label">@Html.LabelFor(p => p.idFamilia)</div>
+                @(Html.Kendo().AutoCompleteFor(p => p.familia.id)
+                        //.Name("AutocompleteId")
+                        //.BindTo("familia.id")
+                        //.DataTextField("familia.id")
+                        .Filter("Contiene")
+                        .HighlightFirst(true)
+                        .MinLength(3)
+                        .HtmlAttributes(new { style = "width:155px" })
+                        .DataSource(source =>
+                        {
+                            source.Read(read =>
+                            {
+                                read.Action("LeerIdFamilia", "GestionarReserva");
+                            })
+                            .ServerFiltering(true);
+                        })
+                           .Events(e => e.Close("InsertarNomUsuario"))
+                )
+
             </li><li>
-                <div id="editor-label">@Html.LabelFor(p => p.familia.usuario.nomUsuario)</div>
-                @Html.TextBox("nombreBox", null, new {@readonly = "readonly"})
+                <div id="editor-label">@Html.Label("Familia")</div>
+                @Html.TextBox("nombreBox", null, new { @readonly = "readonly" })
             </li>
         </ul>
      </form>
@@ -23,43 +41,72 @@
 
 <fieldset>
     <legend>Datos de la reserva</legend>
-    @using (Html.BeginForm("IngresarReservaCancha", "Reservas", FormMethod.Post, new { @id = "Form2" }))
+    @using (Html.BeginForm("IngresarReservaCancha", "GestionarReserva", FormMethod.Post, new { @id = "Form2" }))
     {
-        <form><ul>
-            <li class="long">
+        <form id="Form"><ul>
+            <li>
+                @Html.TextBoxFor(p => p.idFamilia, null, new { style = "display: none;" })        
+            </li><li class="long">
                 <div id="editor-label">@Html.LabelFor(p => p.id)</div>
                 @Html.TextBoxFor(p => p.id, new { @readonly = "readonly" })
             </li><li>
-                <div id="editor-label">@Html.Label("Sede")</div>
-                @(Html.Kendo().DropDownList()
-                .Name("sedeBox")
+                <div id="editor-label">@Html.LabelFor(p=> p.idSede)</div>
+                @(Html.Kendo().DropDownListFor(p => p.idSede)
+                .HtmlAttributes(new { id = "categoriaSede" })
+                //.Name("categoriaSede")
                 .OptionLabel("--Seleccionar--")
                 .DataTextField("nombre")
                 .DataValueField("id")
                 .AutoBind(true)
-                .BindTo(Sede.SeleccionarTodo())
-                .Enable(false)
-                )
+                //.BindTo(Sede.SeleccionarTodo())
+                .DataSource(source => {
+                    source.Read(read =>
+                    {
+                        read.Action("LeerSedes", "GestionarReserva");
+                    }); 
+                })
+                );
+                
              </li><li><div id="editor-label">@Html.LabelFor(p => p.fechaInicio)</div>
                 @(Html.Kendo().DatePickerFor(p => p.fechaInicio)
-                .HtmlAttributes(new { style = "width:150px" })
-                .Min(new DateTime(1990, 1, 1))
+                .HtmlAttributes(new { style= "width:150px"})
+                .Min(DateTime.Today)
                 .Max(new DateTime(2020, 12, 31))
-            //.Value(DateTime.Today)
+                //.Value(DateTime.Today)
                 .Events(e => e.Change("startChange"))
             )
             </li><li>
-                <div id="editor-label">@Html.Label("Tipo de cancha")</div>
+                <div id="editor-label">@Html.LabelFor(p=>p.idTipoCancha)</div>
                 @(//var tipo Box = //Si se usa la asignación y el render, el @ debe envolver con {} y no con ()
-                    Html.Kendo().DropDownList()
-                    .Name("tipoBox")
+                    Html.Kendo().DropDownListFor(p => p.idTipoCancha)
+                .HtmlAttributes(new { id = "categoriaTipo" })
+                    //.Name("categoriaTipo")
                     .OptionLabel("--Seleccionar--")
                     .DataTextField("nombre")
                     .DataValueField("id")
-                    .BindTo(TipoCancha.SeleccionarTodo())
-                    .Enable(false)//;
-            //tipoBox.Render();
-                )
+                    //.BindTo(TipoCancha.SeleccionarTodo())
+                    //tipoBox.Render();
+                    .DataSource(source =>
+                    {
+                     source.Read(read =>
+                    {
+                        read.Action("LeerTipoCancha", "GestionarReserva")
+                            .Data("filterSede");
+                    })
+                    .ServerFiltering(true);
+                    })
+                    .Enable(false)
+                    .AutoBind(false)
+                .CascadeFrom("categoriaSede")
+             )
+             <script>
+                 function filterSede() {
+                     return {
+                         idSede: $("#categoriaSede").val()
+                     };
+                 }
+            </script>
+  
              </li><li><div id="editor-label">@Html.LabelFor(p => p.horaInicio)</div>
                 @(Html.Kendo().TimePickerFor(p => p.horaInicio)
                 .HtmlAttributes(new { style = "width:150px" })
@@ -69,20 +116,36 @@
             </li><li>
                 <div id="editor-label">@Html.Label("Número de cancha")</div>
                 @(Html.Kendo().DropDownListFor(p => p.idCancha)
+                //.Name("categoriaNumero")
                 .OptionLabel("--Seleccionar--")
-                .DataTextField("descripcion")
+                .DataTextField("numero")
                 .DataValueField("id")
                 .AutoBind(false)
-                .BindTo(Cancha.SeleccionarTodo())   //En vez de bind debería usar DataSource
-            /*.DataSource(source =>{
-                source.Read(read =>
+                //.BindTo(Cancha.SeleccionarTodo())   //En vez de bind debería usar DataSource
+                .DataSource(source =>
                 {
-                    read.Action("getCascadeNumeros", "Reservas",
-                    new { tipoCancha = "1" });             //Valor constante. Debería ser tipoBox.ToComponent().Value pero ese valor no lee.
-                });
-            })*/
-            //.CascadeFrom("tipoBox") //Permite que el dropdown se active sólo al haber elegido en tipoBox pero filtra mal si se deja BindTo.
+                  source.Read(read =>
+                {
+                    read.Action("LeerNumeroCancha", "GestionarReserva")
+                        .Data("filterNumero");
+                })
+               .ServerFiltering(true);
+                })
+                .Enable(false)
+                .AutoBind(false)
+                .CascadeFrom("categoriaTipo")
+                
                 )
+                 <script>
+                     function filterNumero() {
+                         return {
+                             idTipo: $("#categoriaTipo").val(),
+                             idSede: $("#categoriaSede").val()
+                         };
+                     }
+                  </script>
+
+
             </li><li><div id="editor-label">@Html.LabelFor(p => p.horaFin)</div>
                 @(Html.Kendo().TimePickerFor(p => p.horaFin)
                 .HtmlAttributes(new { style = "width:150px" })
@@ -91,23 +154,36 @@
             </li>   
         </ul>
         <div id="botones">
-            <input type="button" value="Ver canchas" onclick="Javascript: AbrirPopup()"/>
-            <input type="button" value="Limpiar" id="Limpiar" onclick="location.href = '@(Url.Action("ReservarCancha", "Reservas"))'" />
+            <input type="button" value="Limpiar" id="Limpiar" onclick="location.href = '@(Url.Action("GestionarReservarCancha", "GestionarReserva"))'" />
             <input type="submit" value=@(Model == null || Model.id == 0 ? "Reservar" : "Modificar") />
         </div>
         
         @if (ViewData["message"] == null)
         { }
         else if (ViewData["message"].Equals("F"))
-        {<script type="text/javascript">             alert("Lo sentimos!\nNo se pudo realizar la operación.\nVuelva intentarlo en otro momento. ")</script> }
+        {<script type="text/javascript">             alert("Lo sentimos!\n No se pudo realizar la operación.\nVuelva intentarlo en otro momento. ")</script> }
         else if (ViewData["message"].Equals("R"))
-        { <script type="text/javascript">              alert("Se acaba de registrar su Entrada")</script>}
+        { <script type="text/javascript">              alert("El registro se realizo con éxito")</script>}
         else if (ViewData["message"].Equals("ND"))
-        { <script type="text/javascript">              alert("Cancha no disponible")</script>}
+        { <script type="text/javascript">              alert("Cancha no disponible, Intente en otro horario")</script>}
         else if (ViewData["message"].Equals("NDT"))
         { <script type="text/javascript">              alert("No se encuentra ninguna Cancha Disponible, lo sentimos. Intente de nuevo")</script>}
         else if (ViewData["message"].Equals("HNV"))
-        { <script type="text/javascript">              alert("Las horas no son validad por favor ingresar correctamente")</script>}
+        { <script type="text/javascript">              alert("Las horas no son validas por favor ingresar correctamente")</script>}
+        else if (ViewData["message"].Equals("ML"))
+        { <script type="text/javascript">              alert("Las horas exceden el maximo permitido")</script>}
+        else if (ViewData["message"].Equals("CV"))
+        { <script type="text/javascript">              alert("La reserva no se puede cancelar ya que se encuentra Vencida")</script>}
+        else if (ViewData["message"].Equals("CC"))
+        { <script type="text/javascript">              alert("La reserva no se puede cancelar ya que se encuentra Cancelada")</script>}
+        else if (ViewData["message"].Equals("CVM"))
+        { <script type="text/javascript">              alert("Excedio la cantidad maxima de reservas al dia")</script>}
+        else if (ViewData["message"].Equals("EV"))
+        { <script type="text/javascript">              alert("La reserva no se puede editar ya que se encuentra Vencida")</script>}
+        else if (ViewData["message"].Equals("EC"))
+        { <script type="text/javascript">              alert("La reserva no se puede editar ya que se encuentra Cancelada")</script>}
+        else if (ViewData["message"].Equals("EN"))
+        { <script type="text/javascript">              alert("Codigo de Usuario incorrecto, por favor vuelvalo a intentar ")</script>}                                                                                                                        
     </form>
 
     }
@@ -118,22 +194,25 @@
         .Name("Grid")
         .Columns(columns =>
         {
-            columns.Bound(p => p.cancha.descripcion);
-            columns.Bound(p => p.familia.id);
-            columns.Bound(p => p.horaInicio).Format("{0:dd/MM/yyyy}");
+            //columns.Bound(p => p.cancha.descripcion);
+            columns.Bound(p => p.familia.id).Title("Fam.");
+            columns.Bound(p => p.cancha.sede.nombre).Title("Sede");
+            columns.Bound(p => p.cancha.numero).Title("Num. Cancha");
+            columns.Bound(p => p.fechaInicio).Format("{0:dd/MM/yyyy}").Title("Fecha Inicio");
+            columns.Bound(p => p.horaInicio).Format("{0:HH:mm}").Title("Hora Inicio").Filterable(false).Sortable(false);
+            columns.Bound(p => p.horaFin).Format("{0:HH:mm}").Title("Hora Fin").Filterable(false).Sortable(false);
             columns.Bound(p => p.estado);
-            columns.Command(c => { c.Custom("Editar").Click("EditarPerfil"); c.Custom("Cancelar").Click("Cancelar"); });
+            columns.Command(c => { c.Custom("Editar").Text("<span class='k-icon k-edit'></span>").Click("EditarPerfil"); c.Custom("Cancelar").Click("Cancelar"); });
         }
         )
         .Pageable()
         .Sortable()
         .Filterable(filterable => filterable
+        .Extra(false)
         .Operators(operators => operators
             .ForString(str => str.Clear()
                 .Contains("Contiene")
-                .StartsWith("Empezar con")
-                .IsEqualTo("Es igual a")
-                .IsNotEqualTo("Diferente a"))
+                .StartsWith("Empezar con"))
             .ForNumber(number => number.Clear()
                 .IsGreaterThan("Es mayor a")
                 .IsLessThan("Es menor a")
@@ -142,9 +221,10 @@
         )
        )
        .DataSource(d => d.Ajax()
-            .Read(r => r.Action("LeerReservasCanchas", "Reservas"))
+            .Read(r => r.Action("LeerReservasCanchas", "GestionarReserva"))
             .Events(events => events.Error("ErrorMessage"))
-            .Model(m => m.Id(p => p.id))
+           //.Model(m => m.Id(p => p.id))
+            .PageSize(10)
             )
             .Selectable()
     )
@@ -169,6 +249,34 @@
         var id = dataItem.id;
         location = "@Url.Action("CancelarReservaCancha")" + "?id=" + id;
     }
+
+    function InsertarNomUsuario(e) {
+        var dataItem = this.value();
+        document.getElementsByName('idFamilia')[0].value = dataItem;
+        buscarnombre(dataItem);
+    }
+
+     function buscarnombre(value) {
+        $.ajax({
+            url: '@Url.Action("BuscarId")',
+            type: 'POST',
+            datatype: "json",
+            traditional: true,
+            data: {
+                id: JSON.stringify(value),
+            },
+            success: function(persona){
+                var str = persona.apPaterno + " " + persona.apMaterno
+                document.getElementsByName('nombreBox')[0].value = str.toUpperCase();
+
+            },
+            error: function (event, request, settings) {
+                models = [];
+                window.alert("Debe ingresar una familia válido");
+            },
+            timeout: 20000
+        });
+    }
 </script>
 
 
@@ -182,7 +290,7 @@
 
 
 <script type="text/x-kendo-template" id="template2">
-    <img src="../Images/User.png"alt="Artek Alvar Aalto - Armchair 402" />
+    <img src="../Content/img/mapa-canchas.jpg" />
 </script>
 
 
@@ -192,6 +300,16 @@
 $("#Form2").validate({
         ignore: "", 
 		rules: {
+             idSede:   {
+                required: true
+                },
+             idTipoCancha:   {
+                required: true
+                },
+             fechaInicio:  {
+                required: true
+                },
+
             horaInicio:  {
                 required: true
                 },
@@ -200,8 +318,24 @@ $("#Form2").validate({
                 
                 },
 
+            idFamilia: {
+                  required: true,
+                  digits : true,
+                  minlength: 5,
+                  maxlength: 5        
+                },
+
             },
 		messages: {	
+             idSede:  {
+                required: "*Campo obligatorio"
+                },
+             idTipoCancha:  {
+                required: "*Campo obligatorio"
+                },
+            fechaInicio:  {
+                required: "*Campo obligatorio"
+                },
             horaInicio: {
                  required: "*Campo obligatorio"
                  
@@ -210,7 +344,14 @@ $("#Form2").validate({
                  required: "*Campo obligatorio"
                  
                 },
-             
+           
+           idFamilia: {
+                required: "*Campo Obligatorio",
+                  digits : "Solo se permiten digitos",
+                  minlength: "El codigo debe tener 5 digitos",
+                  maxlength: "El codigo debe tener 5 digitos"             
+                },
+
 		},
         submitHandler: function ConfirmationBox(form) {
         var result = confirm("¿Está seguro de realizar los cambios?");
@@ -224,6 +365,8 @@ $("#Form2").validate({
         }
 		
 });
+
+
 
     var detailsTemplate = kendo.template($("#template2").html());
     function AbrirPopup() {

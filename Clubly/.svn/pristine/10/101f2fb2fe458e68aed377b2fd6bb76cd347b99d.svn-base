@@ -1,0 +1,127 @@
+﻿@model Web.Models.ReservaCancha
+@using Web.Models
+@{
+    ViewBag.Title = "Reservar cancha";
+}
+
+<h1>@ViewBag.Title</h1>
+
+<fieldset>
+    <legend>Datos de la reserva</legend>
+    @using (Html.BeginForm("IngresarReservaCancha", "Reservas", FormMethod.Post, new { @id = "form" }))
+    {
+        <ul>
+            <li>
+                @Html.Label("Sede")
+                @(Html.Kendo().ComboBox()
+                .Name("sedeBox")
+                .DataTextField("nombre")
+                .DataValueField("id")
+                .Filter("startsWith")
+                .Placeholder("--Seleccionar--")
+                .Suggest(true)
+                .BindTo(Sede.SeleccionarTodo())
+                )
+             </li><li>
+                @Html.LabelFor(p => p.horaInicio)
+                @Html.TextBox("horainicio")
+             </li><li>
+                @Html.Label("Tipo de cancha")
+                @(Html.Kendo().ComboBox()
+                .Name("tipoCanchaBox")
+                .DataTextField("nombre")
+                .DataValueField("id")
+                .Filter("startsWith")
+                .Placeholder("--Seleccionar--")
+                .Suggest(true)
+                .BindTo(TipoCancha.SeleccionarTodo())
+                )
+             </li><li>
+                @Html.LabelFor(p => p.horaFin)
+                @Html.TextBox("horafin")
+             </li><li>
+                @Html.LabelFor(p => p.fechaAux)
+                @Html.TextBox("fecha")
+             </li><li>
+                @Html.Label("Número de cancha")
+                @(Html.Kendo().ComboBox()
+                .Name("numeroBox")
+                .DataTextField("descripcion")
+                .DataValueField("id")
+                .Filter("startsWith")
+                .Placeholder("--Seleccionar--")
+                .Suggest(true)
+                /*BindTo() Depende de la sede y el tipo de cancha elegidos. 
+                 * No sé si el query se puede hacer en cualquier momento
+                 * Ni cómo referirme a los otros combo box
+                 */
+                )
+             </li>
+        </ul>
+        <div id="botones">
+            <input type="button" value="Ver canchas" onclick="Javascript: AbrirPopup()"/>
+            <input type="button" value="Limpiar" id="Limpiar" onclick="location.href = '@(Url.Action("ReservarCancha", "Reservas"))'" />
+            <input type="submit" value="Reservar" />
+        </div>
+    }
+</fieldset>
+
+<div id="kendotable">
+    @(Html.Kendo().Grid<Web.Models.ReservaCancha>()
+        .Name("Grid")
+        .Columns(columns =>
+        {
+            columns.Bound(p => p.cancha);
+            columns.Bound(p => p.familia);
+            columns.Bound(p => p.horaInicio);
+            columns.Bound(p => p.estado);
+            columns.Command(c => { c.Custom("Editar").Click("EditarReservaCancha"); c.Custom("Cancelar").Click("CancelarReservaCancha"); });
+        }
+        )
+        .Pageable()
+        .Sortable()
+        .Filterable(filterable => filterable
+        .Operators(operators => operators
+            .ForString(str => str.Clear()
+                .Contains("Contiene")
+                .StartsWith("Empezar con")
+                .IsEqualTo("Es igual a")
+                .IsNotEqualTo("Diferente a"))
+            .ForNumber(number => number.Clear()
+                .IsGreaterThan("Es mayor a")
+                .IsLessThan("Es menor a")
+                .IsEqualTo("Es igual a")
+                .IsNotEqualTo("Es diferente a"))
+        )
+       )
+       .DataSource(d => d.Ajax()
+            .Read(r => r.Action("LeerReservasCanchas", "Reservas"))
+            .Events(events => events.Error("ErrorMessage"))
+            .Model(m => m.Id(p => p.id))
+            )
+            .Selectable()
+    )
+</div>
+
+@(Html.Kendo().Window().Name("Canchas")
+    .Title("Mapa de canchas")
+    .Visible(false)
+    .Modal(true)
+    .Draggable(true)
+    .Resizable()    
+)
+
+<script type="text/javascript">
+    var detailsTemplate = kendo.template($("#template2").html());
+    function AbrirPopup() {
+        var i = 0;
+        var wnd = $("#Canchas").data("kendoWindow");
+        wnd.content(detailsTemplate);
+
+        wnd.center().open();
+    }
+</script>
+
+<script type="text/x-kendo-template" id="template2">
+        @(Html.Kendo().DatePicker().Name("Hola"))
+</script>

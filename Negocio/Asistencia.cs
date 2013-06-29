@@ -60,15 +60,7 @@ namespace Negocio
                     DateTime fecha = DateTime.Today;
                     TimeSpan hora = DateTime.Now.TimeOfDay;
                     IEnumerable<Datos.Asistencia> listaAsistencia = Negocio.Asistencia.SeleccionarAsistencia();
-                    //////////
-                        //DateTime fecha2 = DateTime.Now;
-                        //string lines = "\n Se paso asistencia      "+ nombre +"       "+ fecha2.ToString();   
-                        //System.IO.StreamWriter file = new System.IO.StreamWriter("C:/Users/James/Desktop/LOOOG.txt",true);
-                        //file.WriteLine(lines);
-
-                        //file.Close();
-                     /////////
-
+                   
                     Datos.Asistencia asist = listaAsistencia.SingleOrDefault(a => ((a.fecha.Day == fecha.Day) && (a.fecha.Month == fecha.Month) && (a.fecha.Year == fecha.Year) && (a.Empleado.id == idEmpleado)));
                     if (asist == null)
                     {
@@ -87,9 +79,13 @@ namespace Negocio
                         Datos.Asistencia asistencia = listaAsistencia.SingleOrDefault(a => ((a.fecha.Day == fecha.Day) && (a.fecha.Month == fecha.Month) && (a.fecha.Year == fecha.Year) && (a.Empleado.id == idEmpleado) && (a.horaSalida == null)));
                         if (asistencia != null)
                         {
+                            string horaFinTurno = hora.ToString("hh");
+                            string horaInicioTurno =  asistencia.horaEntrada.ToString("hh");
+                            if( (Convert.ToInt32(horaFinTurno)-Convert.ToInt32(horaInicioTurno)) >= 4 ){
                             asistencia.horaSalida = hora;
                             context().SaveChanges();
                             return 2;
+                            }else return 5;
                         }
                     }
                     return 4;  

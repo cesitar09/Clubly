@@ -38,6 +38,10 @@ namespace Web.Models
         [DisplayName("Estado")]
         public short estado { get; set; }
 
+
+        //Solo se utiliza para el reporte de finanzas
+        public double porcentaje { get; set; }
+
         public ConceptoDePago()
         {
         }

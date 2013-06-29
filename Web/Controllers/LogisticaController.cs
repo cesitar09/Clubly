@@ -10,13 +10,16 @@ using Kendo.Mvc.UI;
 using Web.Controllers;
 using Web.Models;
 using System.Data;
+using System.IO;
 using System.Data.SqlClient;
 using Negocio.Util;
 using System.ComponentModel.DataAnnotations;
+using Web.Util;
+using System.Net;
 
 namespace Web.Controllers
 {
-    
+    [HandleError]
     public class LogisticaController : Controller
     {
         //
@@ -32,47 +35,64 @@ namespace Web.Controllers
             return Json(result);
         }
 
-        public ActionResult eliminarAmbiente([DataSourceRequest] DataSourceRequest request, Web.Models.Ambiente amb)
+        public ActionResult Leer_EstadosAmbiente()
         {
-            if (amb != null)
-            {
-                Ambiente.eliminarAmbiente(amb);
-            }
-            return Json(ModelState.ToDataSourceResult());
+            IEnumerable<Models.Ambiente.Estado_Ambiente> Listaestados = Models.Ambiente.listestadoamb.ToList();
+            return Json(Listaestados, JsonRequestBehavior.AllowGet);    
         }
 
+        public ActionResult eliminarAmbiente([DataSourceRequest] DataSourceRequest request, Web.Models.Ambiente amb)
+        {
+
+
+            if (Models.Ambiente.HayReserva(amb) == false) {
+                if (amb != null)
+                {
+                    Models.Ambiente.eliminarAmbiente(amb.id);
+                }
+            }
+            else ViewData["message"] = "ELIMINA";
+            
+            return View("MantenerAmbiente", amb);
+               
+        }
+        
         public ActionResult modificarAmbiente(Web.Models.Ambiente amb)
         {
             amb = Ambiente.SeleccionarporId(amb.id);
 
+            ViewData["sedeSeleccionarTodo"] = Sede.SeleccionarTodo();
+            ViewData["listaEstadosAmbiente"] = Ambiente.listestadoamb;
+            ViewData["ambienteSeleccionarTodo"] = Ambiente.SeleccionarTodo();
             return View("MantenerAmbiente", amb);
 
         }
 
-
         [HttpPost]
         public ActionResult agregarAmbiente(Web.Models.Ambiente amb)
         {
-            if(amb != null){
+            try
+            {
                 if (amb.id == 0)
                 {
-                    amb.estado = ListaEstados.ESTADO_ACTIVO;
-                    if(Ambiente.insertarAmbiente(amb) == 1)
-                    {
-                        ViewData["message"] = "E";
-                    }
-                    else { ViewData["message"] = "F"; }
+                    Ambiente.insertarAmbiente(amb);
                 }
                 else
                 {
-                    if (Ambiente.modificarAmbiente(amb) == 1)
-                    {
-                        ViewData["message"] = "E";
-                    }
-                    else { ViewData["message"] = "F"; }
+                    Ambiente.modificarAmbiente(amb);
                 }
             }
-            
+            catch (SqlException)
+            {
+                ViewData["message"] = TransactionMessages.SQL_EXCEPTION_MESSAGE;
+            }
+            catch (EntityException)
+            {
+                ViewData["message"] = TransactionMessages.ENTITY_EXCEPTION_MESSAGE;
+            }
+            ViewData["sedeSeleccionarTodo"] = Sede.SeleccionarTodo();
+            ViewData["listaEstadosAmbiente"] = Ambiente.listestadoamb;
+            ViewData["ambienteSeleccionarTodo"] = Ambiente.SeleccionarTodo();
             return View("MantenerAmbiente", amb);
         }
 
@@ -96,9 +116,16 @@ namespace Web.Controllers
         [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
         public ActionResult MantenerAmbiente(Web.Models.Ambiente amb)
         {
-            ViewData["message"] = null;
+            ViewData["sedeSeleccionarTodo"] = Sede.SeleccionarTodo();
+            ViewData["listaEstadosAmbiente"] = Ambiente.listestadoamb;
+            ViewData["ambienteSeleccionarTodo"] = Ambiente.SeleccionarTodo();
             return View((IView)null);
         }
+
+
+        //Validar Ambiente para no Eliminarlos
+
+       
 
 
         
@@ -124,12 +151,15 @@ namespace Web.Controllers
 
         public ActionResult eliminarSede ([DataSourceRequest] DataSourceRequest request, Web.Models.Sede sede)
         {
-            if (sede != null)
+            if (Models.Sede.HayAmbBung(sede) == false)
             {
-                Sede.eliminarSede(sede);
+                if (sede != null)
+                {
+                    Sede.eliminarSede(sede);
+                }
             }
-
-            return Json(ModelState.ToDataSourceResult());
+            else ViewData["message"] = "ELIMINA";
+            return View("MantenerSede", sede);
         }
 
         public ActionResult habilitarSede([DataSourceRequest] DataSourceRequest request, Web.Models.Sede sede)
@@ -158,19 +188,25 @@ namespace Web.Controllers
                     if (sede.id == 0)
                     {
                         sede.estado = ListaEstados.ESTADO_ACTIVO;
-                        if (Sede.insertarSede(sede) == 1)
+                        try
                         {
+                            int nuevoId=Sede.insertarSede(sede);
                             ViewData["message"] = "E";
+                        }catch(Exception){
+                            ViewData["message"] = "F";
                         }
-                        else { ViewData["message"] = "F"; }
                     }
                     else
                     {
-                        if (Sede.modificarSede(sede) == 1)
+                        try
                         {
+                            Sede.insertarSede(sede);
                             ViewData["message"] = "E";
                         }
-                        else { ViewData["message"] = "F"; }
+                        catch (Exception)
+                        {
+                            ViewData["message"] = "F";
+                        }
                     }
             }
             return View("MantenerSede", sede);           
@@ -184,6 +220,21 @@ namespace Web.Controllers
            // return Json(result);
        // }
 
+
+        public ActionResult SubirImagenSede(HttpPostedFileBase file)
+        {
+            if (file != null && file.ContentLength > 0)
+            {
+                // extract only the fielname
+                var fileExtension = Path.GetExtension(file.FileName);
+                var fileName =fileExtension;
+                // store the file inside ~/App_Data/uploads folder
+                var path = Path.Combine(Server.MapPath("~/Content/img"), fileName);
+                file.SaveAs(path);
+            }
+            // redirect back to the index action to show the form once again
+            return View();
+        }
      
 
 
@@ -219,9 +270,23 @@ namespace Web.Controllers
         [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
         public ActionResult MantenerConcesionario(Web.Models.Concesionario concesionario)
         {
-
-            ViewData["message"] = null;
-            return View((IView)null);
+            try
+            {
+                ViewData["sedeSeleccionarTodo"] = Sede.SeleccionarTodo();
+                return View((IView)null);
+            }
+            catch (SqlException)
+            {
+                ViewData["message"] = TransactionMessages.SQL_EXCEPTION_MESSAGE;
+                ViewData["sedeSeleccionarTodo"] = null;
+                return View((IView)null);
+            }
+            catch (EntityException)
+            {
+                ViewData["message"] = TransactionMessages.ENTITY_EXCEPTION_MESSAGE;
+                ViewData["sedeSeleccionarTodo"] = null;
+                return View((IView)null);
+            }
         }
 
         [AcceptVerbs(HttpVerbs.Post)]
@@ -242,52 +307,104 @@ namespace Web.Controllers
                 if (concesionario.id > 0)
                 {
                     Concesionario.modificar(concesionario);
-                    return View("MantenerConcesionario", concesionario);
+                    ViewData["message"] = TransactionMessages.OK_CHANGE_DATA_MESSAGE;
                 }
                 else
                 {
                     concesionario.estado = ListaEstados.ESTADO_ACTIVO;
                     Concesionario.insertar(concesionario);
-                    return View("MantenerConcesionario", concesionario);
+                    ViewData["message"] = TransactionMessages.OK_ADD_DATA_MESSAGE;
                 }
-
-            }
-            catch (ConstraintException)
-            {
+                ViewData["enlistarSedes"] = Sede.Enlistar(concesionario.sedes);
+                ViewData["sedeSeleccionarTodo"] = Sede.SeleccionarTodo();
                 return View("MantenerConcesionario", concesionario);
             }
             catch (SqlException)
             {
-                return View("MantenerConcesionario", concesionario);
+                ViewData["message"] = TransactionMessages.SQL_EXCEPTION_MESSAGE;
+                ViewData["sedeSeleccionarTodo"] = null;
+                return View("MantenerConcesionario", (IView)null);
             }
-            catch (ValidationException)
+            catch (EntityException)
             {
-                return View("MantenerConcesionario", concesionario);
+                ViewData["message"] = TransactionMessages.ENTITY_EXCEPTION_MESSAGE;
+                ViewData["sedeSeleccionarTodo"] = null;
+                return View("MantenerConcesionario", (IView)null);
             }
+
         }
 
         public ActionResult EditarConcesionario(Web.Models.Concesionario concesionario)
         {
-            concesionario = Concesionario.buscarId(concesionario.id);
-            return View("MantenerConcesionario", concesionario);
+            try
+            {
+                concesionario = Concesionario.buscarId(concesionario.id);
+                ViewData["enlistarSedes"] = Sede.Enlistar(concesionario.sedes);
+                ViewData["sedeSeleccionarTodo"] = Sede.SeleccionarTodo();
+                return View("MantenerConcesionario", concesionario);
+            }
+            catch(SqlException)
+            {
+                ViewData["message"] = TransactionMessages.SQL_EXCEPTION_MESSAGE;
+                ViewData["sedeSeleccionarTodo"] = null;
+                return View("MantenerConcesionario", (IView)null);
+            }
+            catch (EntityException)
+            {
+                ViewData["message"] = TransactionMessages.ENTITY_EXCEPTION_MESSAGE;
+                ViewData["sedeSeleccionarTodo"] = null;
+                return View("MantenerConcesionario", (IView)null);
+            }
+            catch (InvalidOperationException)
+            {
+                ViewData["message"] = TransactionMessages.SINGLE_NOT_FOUND_MESSAGE;
+                ViewData["sedeSeleccionarTodo"] = null;
+                return View("MantenerConcesionario", (IView)null);
+            }
         }
 
         public ActionResult LeerConcesionario([DataSourceRequest] DataSourceRequest request)
         {
+            try
+            {
                 IEnumerable<Models.Concesionario> lista = Concesionario.SeleccionarTodo();
                 DataSourceResult result = lista.ToDataSourceResult(request);
                 return Json(result);
+            }
+            catch (EntityException)
+            {
+                Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                return Json("");
+            }
         }
 
         public ActionResult EliminarConcesionario(Web.Models.Concesionario concesionario)
         {
-            Concesionario.eliminar(concesionario);
-            return View("MantenerConcesionario", concesionario);
-        }
-
-        public IEnumerable<String> EnlistarSedes()
-        {
-            return Concesionario.listaSedes();
+            try
+            {
+                Concesionario.eliminar(concesionario.id);
+                ViewData["sedeSeleccionarTodo"] = Sede.SeleccionarTodo();
+                ViewData["concesionarioSeleccionarTodo"] = Concesionario.SeleccionarTodo();
+                return View("MantenerConcesionario", concesionario);
+            }
+            catch (SqlException)
+            {
+                ViewData["message"] = TransactionMessages.SQL_EXCEPTION_MESSAGE;
+                ViewData["sedeSeleccionarTodo"] = null;
+                return View("MantenerConcesionario", (IView)null);
+            }
+            catch (EntityException)
+            {
+                ViewData["message"] = TransactionMessages.ENTITY_EXCEPTION_MESSAGE;
+                ViewData["sedeSeleccionarTodo"] = null;
+                return View("MantenerConcesionario", (IView)null);
+            }
+            catch (InvalidOperationException)
+            {
+                ViewData["message"] = TransactionMessages.SINGLE_NOT_FOUND_MESSAGE;
+                ViewData["sedeSeleccionarTodo"] = null;
+                return View("MantenerConcesionario", (IView)null);
+            }
         }
 
         //CONTROLADOR DE PROVEEDOR//****************************************
@@ -385,6 +502,21 @@ namespace Web.Controllers
         }
         //******************************************************************BUNGALOWS
 
+        public ActionResult SubirImagenBugalow(HttpPostedFileBase file)
+        {
+            if (file != null && file.ContentLength > 0)
+            {
+                // extract only the fielname
+                var fileName = Path.GetFileName(file.FileName);
+                //var fileName = id.ToString() + fileExtension;
+                // store the file inside ~/App_Data/uploads folder
+                var path = Path.Combine(Server.MapPath("~/Content/img"), fileName);
+                file.SaveAs(path);
+            }
+            // redirect back to the index action to show the form once again
+            return View(); 
+        }
+
         [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
         public ActionResult MantenerBungalow(Web.Models.Bungalow bungalow)
         {
@@ -399,12 +531,15 @@ namespace Web.Controllers
             {
                 if (bungalow.id == 0)
                 {
-                    //bungalow.estado = ListaEstados.ESTADO_ACTIVO;
-                    if (Bungalow.insertarBungalow(bungalow) == 1)
-                    {
-                        ViewData["message"] = "E";
+                    if (Models.Bungalow.ExisteNumero(bungalow)==false){
+                        //bungalow.estado = ListaEstados.ESTADO_ACTIVO;
+                        if (Bungalow.insertarBungalow(bungalow) == 1)
+                        {
+                            ViewData["message"] = "E";
+                         }
+                        else  ViewData["message"] = "F";
                     }
-                    else { ViewData["message"] = "F"; }
+                   else ViewData["message"] = "NUM";
                 }
                 else
                 {
@@ -446,12 +581,16 @@ namespace Web.Controllers
 
         public ActionResult EliminarBungalow([DataSourceRequest] DataSourceRequest request, Web.Models.Bungalow bungalow)
         {
-            if (bungalow != null)
+            if (Models.Bungalow.HayReserva(bungalow) == false)
             {
-                Bungalow.eliminarBungalow(bungalow);
+                if (bungalow != null)
+                {
+                    Bungalow.eliminarBungalow(bungalow);
+                }
             }
-            return Json(ModelState.ToDataSourceResult());
-        }
+            else ViewData["message"] = "ELIMINA";
+            return View("MantenerBungalow", bungalow);
+        } 
 
         public ActionResult Leer_Estados() 
         {
@@ -459,15 +598,15 @@ namespace Web.Controllers
             return Json(Listaestados, JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult habilitarBungalow([DataSourceRequest] DataSourceRequest request, Web.Models.Bungalow bungalow)
-        {
-            if (bungalow != null)
-            {
-                Bungalow.habilitarBungalow(bungalow);
-            }
+        //public ActionResult habilitarBungalow([DataSourceRequest] DataSourceRequest request, Web.Models.Bungalow bungalow)
+        //{
+        //    if (bungalow != null)
+        //    {
+        //        Bungalow.habilitarBungalow(bungalow);
+        //    }
 
-            return Json(ModelState.ToDataSourceResult());
-        }
+        //    return Json(ModelState.ToDataSourceResult());
+        //}
 
         //******************************************************************TIPO BUNGALOWS
 
@@ -531,11 +670,16 @@ namespace Web.Controllers
 
         public ActionResult EliminarTipoBungalow([DataSourceRequest] DataSourceRequest request, Web.Models.TipoBungalow tipoB)
         {
-            if (tipoB != null)
+            if (Models.TipoBungalow.HayBungalow(tipoB) == false)
             {
-                TipoBungalow.eliminarTipoBungalow(tipoB);
+                if (tipoB != null)
+                {
+                    TipoBungalow.eliminarTipoBungalow(tipoB);
+                }
+                
             }
-            return Json(ModelState.ToDataSourceResult());
+            else ViewData["message"] = "eliminaTipo";
+            return View("MantenerTipoBungalow", tipoB);
         }
 
         /***********************************************************/

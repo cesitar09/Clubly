@@ -14,6 +14,15 @@ namespace Negocio
             return Context.context();
         }
 
+        //METODO QUE VERIFICA SI HAY RESERVAS LIGAS A UN BUNGALOW
+        public static bool HayReserva(short id) {
+
+            IEnumerable<Datos.ReservaBungalow> listaReservasBungalow = buscarId(id).ReservaBungalow.Where(p => p.estado == 1);
+            if (listaReservasBungalow.Count() > 0) return true;
+            else
+                return false;
+        }
+
         public static Exception insertar(Datos.Bungalow bungalow)
         {
             try
@@ -107,5 +116,18 @@ namespace Negocio
             return null;
         }
 
+
+        //Comprueba si existe numero repetido
+        public static bool ExisteNumero(short num) {
+            IEnumerable<Datos.Bungalow> listaBungs = seleccionarTodo();
+            //Datos.Bungalow b = new Datos.Bungalow();
+            //b = listaBungs.ElementAtOrDefault().where(p => p.numero==num);
+            if (listaBungs.SingleOrDefault(b=>b.numero==num && b.estado!=0) == null) return false;
+            else
+            return true;
+        }
+
+
+        
     }
 }

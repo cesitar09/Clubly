@@ -20,31 +20,31 @@ namespace Web.Models
         [StringLength(50)]
         public string nombre { get; set; }
 
-        [Display(Name = "*Descripción")]
+        [Display(Name = "Descripción")]
         [Required(ErrorMessage = "Debe ingresar una descripción")]
         [StringLength(200)]
         public string descripcion { get; set; }
 
-        [Display(Name = "*Fecha de Inicio")]
+        [Display(Name = "*Fecha Inicio")]
         [Required(ErrorMessage = "Debe seleccionar una fecha")]
         public DateTime fechaInicio { get; set; }
 
-        [Display(Name = "*Fecha de Fin")]
+        [Display(Name = "*Fecha Fin")]
         [Required(ErrorMessage = "Debe seleccionar una fecha")]
         public DateTime fechaFin { get; set; }
 
-        [Display(Name = "*Precio Socio")]
+        [Display(Name = "*Precio\nSocio")]
         [Required(ErrorMessage = "Debe ingresar un precio")]
-        public double precioSocio { get; set; }
+        public double? precioSocio { get; set; }
 
-        [Display(Name = "*Precio Invitado")]
+        [Display(Name = "*Precio\nInvitado")]
         public double? precioInvitado { get; set; }
 
-        [Display(Name = "*Vacantes-Socios")]
-        public short vacantesSocio { get; set; }
+        [Display(Name = "*Vacantes")]
+        public short? vacantesSocio { get; set; }
 
-        [Display(Name = "*Vacantes-Invitados")]
-        public short vacantesInvitado { get; set; }
+        [Display(Name = "Invitados\npor\nSocio")]
+        public short? vacantesInvitado { get; set; }
 
         [Display(Name = "Estado")]
         public short estado { get; set; }
@@ -52,6 +52,7 @@ namespace Web.Models
         [Display(Name = "*Empleado")]
         public Empleado empleado { get; set; }
 
+        [Display(Name = "*Ambiente")]
         public ReservaAmbiente reserva { get; set; }
 
         //CONSTRUCTORES
@@ -78,8 +79,6 @@ namespace Web.Models
 
             if (evento.EventoCorporativo != null)
                 return Models.EventoCorporativo.ConvertirCorp(evento.EventoCorporativo);
-            else if (evento.EventoPrivado != null)
-                return Models.EventoPrivado.Convertir(evento.EventoPrivado);
             else
                 return new Evento(evento);
         }
@@ -91,7 +90,7 @@ namespace Web.Models
 
 
         //INVERSIONES
-        public static Datos.Evento Invertir(Models.Evento mEvento)
+        public static Datos.Evento InvertirEve(Models.Evento mEvento)
         {
             Datos.Evento dEvento;
 
@@ -108,6 +107,36 @@ namespace Web.Models
             dEvento.precioInvitado = mEvento.precioInvitado;
             dEvento.vacantesInvitado = mEvento.vacantesInvitado;
             dEvento.vacantesSocio = mEvento.vacantesSocio;
+            dEvento.estado = 1;
+
+            dEvento.Empleado = Negocio.Empleado.buscarId(mEvento.empleado.persona.id);
+
+            return dEvento;
+        }
+        //invertir con restricciones
+        public static Datos.Evento InvertirEveRestringido(Models.Evento mEvento)
+        {
+            Datos.Evento dEvento;
+
+            if (mEvento.id == 0)
+                dEvento = new Datos.Evento();
+            else
+                dEvento = Negocio.Evento.buscarId(mEvento.id);
+
+            dEvento.nombre = mEvento.nombre;
+            dEvento.descripcion = mEvento.descripcion;
+            //dEvento.fechaInicio = mEvento.fechaInicio;
+            //dEvento.fechaFin = mEvento.fechaFin;
+            //dEvento.precioSocio = mEvento.precioSocio;
+            //dEvento.precioInvitado = mEvento.precioInvitado;
+            Evento eve = Evento.buscarId(mEvento.id);
+
+            //Solo se pueden aumentar las vacantes
+            if (mEvento.vacantesInvitado > eve.vacantesInvitado)
+                dEvento.vacantesInvitado = mEvento.vacantesInvitado;
+            if (mEvento.vacantesSocio > eve.vacantesSocio)
+                dEvento.vacantesSocio = mEvento.vacantesSocio;
+
             dEvento.estado = mEvento.estado;
 
             dEvento.Empleado = Negocio.Empleado.buscarId(mEvento.empleado.persona.id);
@@ -120,36 +149,92 @@ namespace Web.Models
             Datos.ReservaAmbiente dreserva;
 
             if (mEvento.id == 0)
+            {
                 dreserva = new Datos.ReservaAmbiente();
+            }
             else
-                dreserva = Negocio.ReservaAmbiente.buscarId(mEvento.reserva.id);
+                dreserva = Negocio.ReservaAmbiente.buscarIdEvento(mEvento.id);
 
-            dreserva.Evento = Invertir(mEvento);
-            dreserva.Ambiente = Negocio.Ambiente.buscarId(mEvento.reserva.ambiente.id);
+            dreserva.Evento = InvertirEve(mEvento);
+            dreserva.Ambiente = Negocio.Ambiente.buscarId(mEvento.reserva.ambiente.id);            
             dreserva.horaInicio = mEvento.fechaInicio;
             dreserva.horaFin = mEvento.fechaFin;
+            dreserva.estado = 1;
+
+            return dreserva;
+        }
+
+        public static Datos.ReservaAmbiente InvertirResRestringido(Models.Evento mEvento)
+        {
+            Datos.ReservaAmbiente dreserva;
+
+            if (mEvento.id == 0)
+            {
+                dreserva = new Datos.ReservaAmbiente();
+            }
+            else
+                dreserva = Negocio.ReservaAmbiente.buscarIdEvento(mEvento.id);
+
+            dreserva.Evento = InvertirEveRestringido(mEvento);
+            dreserva.Ambiente = Negocio.Ambiente.buscarId(mEvento.reserva.ambiente.id);
+            //dreserva.horaInicio = mEvento.fechaInicio;
+            //dreserva.horaFin = mEvento.fechaFin;
             dreserva.estado = mEvento.estado;
 
             return dreserva;
         }
+
         public static IEnumerable<Datos.Evento> ConvertirListaInverso(IEnumerable<Models.Evento> mEventos)
         {
-            return mEventos.Select(ev => Invertir(ev));
+            return mEventos.Select(ev => InvertirEve(ev));
         }
 
         //METODOS CON LA BD
 
-        public static int insertarEventREs(Models.Evento evento)
+        public static int insertarEventRes(Models.Evento evento)
         {
             if (Negocio.ReservaAmbiente.insertar(InvertirRes(evento)) == null)
                 return 1;
-            else
-                return 0;
+            return 0;
+        }
+
+        public static int CalcularDias(DateTime oldDate, DateTime newDate)
+        {
+            // Diferencia de fechas
+            TimeSpan ts = newDate - oldDate;
+
+            // Diferencia de días
+            return ts.Days;
+        }
+        public static int modificarEventRes(Models.Evento evento)
+        {
+            Evento eve = Evento.buscarId(evento.id);
+            //Días máximos antes del evento para que pueda modificarse completamente
+            if (CalcularDias(DateTime.Today, eve.fechaInicio) >= 14)
+            {
+                Datos.ReservaAmbiente res = InvertirRes(evento);
+                Negocio.ReservaAmbiente.eliminar(res);//Libero temporalmente la reserva
+                if (Ambiente.AmbienteReservado(evento.fechaInicio, evento.fechaFin, evento.reserva.ambiente.id) == false)
+                {
+                    if (Negocio.Evento.modificar(InvertirEve(evento)) == null)
+                        if (Negocio.ReservaAmbiente.modificar(InvertirRes(evento)) == null)
+                            return 1;
+                }
+                res.estado = 1;
+                Negocio.ReservaAmbiente.modificar(res);//Volvemos al estado anterior
+            }
+            else 
+            {
+                if (Negocio.Evento.modificar(InvertirEveRestringido(evento)) == null)
+                    if (Negocio.ReservaAmbiente.modificar(InvertirResRestringido(evento)) == null)
+                        return 1;
+            }
+            return 0;
         }
 
         public static int modificar(Models.Evento evento)
         {
-            if (Negocio.Evento.modificar(Invertir(evento)) == null)
+            if (Negocio.Evento.modificar(InvertirEve(evento)) == null)
                 return 1;
             else
                 return 0;
@@ -157,12 +242,18 @@ namespace Web.Models
 
         public static void eliminar(Models.Evento evento)
         {
-            Negocio.Evento.eliminar(Invertir(evento));
+            Datos.Evento eve = Negocio.Evento.buscarId(evento.id);
+            Datos.ReservaAmbiente reser = Negocio.ReservaAmbiente.buscarIdEvento(evento.id);
+
+            Negocio.ReservaAmbiente.eliminar(reser);
+            Negocio.Evento.eliminar(eve);
         }
 
         public static Models.Evento buscarId(short id)
         {
-            return Convertir(Negocio.Evento.buscarId(id));
+            Evento eve = Convertir(Negocio.Evento.buscarId(id));
+            eve.reserva = ReservaAmbiente.Convertir(Negocio.ReservaAmbiente.buscarIdEvento(id));
+            return eve;
         }
 
         public static IEnumerable<Models.Evento> seleccionarTodo()

@@ -19,9 +19,8 @@ namespace Negocio
         {
             try
             {
-                evento.estado = 1;
                 context().AddToEvento(evento);                
-
+        
                 if (evento.EventoCorporativo != null)
                     context().AddToEventoCorporativo(evento.EventoCorporativo);
                 else
@@ -41,7 +40,6 @@ namespace Negocio
         {
             try
             {
-                context().Evento.Attach(context().Evento.Single(p => p.id == evento.id));
                 context().Evento.ApplyCurrentValues(evento);
                 context().SaveChanges();
             }
@@ -52,7 +50,7 @@ namespace Negocio
             return null;
         }
         //eliminar
-        public static Exception eliminar(Datos.Evento evento)//falta probar, podria no funcionar correctamente
+        public static Exception eliminar(Datos.Evento evento)
         {
             try
             {

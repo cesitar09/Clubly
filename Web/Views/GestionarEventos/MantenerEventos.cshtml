@@ -8,10 +8,11 @@
 <h1>Mantener Evento</h1>
 <fieldset>
  <legend>Datos del Evento</legend>
- 
-    <form id = "form" action="insertarEventoNoCorp" method= "post">
-     <ul>
-         <li>
+  @using (Html.BeginForm("insertarEventoNoCorp", "GestionarEventos", FormMethod.Post, new { @id = "Form" }))
+  {
+    <form>
+    <ul>
+    <li>
     @Html.LabelFor(p => p.id)
     @Html.TextBoxFor(p => p.id, new { @readonly = "readonly" })
     </li><li>
@@ -36,23 +37,19 @@
     </li><li> 
             @*-------DATEPICKER INICIO-------*@
             <div class="editor-label">@Html.LabelFor(p => p.fechaInicio)</div>
-            @(Html.Kendo().DateTimePickerFor(p => p.fechaInicio)
-
+                @(Html.Kendo().DatePickerFor(p => p.fechaInicio)
                 .HtmlAttributes(new { style = "width:160px" })
-                .Min(new DateTime(1990, 1, 1)) 
-                .Max(new DateTime(2020, 12, 31)) 
-                .Value(DateTime.Today) 
+                .Min(new DateTime(1990, 1, 1))
+                .Max(new DateTime(2020, 12, 31))
                 .Events(e => e.Change("startChange"))
             )
     </li><li>  
             @*-------DATEPICKER FIN-------*@                      
             <div class="editor-label">@Html.LabelFor(p => p.fechaFin)</div>
-            @(Html.Kendo().DateTimePickerFor(p => p.fechaFin)
-
+            @(Html.Kendo().DatePickerFor(p => p.fechaFin)
                 .HtmlAttributes(new { style = "width:160px" })
                 .Min(new DateTime(1990, 1, 1))
                 .Max(new DateTime(2020, 12, 31))
-                .Value(DateTime.Today) 
                 .Events(e => e.Change("endChange"))
             )
     </li><li>
@@ -66,8 +63,8 @@
             .DataTextField("persona.nombre")
             .DataValueField("persona.id")
             .AutoBind(true)
-            .BindTo(Empleado.seleccionarTodo())  
-            .Value(Model != null && Model.empleado != null ? Model.empleado.persona.id.ToString() :null)
+            .BindTo(Empleado.seleccionarTodo())
+            .Value(Model != null && Model.empleado != null ? Model.empleado.persona.id.ToString() : null)
             )       
             @Html.TextBoxFor(p => p.empleado.persona.id, new { style = "display: none;" })
     </li><li>
@@ -81,28 +78,33 @@
             .DataTextField("nombre")
             .DataValueField("id")
             .AutoBind(true)
-            .BindTo(Ambiente.SeleccionarTodo())  
-            .Value(Model != null && Model.reserva != null ? Model.reserva.ambiente.id.ToString() :null)
+            .BindTo(Ambiente.SeleccionarTodo())
+            .Value(Model != null && Model.reserva != null ? Model.reserva.ambiente.id.ToString() : null)
             )       
             @Html.TextBoxFor(p => p.reserva.ambiente.id, new { style = "display: none;" })
     </li>
     </ul>   
-    @Html.TextBoxFor(p => p.estado  , new { style = "display: none;" })
+    @Html.TextBoxFor(p => p.estado, new { style = "display: none;" })
     @Html.TextBoxFor(p => p.fechaInicio, new { style = "display: none;" })
     @Html.TextBoxFor(p => p.fechaFin, new { style = "display: none;" })       
 
     <div id="botones">
-        <input type="button" value= "Limpiar"  id="limpiar" onclick="location.href = '@(Url.Action("MantenerEventosNoCorp", "GestionarEventos"))'" class="button fright"/>
+        <input type="button" value= "Limpiar"  id="limpiar" onclick="location.href = '@(Url.Action("MantenerEventos", "GestionarEventos"))'" class="button fright"/>
         <input type="submit" value=  @(Model == null ? "Insertar" : "Modificar")  />
     </div>
     @if (ViewData["message"] == null)
     { }
     else if (ViewData["message"].Equals("F"))
-    { <script type= "text/javascript">alert("Lo sentimos!\n No se pudo realizar la operacion\nVuelva a intentarlo en otro momento. ")</script>}
+    { <script type= "text/javascript">              alert("Lo sentimos!\n No se pudo realizar la operacion\nVuelva a intentarlo en otro momento. ")</script>}
     else if (ViewData["message"].Equals("E"))
-    { <script type= "text/javascript">alert("La operación se realizó con éxito!")</script>}                                                                                                                                      
+    { <script type= "text/javascript">              alert("La operación se realizó con éxito!")</script>}
+    else if (ViewData["message"].Equals("FNV"))
+    {<script type="text/javascript">                alert("Lo sentimos!\nLas fechas no son válidas. Deberá elegir un rango correcto\nIntente nuevamente")</script> }
+    else if (ViewData["message"].Equals("Reservado"))
+    { <script type="text/javascript">               alert("Lo sentimos!\nEl ambiente seleccionado está reservado en este período.\nIntente en un período diferente o seleccione otro ambiente\nGracias.")</script> }
+        
   </form>
-  
+  }
   </fieldset>
    
    <div id="kendotable">
@@ -110,12 +112,12 @@
     .Name("Grid")
     .Columns(columns =>
     {
-        columns.Bound(p => p.nombre).Sortable(true).Width(100);
-        columns.Bound(p => p.fechaInicio).Sortable(true).Format("{0:dd/MM/yyyy}").Width(100);
-        columns.Bound(p => p.fechaFin).Sortable(true).Format("{0:dd/MM/yyyy}").Width(100);
-        columns.Bound(p => p.vacantesSocio).Sortable(true).Width(50); ;
-        columns.Bound(p => p.vacantesInvitado).Sortable(true).Width(50); ;
-        columns.Command(command => { command.Custom("Editar").Click("onChange"); command.Destroy().Text("Eliminar"); }).Width(175);
+        columns.Bound(p => p.nombre).Sortable(true);
+        columns.Bound(p => p.fechaInicio).Sortable(true).Format("{0:dd/MM/yyyy}");
+        columns.Bound(p => p.fechaFin).Sortable(true).Format("{0:dd/MM/yyyy}");
+        columns.Bound(p => p.vacantesSocio).Sortable(true);
+        columns.Bound(p => p.vacantesInvitado).Sortable(true);
+        columns.Command(command => { command.Custom("Editar").Text("<span class='k-icon k-edit'></span>").Click("onChange"); command.Destroy().Text(" "); });
 
     })
     .Editable(editable => { editable.Mode(GridEditMode.InLine); editable.DisplayDeleteConfirmation("El registro será eliminado ¿Desea continuar?"); })
@@ -173,7 +175,7 @@
         location = "@Url.Action("modificarEventoNoCorp")"+ "?id=" + id;
     };
 
-$("#form").validate({
+$("#Form").validate({
     ignore: "",
 		rules: {
             "nombre":  {
@@ -181,7 +183,7 @@ $("#form").validate({
                 maxlength : 50     
                 },
             "descripcion":  {
-                required : true,
+                required : false,
                 maxlength : 150
                 },
             "fechaInicio":  {

@@ -13,10 +13,9 @@ namespace Negocio
             return Context.context();
         }
 
-        public static Exception insertar(Datos.Empleado empleado)
+        public static void insertar(Datos.Empleado empleado)
         {
-            try
-            {
+            
                 Datos.EmpleadoXTurno empxturno = new Datos.EmpleadoXTurno();
                 empxturno.TurnoDeTrabajo = Negocio.TurnoDeTrabajo.buscarId(empleado.TurnoDeTrabajo.id);
                 empxturno.fecha = DateTime.Now;
@@ -29,11 +28,7 @@ namespace Negocio
                 context().EmpleadoXTurno.AddObject(empxturno);
                 context().EmpleadoXSede.AddObject(empxsede);
                 context().SaveChanges();
-            }
-            catch (Exception ex) {
-                return ex;
-            }
-            return null;
+                Negocio.Util.logito.ElLogeador("Se ingreso el empleado", empleado.Persona.nombre);
           
         }
 
@@ -42,24 +37,26 @@ namespace Negocio
             return context().Empleado.Where(empleado=>empleado.Persona.estado!=0);
         }
 
-        public static Datos.Empleado buscarId(short id)
+        public static Datos.Empleado buscarId(long id)
         {
-            return context().Empleado.Single(p => p.id == id);
+          
+               return  context().Empleado.Single(p => p.id == id);
+           
+            
+    
         }
 
-        public static Exception modificar(Datos.Empleado empleado )
+        public static void modificar(Datos.Empleado empleado )
         {
-            try
-            {
+            
                 Negocio.Persona.modificar(empleado.Persona);
                 context().Empleado.ApplyCurrentValues(empleado);
                 context().SaveChanges();
-            }
-            catch (Exception ex) {
-                return ex;
-            }
-            return null;
+                Negocio.Util.logito.ElLogeador("Se modifico el empleado", empleado.Persona.nombre);
+        }
 
+        public static bool existeDNI(Int32 dni, short id) {
+            return Negocio.Persona.existeDNI(dni, id);
         }
   
     }

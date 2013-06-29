@@ -2,7 +2,7 @@
 @using Web.Models
 
 @{
-    ViewBag.Title = "InscribirseEnActividad";
+    ViewBag.Title = "Inscribirse En Actividad";
 }
 
 <h1>Inscripción a Actividades Disponibles</h1>
@@ -12,15 +12,17 @@
     .Name("tablaActividades") 
     .Columns(columns =>
     {
-        columns.Bound(p => p.nombre).Sortable(true);
-        columns.Bound(p => p.descripcion).Sortable(true);
-        columns.Bound(p => p.fechaInicio).Width(70).Format("{0:dd/MM/yyyy}");
-        columns.Bound(p => p.fechaFin).Width(70).Format("{0:dd/MM/yyyy}");
-        columns.Bound(p => p.vacantesDisponibles).Title("Vacantes");
-        columns.Command(c => c.Custom("Inscribir").Click("Registrar"));
-                 
+        columns.Bound(p => p.nombre).Width(50);
+        columns.Bound(p => p.descripcion).Width(60);
+        columns.Bound(p => p.fechaInicio).Width(60).Format("{0:dd/MM/yyyy}").Title("Fecha Inicio");
+        columns.Bound(p => p.fechaFin).Width(55).Format("{0:dd/MM/yyyy}").Title("Fecha Fin");
+        columns.Template(p => p.vacantesDisponibles).ClientTemplate("#=vacantesDisponibles#/#=vacantesTotales#").Title("Vacantes").Width(45);
+        columns.Bound(p => p.precio).Title("Precio").Width(37);
+        columns.Command(c => c.Custom("Inscribir").Click("Registrar")).Width(45);
     })
+    .Scrollable()
     .Selectable()
+    .Pageable()
     .Filterable(filterable => filterable
         .Extra(false)
         .Operators(operators => operators
@@ -37,7 +39,8 @@
     )
     .DataSource(datasource => datasource
         .Ajax()
-        .Read(read=> read.Action("LeerActividadesDisponible", "Actividad"))
+        .Read(read=> read.Action("LeerActividadesDisponibles", "Actividad"))
+        .PageSize(10)
     )
 )
  </div>

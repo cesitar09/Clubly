@@ -15,18 +15,25 @@ namespace Web.Models
         public short usuario { get; set; }
         [DisplayName("Contraseña")]
         public String contrasena { get; set; }
+        [DisplayName("Nombre de usuario")]
+        public String nombreusuario { get; set; }
         public short perfil { get; set; }
         //public string perfil { get; set; }
 
         public  Login(){}
 
-        public  Login(short us, String cont, short perf) {
+        public  Login(short us, String cont, short perf, string nomb) {
             usuario = us;
             contrasena = cont;
             perfil = perf;
+            nombreusuario = nomb;
         }
-        public static int esValido(short us, String cont) {
-            return Models.Usuario.esValido(us, cont);        
+        public static int esValido(string nomb, String cont) {
+            return Negocio.Usuario.esValido(nomb , cont);        
+        }
+
+        public static   short obtenerid(string nomb, string  contrasena){
+            return Negocio.Usuario.obtenerid(nomb, contrasena);
         }
     }
 

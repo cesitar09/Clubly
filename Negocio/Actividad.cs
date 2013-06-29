@@ -73,5 +73,51 @@ namespace Negocio
         {
             return context().Actividad.Where(p => p.nombre == nombre);
         }
+
+        public static IEnumerable<Datos.Actividad> SeleccionarActividadesDisponibles()
+        {
+            DateTime hoy = DateTime.Now;
+            return Context.context().Actividad.Where(a => a.estado != 0 && a.fechaInicio.CompareTo(hoy) > 0);
+        }
+        public static IEnumerable<Datos.Actividad> SeleccionarActividadesDisponiblesSocio()
+        {
+            
+            Datos.Parametros param = Negocio.Parametros.SeleccionarParametros();
+            DateTime hoy = DateTime.Now.AddDays(param.diasLimitePago);
+            return Context.context().Actividad.Where(a => a.estado != 0 && a.fechaInicio
+                //.AddDays(param.diasLimitePago)
+                .CompareTo(hoy) > 0);
+        }
+
+        public static bool HayInscritos(short id)
+        {
+            IEnumerable<Datos.SocioXActividad> listaInscritos = BuscarId(id).SocioXActividad.Where(p => p.estado == 1);
+            if(listaInscritos.Count() > 0) return true;
+            else
+                return false;
+        }
+
+        public static IEnumerable<Datos.Actividad> BuscarActividadIdFamilia(short idFamilia)
+        {
+            List<Datos.Actividad> listaActividad = new List<Datos.Actividad>();
+            foreach (Datos.Actividad actividad in Negocio.Actividad.SeleccionarActividadesDisponiblesSocio())
+            {
+                bool inscrito = false;
+                foreach (Datos.SocioXActividad sxa in actividad.SocioXActividad)
+                    if (sxa.Socio.Familia.id == idFamilia)
+                        inscrito = true;
+
+                if (inscrito)
+                    listaActividad.Add(actividad);
+            }
+            
+            //IEnumerable<Datos.Actividad> listaSocioXActividad = Context.context().Actividad
+            //    .Where(p => p.SocioXActividad.Where(s=>s.Socio.Familia.id == idFamilia).Count() > 0);
+            return listaActividad;
+        }
+
+        public static IEnumerable<Datos.Ambiente> listaAmbientesDisponibles { get; set; }
+
+    
     }
 }

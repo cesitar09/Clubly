@@ -179,6 +179,8 @@
     <Compile Include="Controllers\GestionarReservaController.cs" />
     <Compile Include="Controllers\MembresiaController.cs" />
     <Compile Include="Controllers\PaginaPersonalController.cs" />
+    <Compile Include="Controllers\RealizarSorteoController.cs" />
+    <Compile Include="Controllers\ReportesController.cs" />
     <Compile Include="Controllers\ReservasController.cs" />
     <Compile Include="Controllers\RRHHController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
@@ -200,10 +202,17 @@
     <Compile Include="Models\Asistencia.cs" />
     <Compile Include="Models\Bungalow.cs" />
     <Compile Include="Models\Cancha.cs" />
+    <Compile Include="Models\PuntosMapa.cs" />
+    <Compile Include="Models\ReporteAsistencia.cs" />
+    <Compile Include="Models\ReporteFinanzas.cs" />
+    <Compile Include="Models\Sorteo.cs" />
+    <Compile Include="Models\ReservaBungalowSorteo.cs" />
+    <Compile Include="Models\ComprobanteDePago.cs" />
     <Compile Include="Models\Invitado.cs" />
     <Compile Include="Models\InvitadoXFamilia.cs" />
     <Compile Include="Models\Login.cs" />
     <Compile Include="Models\Pago.cs" />
+    <Compile Include="Models\Parametros.cs" />
     <Compile Include="Models\Promocion.cs" />
     <Compile Include="Models\ReservaBungalow.cs" />
     <Compile Include="Models\Servicio.cs" />
@@ -217,8 +226,6 @@
     <Compile Include="Models\EmpleadoXTurno.cs" />
     <Compile Include="Models\Evento.cs" />
     <Compile Include="Models\EventoCorporativo.cs" />
-    <Compile Include="Models\EventoPrivado.cs" />
-    <Compile Include="Models\EventoPublico.cs" />
     <Compile Include="Models\Familia.cs" />
     <Compile Include="Models\Perfil.cs" />
     <Compile Include="Models\Permiso.cs" />
@@ -238,9 +245,14 @@
     <Compile Include="Models\TurnoDeTrabajo.cs" />
     <Compile Include="Models\Usuario.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Util\TransactionMessages.cs" />
+    <Compile Include="Util\Validar.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\img\logo.png" />
+    <Content Include="Content\img\2.jpg" />
+    <Content Include="Content\img\3.jpg" />
+    <Content Include="Content\img\SeleccionarSede.png" />
     <Content Include="Content\kendo.clubly.min.css" />
     <Content Include="Content\style.css" />
     <Content Include="Content\kendo\2013.1.319\Black\editor.png" />
@@ -906,6 +918,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Content\ListaParticipantesEvento\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
@@ -950,6 +963,22 @@
     <Content Include="Views\Finanzas\ConsultarHistorialPagosParaEmpleado.cshtml" />
     <Content Include="Views\GestionarReserva\RegistrarIngresoBungalow.cshtml" />
     <Content Include="Views\GestionarEventos\MantenerEventosCorp.cshtml" />
+    <Content Include="Views\Reservas\ReservarBungalow.cshtml" />
+    <Content Include="Views\Administracion\MantenerParametros.cshtml" />
+    <Content Include="Views\Actividad\VerActividadesXsocio.cshtml">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="Views\Logistica\SubirImagenBugalow.cshtml" />
+    <Content Include="Views\Membresia\MantenerSocioFamilia.cshtml" />
+    <Content Include="Views\Finanzas\MostrarComprobanteDePago.cshtml" />
+    <Content Include="Views\Administracion\AgregarCuotas.cshtml" />
+    <Content Include="Views\Administracion\MantenerServicio.cshtml" />
+    <Content Include="Views\Reportes\ParametrosFinanzas.cshtml" />
+    <Content Include="Views\Reportes\ReporteFinanzas.cshtml" />
+    <Content Include="Views\Reportes\ReporteAsistencia.cshtml" />
+    <Content Include="Views\Reportes\ParametrosAsistencia.cshtml" />
+    <Content Include="Views\Reportes\ReporteAsistencias.cshtml" />
+    <Content Include="Views\Reservas\ReservarBungalowGlobal.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Datos\Datos.csproj">
@@ -980,7 +1009,7 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>54442</DevelopmentServerPort>
+          <DevelopmentServerPort>64842</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>http://localhost:54442/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>

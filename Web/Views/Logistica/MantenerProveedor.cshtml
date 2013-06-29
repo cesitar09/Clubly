@@ -41,7 +41,7 @@
         </ul>
         <div id="botones">
             <input type="button" value="Limpiar" id="Limpiar" onclick="location.href = '@(Url.Action("MantenerProveedor", "Logistica"))'" />
-            <input type="submit" value=@(Model == null || Model.id == 0 ? "Insertar" : "Modificar") />
+            <input type="submit" value=@(Model == null? "Insertar" : "Modificar") />
         </div> 
         
          @if (ViewData["message"] == null)
@@ -59,10 +59,10 @@
     .Name("Grid")
     .Columns(columns =>
     {
-        columns.Bound(p => p.ruc).Sortable(true).Width(100);
-        columns.Bound(p => p.nombre).Sortable(true).Width(200);
-        columns.Bound(p => p.direccion).Sortable(true).Width(200);
-        columns.Command(c => { c.Custom("Editar").Click("onChange"); c.Destroy().Text("Eliminar"); }).Width(200);
+        columns.Bound(p => p.ruc).Sortable(true);
+        columns.Bound(p => p.nombre).Sortable(true);
+        columns.Bound(p => p.direccion).Sortable(true);
+        columns.Command(c => { c.Custom("Editar").Text("<span class='k-icon k-edit'></span>").Click("onChange"); c.Destroy().Text(" "); });
     })
         .Editable(editable => { editable.Mode(GridEditMode.InLine); editable.DisplayDeleteConfirmation("El regitro será eliminado ¿Desea continuar?"); })
         .Pageable()

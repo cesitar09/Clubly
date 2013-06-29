@@ -25,10 +25,6 @@ namespace Web.Models
         [Display(Name = "*Núm. de Participantes")]
         public short numParticipantes { get; set; }
 
-        //Para enlazar con reserva de ambiente
-        [Display(Name = "*Ambiente")]
-        public ReservaAmbiente reserva { get; set; }
-
         public EventoCorporativo() { }
         
         public EventoCorporativo(Datos.EventoCorporativo eventoCorp)
@@ -55,14 +51,14 @@ namespace Web.Models
         }
 
         //CONVERSION
-        public static Models.EventoCorporativo ConvertirCorp(Datos.EventoCorporativo eventoCorp)
+        public static EventoCorporativo ConvertirCorp(Datos.EventoCorporativo eventoCorp)
         {
             return new EventoCorporativo(eventoCorp);
         }
 
         public static IEnumerable<Models.EventoCorporativo> ConvertirListaCorp(IEnumerable<Datos.EventoCorporativo> listaEventos)
         {
-            return listaEventos.Select(evento => ConvertirCorp(evento));
+            return listaEventos.Select(evento => new EventoCorporativo(evento));
         }
 
         //INVERSION
@@ -83,22 +79,22 @@ namespace Web.Models
             dEventoCorp.numParticipantes = mEventoCorp.numParticipantes;
 
             //Referencia circular
-            dEventoCorp.Evento = Models.Evento.Invertir(mEventoCorp);
+            dEventoCorp.Evento = Models.Evento.InvertirEve(mEventoCorp);
             dEventoCorp.Evento.EventoCorporativo = dEventoCorp;
         
             return dEventoCorp;
         }
 
-        public static Datos.ReservaAmbiente InvertirRes(Models.EventoCorporativo  mEventoCorp)
+        public static Datos.ReservaAmbiente InvertirRes(Models.EventoCorporativo mEventoCorp)
         {
             Datos.ReservaAmbiente dreserva;
 
             if (mEventoCorp.id == 0)
                 dreserva = new Datos.ReservaAmbiente();
             else
-                dreserva = Negocio.ReservaAmbiente.buscarId(mEventoCorp.reserva.id);
+                dreserva = Negocio.ReservaAmbiente.buscarIdEvento(mEventoCorp.id);
 
-            dreserva.Evento = Invertir(mEventoCorp);
+            dreserva.Evento = Negocio.Evento.buscarId(mEventoCorp.id);
             dreserva.Ambiente = Negocio.Ambiente.buscarId(mEventoCorp.reserva.ambiente.id);
             dreserva.horaInicio = mEventoCorp.fechaInicio;
             dreserva.horaFin = mEventoCorp.fechaFin;
@@ -106,45 +102,147 @@ namespace Web.Models
 
             return dreserva;
         }
+        public static Datos.Evento InvertirEv(Models.EventoCorporativo mEventoCorp)
+        {
+            Datos.Evento dEvento;
+
+            if (mEventoCorp .id == 0)
+                dEvento = new Datos.Evento();
+            else
+                dEvento = Negocio.Evento.buscarId(mEventoCorp.id);
+
+            mEventoCorp.estado = 1;
+            dEvento.nombre = mEventoCorp.nombre;
+            dEvento.descripcion = mEventoCorp.descripcion;
+            dEvento.fechaInicio = mEventoCorp.fechaInicio;
+            dEvento.fechaFin = mEventoCorp.fechaFin;
+            dEvento.precioSocio = mEventoCorp.precioSocio;
+            dEvento.precioInvitado = mEventoCorp.precioInvitado;
+            dEvento.vacantesInvitado = mEventoCorp.vacantesInvitado;
+            dEvento.vacantesSocio = mEventoCorp.vacantesSocio;
+            dEvento.estado = mEventoCorp.estado;
+
+            dEvento.Empleado = Negocio.Empleado.buscarId(mEventoCorp.empleado.persona.id);
+
+            Datos.EventoCorporativo eve = new Datos.EventoCorporativo();
+            eve.razonSocial = mEventoCorp.razonSocial;
+            eve.ruc = mEventoCorp.ruc;
+            eve.direccion = mEventoCorp.direccion;
+            eve.paginaWeb = mEventoCorp.paginaWeb;
+            eve.numParticipantes = mEventoCorp.numParticipantes;
+
+            Datos.ReservaAmbiente reser = new Datos.ReservaAmbiente();
+            reser.Ambiente = Negocio.Ambiente.buscarId(mEventoCorp.reserva.ambiente.id);
+            reser.horaInicio = mEventoCorp.fechaInicio;
+            reser.horaFin = mEventoCorp.fechaFin;
+            reser.estado = mEventoCorp.estado;
+            
+            dEvento.EventoCorporativo = eve;
+            dEvento.ReservaAmbiente = reser;
+
+            return dEvento;
+        }
+
+        public static Datos.Evento InvertirEvRestringido(Models.EventoCorporativo mEventoCorp)
+        {
+            Datos.Evento dEvento;
+
+            if (mEventoCorp.id == 0)
+                dEvento = new Datos.Evento();
+            else
+                dEvento = Negocio.Evento.buscarId(mEventoCorp.id);
+
+            dEvento.nombre = mEventoCorp.nombre;
+            dEvento.descripcion = mEventoCorp.descripcion;
+            //dEvento.fechaInicio = mEventoCorp.fechaInicio;
+            //dEvento.fechaFin = mEventoCorp.fechaFin;
+            //dEvento.precioSocio = mEventoCorp.precioSocio;
+            //dEvento.precioInvitado = mEventoCorp.precioInvitado;
+
+            Evento ev = Evento.buscarId(mEventoCorp.id);
+
+            //Solo se pueden aumentar las vacantes
+            if (mEventoCorp.vacantesInvitado > ev.vacantesInvitado)
+                dEvento.vacantesInvitado = mEventoCorp.vacantesInvitado;
+            if (mEventoCorp.vacantesSocio > ev.vacantesSocio)
+                dEvento.vacantesSocio = mEventoCorp.vacantesSocio;
+
+            dEvento.estado = mEventoCorp.estado;
+
+            //dEvento.Empleado = Negocio.Empleado.buscarId(mEventoCorp.empleado.persona.id);
+
+            Datos.EventoCorporativo eve = new Datos.EventoCorporativo();
+            //eve.razonSocial = mEventoCorp.razonSocial;
+            //eve.ruc = mEventoCorp.ruc;
+            eve.direccion = mEventoCorp.direccion;
+            eve.paginaWeb = mEventoCorp.paginaWeb;
+            //eve.numParticipantes = mEventoCorp.numParticipantes;
+
+            Datos.ReservaAmbiente reser = new Datos.ReservaAmbiente();
+            reser.Ambiente = Negocio.Ambiente.buscarId(mEventoCorp.reserva.ambiente.id);
+            //reser.horaInicio = mEventoCorp.fechaInicio;
+            //reser.horaFin = mEventoCorp.fechaFin;
+            reser.estado = mEventoCorp.estado;
+
+            dEvento.EventoCorporativo = eve;
+            dEvento.ReservaAmbiente = reser;
+
+            return dEvento;
+        }
 
         public static IEnumerable<Datos.EventoCorporativo> ConvertirListaInversoCorp(IEnumerable<Models.EventoCorporativo> mEventos)
         {
             return mEventos.Select(ev => InvertirEvCorp(ev));
         }
 
-        public static Models.EventoCorporativo buscarIdCorp(short id)
-        {
-            return ConvertirCorp(Negocio.EventoCorp.buscarIdCorp(id));
-        }
-
         //INTERACCIÓN BD
 
-        public static int insertarCorpRes(Models.EventoCorporativo corp)
+        public static int insertarCorp(Models.EventoCorporativo corp)
         {
-            if (Negocio.ReservaAmbiente.insertar(InvertirRes(corp)) == null)
-                return 1;
-            else
-                return 0;
-        }
-
-        public static int modificarCorpRes(Models.EventoCorporativo corp)
-        {
-            if (Negocio.EventoCorp.modificarCorp(InvertirEvCorp(corp)) == null)
-                if (Negocio.ReservaAmbiente.modificar(InvertirRes(corp)) == null)
+            //
+            if (Negocio.Evento.insertar(InvertirEv(corp)) == null)
                     return 1;
             return 0;
         }
 
-   
+        public static int modificarCorp(Models.EventoCorporativo corp)
+        {
+            EventoCorporativo eve = EventoCorporativo.buscarIdCorp(corp.id);
+            //Días máximos antes del evento para que pueda modificarse completamente
+            if (CalcularDias(DateTime.Today, eve.fechaInicio) >= 14)
+            {
+                Datos.ReservaAmbiente res = InvertirRes(corp);
+                Negocio.ReservaAmbiente.eliminar(res);//Libero temporalmente la reserva
+                if (Ambiente.AmbienteReservado(corp.fechaInicio, corp.fechaFin, corp.reserva.ambiente.id) == false)
+                {
+                    if (Negocio.Evento.modificar(InvertirEv(corp)) == null)
+                        return 1;
+                }
+                res.estado = 1;
+                Negocio.ReservaAmbiente.modificar(res);//Volvemos al estado anterior
+            }
+            else
+            {
+                if (Negocio.Evento.modificar(InvertirEvRestringido(corp)) == null)
+                    return 1;
+            }
+            return 0;
+        }
 
         public static void eliminarCorp(Models.EventoCorporativo corp)
         {
-            // Negocio.Actividad.Eliminar(Invertir(act));
             Datos.EventoCorporativo evento = Negocio.EventoCorp.buscarIdCorp(corp.id);
-            Datos.ReservaAmbiente reser = Negocio.ReservaAmbiente.buscarIdActividad(corp.id);
+            Datos.ReservaAmbiente reser = Negocio.ReservaAmbiente.buscarIdEvento(corp.id);
 
             Negocio.ReservaAmbiente.eliminar(reser);
             Negocio.EventoCorp.eliminarCorp(evento);
+        }
+
+        public static Models.EventoCorporativo buscarIdCorp(short id)
+        {
+            EventoCorporativo eve = ConvertirCorp(Negocio.EventoCorp.buscarIdCorp(id));
+            eve.reserva = ReservaAmbiente.Convertir(Negocio.ReservaAmbiente.buscarIdEvento(id));
+            return eve;
         }
     }
 }

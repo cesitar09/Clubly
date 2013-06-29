@@ -6,17 +6,17 @@
 
 <h2>Historal de Actividades</h2>
 
-@(Html.Kendo().Grid<Web.Models.SocioXActividad>()
-    .Name("tablaSocioXActividad") 
+@(Html.Kendo().Grid<Web.Models.Actividad>()
+        .Name("tablaActividades") 
     .Columns(columns =>
     {
-        columns.Bound(p => p.Actividad.nombre);
-        columns.Bound(p => p.Actividad.tipoActividad.nombre);
+        columns.Bound(p => p.nombre);
+        columns.Bound(p => p.tipoActividad.nombre);
         columns.Bound(p => p.estado);
-        //columns.Bound(p => p.Actividad.fechaInicio).Width(70).Format("{0:dd/MM/yyyy}");
-        //columns.Bound(p => p.Actividad.fechaFin).Width(70).Format("{0:dd/MM/yyyy}");
-        columns.Command(c => c.Custom("Cancelar").Click("CancelarSocio")).Width(100);                         
-                                    
+        columns.Bound(p => p.fechaInicio).Width(70).Format("{0:dd}/{0:MM}/{0:yyyy}");
+        columns.Bound(p => p.fechaFin).Width(70).Format("{0:dd/MM/yyyy}");
+        //columns.Command(c => c.Custom("Cancelar").Click("CancelarSocio")).Width(100);                         
+        columns.Command(c => c.Custom("Modificar").Click("Modificar").Text("<span class='k-icon k-edit'></span>"));                            
         
     })
     .Selectable()
@@ -39,10 +39,9 @@
     )
     .DataSource(datasource => datasource
         .Ajax()
-           .Read(read => read.Action("LeerActividadxSocio", "Actividad",@Model))
-               .Model(model => model.Id(p => p.idSocio))
-              
-        
+        .Read(read => read.Action("LeerActividadxSocio", "Actividad",@Model))
+        .Model(model => model.Id(p => p.id))
+        .PageSize(10)        
     )
 )
 
@@ -50,33 +49,41 @@
 
  <script type="text/javascript">
 
-     function CancelarSocio(e) {
-         if (confirm("Este registro será eliminado ¿Desea continuar?"))
-         {
+//     function CancelarSocio(e) {
+//         if (confirm("Este registro será eliminado ¿Desea continuar?"))
+//         {
+//        e.preventDefault();
+//        var grid = $('#tablaSocioXActividad').data('kendoGrid');
+//        var row = grid.select();
+//        var dataItem = grid.dataItem(row);
+//        var id = dataItem.Socio.persona.id;
+//        var idAct = dataItem.Actividad.id;
+//        $.ajax({
+//            url: '@Url.Action("CancelarInscripcion")',
+//            type: 'POST',
+//            datatype: "json",
+//            traditional: true,
+//            data: { 
+//                strIdSocio: JSON.stringify(id),
+//                strIdActividad: JSON.stringify(idAct)
+//            },
+//            success: function () { 
+//                window.location=window.location;
+//            },
+//            error: function () {  
+//                window.location=window.location; 
+//            },
+//            timeout: 20000
+//        });
+//        }
+//    }
+    function Modificar(e) {
         e.preventDefault();
-        var grid = $('#tablaSocioXActividad').data('kendoGrid');
+        var grid = $('#tablaActividades').data('kendoGrid');
         var row = grid.select();
         var dataItem = grid.dataItem(row);
-        var id = dataItem.Socio.persona.id;
-        var idAct = dataItem.Actividad.id;
-        $.ajax({
-            url: '@Url.Action("CancelarInscripcion")',
-            type: 'POST',
-            datatype: "json",
-            traditional: true,
-            data: { 
-                strIdSocio: JSON.stringify(id),
-                strIdActividad: JSON.stringify(idAct)
-            },
-            success: function () { 
-                window.location=window.location;
-            },
-            error: function () {  
-                window.location=window.location; 
-            },
-            timeout: 20000
-        });
-        }
+        var id = dataItem.id;
+        location = "@Url.Action("RealizarInscripcion")" + "?id=" + id;
     }
 
   </script>

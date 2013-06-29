@@ -45,5 +45,9 @@ namespace Web.Models
             return Convertir(Negocio.TipoCancha.BuscarId(idCancha));
         }
 
+        public static IEnumerable<Models.TipoCancha> BuscarPorSede(short idSede)
+        {
+            return ConvertirLista(Negocio.TipoCancha.BuscarPorSede(idSede));    
+        }
     }
 }
