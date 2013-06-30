@@ -1,0 +1,65 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Negocio", "Negocio\Negocio.csproj", "{994169A7-057A-48E3-BF4B-57930B97EED0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Datos", "Datos\Datos.csproj", "{542765CA-B0FB-46F9-8C22-EB20132BB151}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Web", "Web\Web.csproj", "{689DFE63-3148-4FD0-A297-A3868CD0B1E5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{228B4147-53C7-4094-AAF0-37B20CDAC505}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.Config = .nuget\NuGet.Config
+		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\NuGet.targets = .nuget\NuGet.targets
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SubversionScc) = preSolution
+		Svn-Managed = True
+		Manager = AnkhSVN - Subversion Support for Visual Studio
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|Mixed Platforms = Debug|Mixed Platforms
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|Mixed Platforms = Release|Mixed Platforms
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{994169A7-057A-48E3-BF4B-57930B97EED0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{994169A7-057A-48E3-BF4B-57930B97EED0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{994169A7-057A-48E3-BF4B-57930B97EED0}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{994169A7-057A-48E3-BF4B-57930B97EED0}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{994169A7-057A-48E3-BF4B-57930B97EED0}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{994169A7-057A-48E3-BF4B-57930B97EED0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{994169A7-057A-48E3-BF4B-57930B97EED0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{994169A7-057A-48E3-BF4B-57930B97EED0}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{994169A7-057A-48E3-BF4B-57930B97EED0}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{994169A7-057A-48E3-BF4B-57930B97EED0}.Release|x86.ActiveCfg = Release|Any CPU
+		{542765CA-B0FB-46F9-8C22-EB20132BB151}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{542765CA-B0FB-46F9-8C22-EB20132BB151}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{542765CA-B0FB-46F9-8C22-EB20132BB151}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{542765CA-B0FB-46F9-8C22-EB20132BB151}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{542765CA-B0FB-46F9-8C22-EB20132BB151}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{542765CA-B0FB-46F9-8C22-EB20132BB151}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{542765CA-B0FB-46F9-8C22-EB20132BB151}.Release|Any CPU.Build.0 = Release|Any CPU
+		{542765CA-B0FB-46F9-8C22-EB20132BB151}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{542765CA-B0FB-46F9-8C22-EB20132BB151}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{542765CA-B0FB-46F9-8C22-EB20132BB151}.Release|x86.ActiveCfg = Release|Any CPU
+		{689DFE63-3148-4FD0-A297-A3868CD0B1E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{689DFE63-3148-4FD0-A297-A3868CD0B1E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{689DFE63-3148-4FD0-A297-A3868CD0B1E5}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{689DFE63-3148-4FD0-A297-A3868CD0B1E5}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{689DFE63-3148-4FD0-A297-A3868CD0B1E5}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{689DFE63-3148-4FD0-A297-A3868CD0B1E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{689DFE63-3148-4FD0-A297-A3868CD0B1E5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{689DFE63-3148-4FD0-A297-A3868CD0B1E5}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{689DFE63-3148-4FD0-A297-A3868CD0B1E5}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{689DFE63-3148-4FD0-A297-A3868CD0B1E5}.Release|x86.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
