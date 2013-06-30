@@ -1,0 +1,7 @@
+﻿@{
+    ViewBag.Title = "ReservarBungalow";
+}
+
+<h2>ReservarBungalow</h2>
+
+@Html.Partial("ConsultarDisponibilidadBungalow")

@@ -1,0 +1,213 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Data.Linq;
+using System.Web;
+using System.Web.Mvc;
+using Kendo.Mvc.Extensions;
+using Newtonsoft.Json;
+using Kendo.Mvc.UI;
+using Web.Controllers;
+using Web.Models;
+using System.Data;
+using System.Data.SqlClient;
+
+namespace Web.Controllers
+{
+    public class LogisticaController : Controller
+    {
+        //
+        // GET: /Logistica/
+
+        //..............SEDE.................//
+
+        public ActionResult getSede([DataSourceRequest] DataSourceRequest request) 
+        {
+            IEnumerable<Datos.Sede> ListaSedes = Negocio.Sede.seleccionarTodo();
+            DataSourceResult result = Models.Sede.ConvertirLista(ListaSedes).ToDataSourceResult(request);
+            return Json(result);
+        }
+
+
+        public ActionResult eliminarSede ([DataSourceRequest] DataSourceRequest request, Web.Models.Sede sede)
+        {
+            if (sede != null)
+            {
+                Sede.eliminarSede(sede);
+            }
+
+            return Json(ModelState.ToDataSourceResult());
+        }
+
+        public ActionResult modificarSede([DataSourceRequest] DataSourceRequest request, Web.Models.Sede sede)
+        {
+            if (sede != null)
+            {
+                Sede.modificarSede(sede);
+            }
+
+            return Json(ModelState.ToDataSourceResult());
+        }
+
+        [HttpPost]
+        public ActionResult agregarSede(Web.Models.Sede sede)
+        {
+            if (sede != null)
+            {
+                Sede.insertarSede(sede);
+            }
+
+            return View("MantenerSede", sede);
+        }
+
+
+
+        //public ActionResult createSede([DataSourceRequest] DataSourceRequest request)
+        //{
+
+           // return Json(result);
+       // }
+
+     
+
+
+        public ActionResult FilterMenuCustomization_Nombre()
+        {
+            return Json(Negocio.Sede.seleccionarTodo().Select(e => e.nombre).Distinct(), JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult FilterMenuCustomization_Descripcion()
+        {
+            return Json(Negocio.Sede.seleccionarTodo().Select(e => e.descripcion).Distinct(), JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult FilterMenuCustomization_Direccion()
+        {
+            return Json(Negocio.Sede.seleccionarTodo().Select(e => e.direccion).Distinct(), JsonRequestBehavior.AllowGet);
+        }
+
+        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
+        public ActionResult MantenerSede(Web.Models.Sede sede)
+        {
+            return View(sede);
+        }
+
+        public ActionResult Sede2()
+        {
+            return View(Models.Sede.SeleccionarTodo());
+        }
+
+        //Concesionario
+        
+        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
+        public ActionResult MantenerConcesionario(Web.Models.Concesionario concesionario)
+        {
+            return View((IView)null);
+        }
+
+        [AcceptVerbs(HttpVerbs.Post)]
+        public ActionResult InsertarConcesionario(Web.Models.Concesionario concesionario)
+        {
+            try
+            {
+                if (concesionario.id > 0)
+                {
+                    Concesionario.modificar(concesionario);
+                    return View("MantenerConcesionario");
+                }
+                else
+                {
+                    concesionario.sedes = Sede.SeleccionarTodo();
+                    concesionario.estado = Util.ListaEstados.ESTADO_ACTIVO;
+                    Concesionario.insertar(concesionario);
+                    return View("MantenerConcesionario");
+                }
+            }
+            catch (ConstraintException e)
+            {
+                return View("MantenerConcesionario", concesionario);
+            }
+        }
+
+        public ActionResult EditarConcesionario(Web.Models.Concesionario concesionario)
+        {
+            concesionario = Concesionario.buscarId(concesionario.id);
+            return View("MantenerConcesionario", concesionario);
+        }
+
+        public ActionResult LeerConcesionario([DataSourceRequest] DataSourceRequest request)
+        {
+                IEnumerable<Models.Concesionario> lista = Concesionario.SeleccionarTodo();
+                DataSourceResult result = lista.ToDataSourceResult(request);
+                return Json(result);
+        }
+
+        public ActionResult EliminarConcesionario(Web.Models.Concesionario concesionario)
+        {
+            Concesionario.eliminar(concesionario);
+            return View("MantenerConcesionario", concesionario);
+        }
+
+        //Controlador de Proveedor//*************************************
+
+
+        public ActionResult getProveedor([DataSourceRequest] DataSourceRequest request)
+        {
+            IQueryable<Datos.Proveedor> listaProveedores = Negocio.Proveedor.seleccionarTodo();
+            DataSourceResult result = Models.Proveedor.ConvertirLista(listaProveedores).ToDataSourceResult(request);
+            return Json(result);
+        }
+
+
+        public ActionResult eliminarProveedor([DataSourceRequest] DataSourceRequest request, Web.Models.Proveedor proveedor)
+        {
+            if (proveedor != null)
+            {
+                Proveedor.eliminarProveedor(proveedor);
+            }
+            return Json(ModelState.ToDataSourceResult());
+        }
+
+        public ActionResult modificarProveedor([DataSourceRequest] DataSourceRequest request, Web.Models.Proveedor proveedor)
+        {
+            if (proveedor != null)
+            {
+                Proveedor.modificarProveedor(proveedor);
+            }
+
+            return Json(ModelState.ToDataSourceResult());
+        }
+
+        public ActionResult agregarProveedor([DataSourceRequest] DataSourceRequest request, Web.Models.Proveedor proveedor)
+        {
+            if (proveedor != null)
+            {
+                Proveedor.insertarProveedor(proveedor);
+            }
+            return Json(ModelState.ToDataSourceResult());
+        }
+
+        //
+
+        public ActionResult FilterMenuCustomization_NombreProveedor()
+        {
+            return Json(Negocio.Proveedor.seleccionarTodo().Select(e => e.nombre).Distinct(), JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult FilterMenuCustomization_RucProveedor()
+        {
+            return Json(Negocio.Proveedor.seleccionarTodo().Select(e => e.ruc).Distinct(), JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult FilterMenuCustomization_DireccionProveedor()
+        {
+            return Json(Negocio.Proveedor.seleccionarTodo().Select(e => e.direccion).Distinct(), JsonRequestBehavior.AllowGet);
+        }
+
+        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
+        public ActionResult MantenerProveedor(Web.Models.Proveedor proveedor)
+        {
+            return View(proveedor);
+        }
+    }
+}

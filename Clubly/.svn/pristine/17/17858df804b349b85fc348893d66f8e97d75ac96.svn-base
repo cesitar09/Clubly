@@ -1,0 +1,117 @@
+﻿@model Web.Models.Sede
+@using Web.Models
+@{
+    ViewBag.Title = "Mantener sede";
+}
+
+<h1>@ViewBag.Title</h1>
+
+<fieldset>
+ <legend>Datos del Formulario</legend>
+ @using (Html.BeginForm("agregarSede", "Logistica", FormMethod.Post))
+ {
+  
+    <ul>
+        <li>
+            <div class="editor-label">@Html.LabelFor(p => p.id)</div>
+            @Html.TextBoxFor(p => p.id, new {@readonly = "readonly" })
+        </li><li>
+            <div class="editor-label">@Html.LabelFor(p => p.nombre)</div>
+            @Html.TextBoxFor(p => p.nombre)
+        </li><li>
+            <div class="editor-label">@Html.LabelFor(p => p.descripcion)</div>
+            @Html.TextBoxFor(p => p.descripcion)
+        </li><li>
+            <div class="editor-label">@Html.LabelFor(p => p.direccion)</div>
+            @Html.TextBoxFor(p => p.direccion)
+        </li>
+        @Html.TextBoxFor(p => p.estado, new { style = "display: none;" })
+    </ul>
+  <div id="botones">
+  <input type="button" value= "Limpiar"  id="cancel" onclick="location.href = '@(Url.Action("MantenerSede", "Logistica"))'" class="button fright"/>
+  <input type="submit" value=@(Model == null ? "Insertar" : "Modificar" ) /></div>
+ 
+ }
+  </fieldset>
+
+<div id="kendotable">
+@(Html.Kendo().Grid<Web.Models.Sede>()
+    .Name("Grid")
+    .Columns(columns =>
+    {
+        columns.Bound(p => p.nombre).Sortable(true)
+            .Filterable(filterable => filterable.UI("nombreFiltro"));
+        columns.Bound(p => p.descripcion).Sortable(true)
+            .Filterable(filterable => filterable.UI("descripcionFiltro"));
+        columns.Bound(p => p.direccion);
+        columns.Command(command => { command.Custom("Editar").Click("onChange"); command.Destroy().Text("Eliminar"); }).Width(200);
+
+    })
+     .Pageable()
+     .Selectable()
+    .Filterable(filterable => filterable
+        .Extra(false)
+        .Operators(operators => operators
+            .ForString(str => str.Clear()
+                .StartsWith("Starts with")
+                .IsEqualTo("Is equal to")
+                .IsNotEqualTo("Is not equal to")
+            ))
+        )
+    .DataSource(datasource => datasource
+                                .Ajax()
+                                    .Events(events => events.Error("error_handler"))
+                                    .Model(model => model.Id(p => p.id))
+                                    .Read(read => read.Action("getSede", "Logistica"))
+                                    .Destroy(update => update.Action("eliminarSede", "Logistica"))
+                                    
+                                    )
+           )
+</div>
+
+
+<script type="text/javascript">
+    function error_handler(e) {
+        if (e.errors) {
+            var message = "Errors:\n";
+            $.each(e.errors, function (key, value) {
+                if ('errors' in value) {
+                    $.each(value.errors, function () {
+                        message += this + "\n";
+                    });
+                }
+            });
+            alert(message);
+        }
+    }
+
+
+function onChange(e){
+        e.preventDefault();
+        var grid = $('#Grid').data('kendoGrid');
+        var row = grid.select();
+        var dataItem = grid.dataItem(row);
+        var id = dataItem.id;
+        location = "@Url.Action("modificarSede")" + "?id=" + id;
+    }
+
+    function nombreFiltro(element) {
+        element.kendoAutoComplete({
+            dataSource: {
+                transport: {
+                    read: "@Url.Action("/FilterMenuCustomization_Nombre")"
+                }
+            }
+        });
+    }
+
+    function descripcionFiltro(element) {
+        element.kendoAutoComplete({
+            dataSource: {
+                transport: {
+                    read: "@Url.Action("/FilterMenuCustomization_Descripcion")"
+                }
+            }
+        });
+    }
+</script>

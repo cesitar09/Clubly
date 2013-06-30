@@ -1,0 +1,365 @@
+﻿     
+@model Web.Models.Empleado
+@using Web.Models
+@{
+    ViewBag.Title = "Mantener Empleado";   
+}
+
+
+<h1>Mantener Empleado</h1>
+
+<fieldset>
+ <legend>Datos del Formulario</legend>
+ 
+    <form id = "form" action="Guardar" method= post>
+     <ul>
+     <li>
+        @Html.LabelFor(p => p.persona.id)
+        @Html.TextBoxFor(p => p.persona.id, new { @readonly = "readonly" })
+     </li><li>
+                 <div class="editor-label">@Html.LabelFor(p => p.persona.nombre)</div>
+                     @Html.TextBoxFor(p => p.persona.nombre)    
+        </li><li>  
+                 <div class="editor-label">@Html.LabelFor(p => p.persona.apPaterno)</div>  
+                     @Html.TextBoxFor(p => p.persona.apPaterno)           
+        </li><li>           
+                    <div class="editor-label">@Html.LabelFor(p => p.persona.apMaterno)</div>
+                    @Html.TextBoxFor(p => p.persona.apMaterno)          
+        </li><li>            
+                    <div class="editor-label">@Html.LabelFor(p => p.persona.direccion)</div>
+                    @Html.TextBoxFor(p => p.persona.direccion)              
+        </li><li>
+                    <div class="editor-label">@Html.LabelFor(p => p.sueldo)</div>
+                    @Html.TextBoxFor(p => p.sueldo)
+         </li><li>
+                    <div class="editor-label">@Html.LabelFor(p => p.persona.dni)</div>
+                    @Html.TextBoxFor(p => p.persona.dni)
+         </li><li>
+         </li><li>
+            @*------------ESTODOCIVIL--------------*@
+     <div class = "editor-label">    @Html.LabelFor(p => p.persona.estadoCivil)    </div>  
+          @(Html.Kendo().DropDownList()
+                  .OptionLabel("--Seleccionar--")
+           .Name("estadoComboBox")
+          .DataTextField("nombre")
+          .DataValueField("nombre")
+          .AutoBind(true)
+          .DataSource(source =>
+          {
+              source.Read(read =>
+              {
+                  read.Action("Leer_Estados", "RRHH");
+              })
+              .ServerFiltering(true);
+          })
+          .Value(Model != null && Model.persona != null ? Model.persona.estadoCivil : null)
+                  //.Value(Model != null && Model.persona != null ? Model.persona.estadoCivil : Web.Models.Persona.listestadocivil.FirstOrDefault().nombre)
+    )  
+        @Html.TextBoxFor(p => p.persona.estadoCivil  , new { style = "display: none;" })   
+        </li><li> 
+            @*-----------------SEDES----------------*@
+            <div class = "editor-label">   @Html.LabelFor(p => p.sede.nombre) </div> 
+                 
+          @(Html.Kendo().DropDownList()
+           .Name("sedeComboBox")
+                   .OptionLabel("--Seleccionar--")
+          .DataTextField("nombre")
+          .DataValueField("id")
+         .AutoBind(true)
+        .BindTo((IEnumerable<Sede>)ViewData["Leer_Sedes"])      
+        .Value(Model != null && Model.sede != null ? Model.sede.id.ToString() : null)
+          )
+          @Html.TextBoxFor(p => p.sede.id, new { style = "display: none;" })
+            </li><li>            
+         <div class = "editor-label">   @Html.LabelFor(p => p.tipoEmpleado.nombre) </div>        
+           
+          @(Html.Kendo().DropDownList()
+           .Name("tipoempleadoComboBox")
+                   .OptionLabel("--Seleccionar--")
+          .DataTextField("nombre")
+          .DataValueField("id")
+          .AutoBind(true)
+          .BindTo((IEnumerable<TipoEmpleado>)ViewData["Leer_TiposEmpleado"])  
+          .Value(Model != null && Model.tipoEmpleado != null ? Model.tipoEmpleado.id.ToString() :null)
+    )
+     @Html.TextBoxFor(p => p.tipoEmpleado.id , new { style = "display: none;" }) 
+    </li><li>
+    <div class = "editor-label">   @Html.LabelFor(p => p.turnodetrabajo.nombre) </div>        
+           
+          @(Html.Kendo().DropDownList()
+           .Name("turnotrabajoComboBox")
+                   .OptionLabel("--Seleccionar--")
+          .DataTextField("nombre")
+          .DataValueField("id")
+          .AutoBind(true)
+          .BindTo((IEnumerable < TurnoDeTrabajo > )ViewData["Leer_Turnos"]) 
+          .Value(Model != null && Model.turnodetrabajo != null ? Model.turnodetrabajo.id.ToString() : null)
+    )
+     @Html.TextBoxFor(p => p.turnodetrabajo.id , new { style = "display: none;" })
+      </li>
+    </ul>     
+              
+                
+            
+           
+
+    <div id="botones">
+  <input type="button" value= "Limpiar"  id="limpiar" onclick="location.href = '@(Url.Action("MantenerEmpleado", "RRHH"))'" class="button fright"/>
+  <input type="submit" value=  @(Model == null ? "Insertar" : "Modificar")  />
+  <!--input type="button" value= "Cancelar" id="cancelar" onclick="location.href = '@(Url.Action("Index", "Home"))'" class="button fright"/--> 
+    </div>
+    @if (ViewData["message"] != null)
+    {
+    <script type="text/javascript">alert("@ViewData["message"]")</script>  
+    }                                                                                                                                
+  </form>
+  
+  </fieldset>
+   
+   <div id="kendotable">
+    @(Html.Kendo().Grid<Web.Models.Empleado>()
+    .Name("Grid")
+    .Columns(columns =>
+    {
+        columns.Bound(p => p.persona.nombre).Title("Nombre").Sortable(true);     //100
+        //  .Filterable(filterable => filterable.UI("nombreFiltro"));
+        columns.Bound(p => p.persona.apPaterno).Title("Ap. Paterno").Sortable(true);  //140
+        columns.Bound(p => p.persona.apMaterno).Title("Ap. MAterno").Sortable(true);  //140
+        columns.Bound(p => p.sede.nombre).Title("Nombre de la sede").Sortable(true);             //180
+        columns.Bound(p => p.tipoEmpleado.nombre).Title("Cargo").Sortable(true);
+       // columns.Bound(p => p.persona.estadoCivil).Sortable(true);
+        // .Filterable(filterable => filterable.UI("sueldoFiltro"));
+        columns.Command(command => { command.Custom("Editar").Text("<span class='k-icon k-edit'></span>").Click("Edit"); command.Destroy().Text(" "); }).Width(181);
+
+    })
+    .Editable(editable => { editable.Mode(GridEditMode.InLine); editable.DisplayDeleteConfirmation("El registro será eliminado ¿Desea continuar?"); })
+    .Selectable()
+            //.Groupable()
+               .Pageable()
+               .Sortable()
+               .Filterable(filterable => filterable
+                                              .Extra(false)
+                                              .Operators(operators => operators
+                                                                      .ForString(str => str.Clear()
+                                                                          .Contains("Contiene")
+                                                                                           .StartsWith("Empezar con")
+                                                                                           .IsEqualTo("Es igual a")
+                                                                                           .IsNotEqualTo("Diferente a"))
+                                                                      .ForNumber(number => number.Clear()
+                                                                                                 .IsGreaterThan("Es mayor a")
+                                                                                                 .IsLessThan("Es menor a")
+                                                                                                 .IsEqualTo("Es igual a")
+                                                                                                 .IsNotEqualTo("Es diferente a"))
+                                                                      )
+                                )
+    .DataSource(datasource => datasource
+                                .Ajax()
+                                        .PageSize(6)
+                                    .Read(read => read.Action("Leer", "RRHH"))
+                                                        .Batch(false)
+                                                                .ServerOperation(false)
+                                                               .Events(events => events.Error("error_handler"))
+                                                               .Model(model => model.Id(p => p.persona.id))
+                                                              .Destroy(update => update.Action("Eliminar", "RRHH"))
+
+
+
+                )
+)
+</div>
+
+
+
+<script type="text/javascript">
+jQuery.validator.addMethod("accept2", function(value, element, param) {
+  return value.match(new RegExp("^" + param + "$"));
+});
+
+$("#form").validate({
+    ignore: "",
+		rules: {
+            "persona.estadoCivil":  {
+                required : true      
+                },
+            "tipoEmpleado.id":  {
+                required : true
+                },
+            "sede.id":  {
+                required : true
+                },
+			"persona.nombre" : {    
+                required : true,
+                maxlength : 50,
+                accept2: "[a-zA-ZáéíóúñÑ ]+"
+                },
+            "persona.apPaterno" :{
+                required : true,
+                maxlength : 50,
+                accept2: "[a-zA-ZáéíóúñÑ ]+"
+                },
+            "persona.apMaterno" : {
+                required : true,
+                maxlength : 50,
+                accept2: "[a-zA-ZáéíóúñÑ ]+"
+                },
+            "persona.dni" : {required: true, digits: true, minlength: 8, maxlength: 8},
+            "persona.direccion" : {
+                required : true,
+                maxlength : 150,
+                accept2: "[a-zA-Z0-9áéíóúñÑ.,; ]+"
+                },
+            "turnodetrabajo.id" : {
+                required : true
+                },
+            sueldo:{
+				required: true,
+                number: true,
+                range: [750,100000]
+			}
+		},
+		messages: {
+      "persona.estadoCivil":  {
+                required:"*Seleccionar"
+               
+                },
+                 "turnodetrabajo.id": {
+                required: "*Seleccionar"
+                },
+            "tipoEmpleado.id":  {
+                required: "*Seleccionar"
+                },
+            "sede.id":  {
+                required: "*Seleccionar"
+                },
+       		"persona.nombre" : {
+                required: "*Campo obligatorio",
+                maxlength: "Tamaño máx. 50 caracteres",
+                accept2: "Solo se permiten letras"
+                },
+             "persona.apPaterno" : {
+                required: "*Campo obligatorio",
+                maxlength: "Tamaño máx. 50 caracteres",
+                accept2: "Solo se permiten letras"
+                },
+            "persona.apMaterno" : {
+                required: "*Campo obligatorio",
+                maxlength: "Tamaño máx. 50 caracteres",
+                accept2: "Solo se permiten letras"
+                },
+            "persona.direccion" : {
+                required: "*Campo obligatorio",
+                maxlength : "Tamaño máx. 150 caracteres",
+                accept2: "Solo se permiten letras y signos de puntuación"
+                },
+            "persona.dni" : {required: "*Campo obligatorio", digits: "Ingrese solo dígitos", minlength: "Ingrese 8 dígitos", maxlength: "Ingrese 8 dígitos"},
+            sueldo:{
+				required: "*Campo obligatorio",
+                number:  "Ingrese un número válido",
+                range: "El sueldo esta fuera del rango"
+			}
+		},
+//		submitHandler: function(form) {
+//            form.submit();		
+//		}
+		submitHandler: function ConfirmationBox(form){
+            var result = confirm ("¿Está seguro de realizar los cambios?");
+            if (result == true){
+                form.submit();
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+});
+
+
+
+
+$(document).ready(function() {
+var dropdownlist = $("#sedeComboBox").data("kendoDropDownList");
+        
+            $("#sede_id").val(dropdownlist.value());
+        dropdownlist.bind("change",function(e){ 
+            $("#sede_id").val(dropdownlist.value());            
+           //alert("idSede: "+dropdownlist.value()); 
+        });
+     
+    });
+$(document).ready(function() {
+var dropdownlist = $("#turnotrabajoComboBox").data("kendoDropDownList");
+        $("#turnodetrabajo_id").val(dropdownlist.value());
+        dropdownlist.bind("change",function(e){
+            $("#turnodetrabajo_id").val(dropdownlist.value());
+            //alert("idSede: "+combobox.value()); 
+        });
+        
+    });
+$(document).ready(function() {
+        var dropdownlist = $("#estadoComboBox").data("kendoDropDownList");
+          $("#persona_estadoCivil").val(dropdownlist.value());
+        dropdownlist.bind("change",function(e){
+            $("#persona_estadoCivil").val(dropdownlist.value());
+            // alert("idSede: "+combobox.value()); 
+        });
+    });
+$(document).ready(function() {
+        var dropdownlist = $("#tipoempleadoComboBox").data("kendoDropDownList");
+        $("#tipoEmpleado_id").val(dropdownlist.value());
+        dropdownlist.bind("change",function(e){
+            $("#tipoEmpleado_id").val(dropdownlist.value());
+          //   alert("idSede: "+combobox.value()); 
+        });
+    });
+function error_handler(e) {
+//            if (e.errors) {
+//                var message = "Errors:\n";
+//                $.each(e.errors, function (key, value) {
+//                    if ('errors' in value) {
+//                        $.each(value.errors, function () {
+//                            message += this + "\n";
+//                        });
+//                    }
+//                });
+//                alert(message);
+//            }
+    alert("A ocurrido un error en el servidor!\n Vuelva a intentar la operación en unos minutos...");
+      }
+    function nombreFiltro(element) {
+        element.kendoAutoComplete({
+            dataSource: {
+                transport: {
+                    read: "@Url.Action("/FilterMenuCustomization_Nombre", "RRHH")"
+                }
+            }
+        });
+    }
+
+    function sueldoFiltro(element) {
+        element.kendoAutoComplete({
+            dataSource: {
+                transport: {
+                    read: "@Url.Action("/FilterMenuCustomization_Sueldo", "RRHH")"
+                }
+            }
+        });
+     } 
+
+     function Edit(e){
+        e.preventDefault();
+        var grid = $('#Grid').data('kendoGrid');
+        var row = grid.select();
+        var dataItem = grid.dataItem(row);
+        var id = dataItem.id;
+        var sede = dataItem.sede.id;
+        location = "@Url.Action("Editar")"+"?persona.id=" + id ;
+    }
+  </script>
+  <script type="text/javascript">   
+      function onAdditionalData() {
+        return {
+            text: $("#sedeComboBox").val()
+        };
+    }
+     
+</script>

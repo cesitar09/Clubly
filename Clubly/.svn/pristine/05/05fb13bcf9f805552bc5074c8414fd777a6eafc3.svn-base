@@ -1,0 +1,8 @@
+﻿@using Web.Models
+@{
+    ViewBag.Title = "AceptarInscripcionActividad";
+}
+
+<h2>AceptarInscripcionActividad</h2>
+
+

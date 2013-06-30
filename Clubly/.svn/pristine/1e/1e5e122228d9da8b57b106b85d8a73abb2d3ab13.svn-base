@@ -1,0 +1,60 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using Datos;
+
+namespace Negocio
+{
+    public class SocioXActividad
+    {
+        static Entities ctx = null;
+        public static Entities context()
+        {
+            if (ctx == null)
+                ctx = new Entities();
+            return ctx;
+        }
+
+        public Exception insertar(Datos.SocioXActividad socioxactividad)
+        {
+            try
+            {
+                ctx.SocioXActividad.AddObject(socioxactividad);
+                ctx.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                return ex;
+            }
+            return null;
+        }
+
+        public Exception modificar(Datos.SocioXActividad socioxactividad)
+        {
+            try
+            {
+                ctx.SocioXActividad.AddObject(socioxactividad);
+                ctx.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                return ex;
+            }
+            return null;
+        }
+
+        public static IEnumerable<Datos.SocioXActividad> seleccionarTodo()
+        {
+            IEnumerable<Datos.SocioXActividad> listaSocioXActividad = context().SocioXActividad.Where(p => p.estado != 0);
+            return listaSocioXActividad;
+        }
+
+        public static IEnumerable<Datos.SocioXActividad> BuscarIdFamilia(short id)
+        {
+            IEnumerable<Datos.SocioXActividad> listaSocioXActividad = context().SocioXActividad
+                .Where(p => (p.estado != 0)&&(p.Socio.Familia.id==id));
+            return listaSocioXActividad;
+        }
+    }
+}

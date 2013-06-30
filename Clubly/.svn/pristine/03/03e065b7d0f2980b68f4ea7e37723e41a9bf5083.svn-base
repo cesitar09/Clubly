@@ -1,0 +1,44 @@
+﻿@model Web.Models.Familia
+@using Web.Models
+@{
+    ViewBag.Title = "Consultar información de familia";
+}
+
+<h1>@ViewBag.Title</h1>
+
+<div id="kendo-table">
+    @(Html.Kendo().Grid<Web.Models.Familia>()
+        .Name("Grid")
+        .Columns(columns =>
+        {
+            columns.Bound(p => p.id);
+            columns.Bound(p => p.usuario.nomUsuario);
+        }
+        )
+        .Pageable()
+        .Sortable()
+        .Filterable(filterable => filterable
+        .Operators(operators => operators
+            .ForString(str => str.Clear()
+                .Contains("Contiene")
+                .StartsWith("Empezar con")
+                .IsEqualTo("Es igual a")
+                .IsNotEqualTo("Diferente a"))
+            .ForNumber(number => number.Clear()
+                .IsGreaterThan("Es mayor a")
+                .IsLessThan("Es menor a")
+                .IsEqualTo("Es igual a")
+                .IsNotEqualTo("Es diferente a"))
+        ))
+        .DataSource(d => d.Ajax()
+            .Read(r => r.Action("leerFamilias", "Membresia"))
+            .Events(events => events.Error("ErrorMessage"))
+            .Model(m => m.Id(p => p.id))
+        )
+    ) 
+</div>
+<script type="text/javascript">
+    function ErrorMessage(e) {
+        alert("A ocurrido un error en el servidor!\nVuelva a intentar la operación en unos minutos...");
+    }
+</script>

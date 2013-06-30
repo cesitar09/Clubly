@@ -1,0 +1,163 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+    <head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+        <meta charset="utf-8" />
+        <title>@ViewBag.Title - Bienvenidos</title>
+        <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+        <meta name="viewport" content="width=device-width" />
+        @Scripts.Render("~/bundles/jquery")
+        @Scripts.Render("~/bundles/jqueryval")
+        @Scripts.Render("~/bundles/jqueryui")
+        @Scripts.Render("~/bundles/modernizr")
+        @Scripts.Render("~/bundles/kendo")
+        @Styles.Render("~/Content/kendo")
+        @Styles.Render("~/Content/css")
+    </head>
+    <body>
+    <div id="wrapper">
+        <div id="header">
+            <div id="logo">
+	            <img src="~/Content/img/logo.png" alt="Designa Studio"/> 
+            </div>
+        </div><div id="menubar">
+            <ul>
+                <li class="main">
+                    <a href="~/">Página principal</a>
+                </li><li class="logout">
+                    <a href="/Session/logof" >Cerrar sesión</a>
+                </li>
+            </ul>
+        </div>
+
+        @if (Session != null && Session["PerfilUsuario"]!=null)
+              {
+        @(Html.Kendo().Menu()
+            .Name("Menu")
+             .Items(items =>
+            {//
+                items.Add().Text("Página personal").Visible(Convert.ToInt32(Session["PerfilUsuario"]) == 1 || Convert.ToInt32(Session["PerfilUsuario"])==12 ? true : false)
+                    .Items(children =>
+                    {
+                        children.Add().Text("Consultar historial de cuenta")
+                            .Url("~/PaginaPersonal/ConsultarHistorialPagos");
+                    });
+                items.Add().Text("Reservas").Visible(Convert.ToInt32(Session["PerfilUsuario"]) == 1 || Convert.ToInt32(Session["PerfilUsuario"]) == 12 ? true : false)
+                    .Items(children =>
+                    {
+                        children.Add().Text("Reservar cancha")
+                            .Url("~/Reservas/ReservarCancha");
+                    });
+                items.Add().Text("Eventos").Enabled(false).Visible(Convert.ToInt32(Session["PerfilUsuario"]) == 1 || Convert.ToInt32(Session["PerfilUsuario"]) == 12 ? true : false);
+                items.Add().Text("Actividades").Visible(Convert.ToInt32(Session["PerfilUsuario"]) == 1 || Convert.ToInt32(Session["PerfilUsuario"]) == 12 ? true : false)
+                    .Items(children =>
+                    {
+                        children.Add().Text("Inscribirse en actividad")
+                            .Url("~/Actividad/InscribirseEnActividad");
+                    });
+                items.Add().Text("Adm. del sist.").Visible(Convert.ToInt32(Session["PerfilUsuario"]) == 1 ? true : false)
+                    .Items(children =>
+                    {
+                        children.Add().Text("Mantener promociones").Enabled(false);
+                        children.Add().Text("Mantener servicios").Enabled(false);
+                        children.Add().Text("Mantener temporada alta")
+                            .Url("~/Administracion/MantenerTemporadaAlta");
+                    });
+                items.Add().Text("Gest. reservas").Visible(Convert.ToInt32(Session["PerfilUsuario"]) == 1 || Convert.ToInt32(Session["PerfilUsuario"]) == 10 ? true : false)
+                    .Items(children =>
+                    {
+                        children.Add().Text("Reservar cancha")
+                            .Url("~/GestionarReserva/GestionarReservarCancha");
+                        children.Add().Text("Registrar ingreso a bungalow")
+                            .Url("~/GestionarReserva/RegistrarIngresoBungalow");
+                        children.Add().Text("Mantener sorteos").Enabled(false);
+                    });
+                items.Add().Text("Membresía").Visible(Convert.ToInt32(Session["PerfilUsuario"]) == 1 || Convert.ToInt32(Session["PerfilUsuario"]) == 5 || Convert.ToInt32(Session["PerfilUsuario"]) == 6 ? true : false)
+                    .Items(children =>
+                    {
+                        children.Add().Text("Mantener solicitud de membresía")
+                            .Url("~/SolicitudMembresia/VerSolicitudesDeMembresia");
+                        children.Add().Text("Mantener socio")
+                            .Url("~/Membresia/MantenerSocio");
+                        children.Add().Text("Registrar socio no titular")
+                            .Url("~/Membresia/RegistrarNoTitular");
+                        children.Add().Text("Consultar información de familia")
+                            .Url("~/Membresia/ConsultarFamilia");
+                        //children.Add().Text("Consultar Historial de Pagos")
+                        //   .Url("~/Membresia/ConsultarHistorialdePagos").Visible(Session["PerfilUsuario"].Equals("1")||Session["PerfilUsuario"].Equals("5")? false : true);
+                        children.Add().Text("Registrar ingreso de invitados").Enabled(false);
+                    });
+                items.Add().Text("Gest. eventos").Visible(Convert.ToInt32(Session["PerfilUsuario"]) == 1 || Convert.ToInt32(Session["PerfilUsuario"]) == 7 ? true : false)
+                    .Items(children =>
+                    {
+                        children.Add().Text("Mantener evento").Url("~/GestionarEventos/MantenerEventos");
+
+                    });
+                items.Add().Text("Gest. actividades").Visible(Convert.ToInt32(Session["PerfilUsuario"]) == 1 || Convert.ToInt32(Session["PerfilUsuario"]) == 8 ? true : false)
+                    .Items(children =>
+                    {
+                        children.Add().Text("Mantener inscripción")
+                            .Url("~/GestionarActividad/InscribirSocioEnActividad");
+                        children.Add().Text("Mantener actividad")
+                            .Url("~/GestionarActividad/MantenerActividad");
+                    });
+                items.Add().Text("Finanzas").Enabled(true).Visible(Convert.ToInt32(Session["PerfilUsuario"]) == 1 || Convert.ToInt32(Session["PerfilUsuario"]) == 11 ? true : false)
+                    .Items(children =>
+                        {
+                            children.Add().Text("Consultar Historial Pagos")
+                            .Url("~/Finanzas/ConsultarHistorialPagosParaEmpleado");
+                        });
+                //FALTA REGISTRAR PAGOS SOCIO
+                items.Add().Text("Ventas").Enabled(false).Visible(Convert.ToInt32(Session["PerfilUsuario"]) == 1 ? true : false);
+                items.Add().Text("RR. HH.").Visible(Convert.ToInt32(Session["PerfilUsuario"]) == 1 || Convert.ToInt32(Session["PerfilUsuario"]) == 4 ? true : false)
+                    .Items(children =>
+                        {
+                            children.Add().Text("Mantener Empleados")
+                                .Url("~/RRHH/MantenerEmpleado");
+                            children.Add().Text("Asistencia")
+                                .Url("~/RRHH/Asistencia");
+                        });
+                items.Add().Text("Logística").Visible(Convert.ToInt32(Session["PerfilUsuario"]) == 1 || Convert.ToInt32(Session["PerfilUsuario"]) == 3 ? true : false)
+                    .Items(children =>
+                    {
+                        children.Add().Text("Mantener sede")
+                            .Url("~/Logistica/MantenerSede");
+                        children.Add().Text("Mantener ambiente")
+                            .Url("~/Logistica/MantenerAmbiente");
+                        children.Add().Text("Mantener proveedor")
+                            .Url("~/Logistica/MantenerProveedor");
+                        children.Add().Text("Mantener productos")
+                            .Url("~/Administracion/MantenimientoProducto");
+                        children.Add().Text("Mantener concesionario")
+                            .Url("~/Logistica/MantenerConcesionario");
+                        children.Add().Text("Mantener bungalow")
+                            .Url("~/Logistica/MantenerBungalow");
+                        children.Add().Text("Mantener tipo de bungalow")
+                             .Url("~/Logistica/MantenerTipoBungalow");
+                    });
+                items.Add().Text("Reportes").Enabled(false).Visible(Convert.ToInt32(Session["PerfilUsuario"]) == 1 || Convert.ToInt32(Session["PerfilUsuario"]) == 2 || Convert.ToInt32(Session["PerfilUsuario"]) == 5 || Convert.ToInt32(Session["PerfilUsuario"]) == 6 ? true : false);
+            })
+            )
+           }
+        <div id="page">
+            @RenderSection("featured", required: false)
+            @RenderBody()
+        </div>
+        <div id="footer">
+            <hr />
+            <ul>
+                <li class="footer-left">
+                    © Clubly 2013
+                </li><li class="footer-right">
+                    Atención al cliente: 555-5555
+                </li>
+            </ul>
+        </div>
+    </div>
+    </body>
+</html>
+@*<script type="text/javascript">
+    $("#cerrarsesion").function(){
+        
+    }
+</script>*@
